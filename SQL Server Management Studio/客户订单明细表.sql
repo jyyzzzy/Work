@@ -1,0 +1,50 @@
+SELECT 
+TD001 订单单别,
+TD002 订单单号,
+TD003 订单序号,
+TC003 订单日期,
+TC004 客户编号,
+MA002 客户简称,
+MA003 客户全称,
+TC005 部门编号,
+TC006 业务人员,
+TC008 交易币种,
+TC009 汇率,
+TC014 付款条件,
+ISNULL(TC015,'') 备注,
+TC032 CONSIGNEE,
+TC041 税率,
+TC042 付款条件编号,
+COPTC.UDF06,
+TD004 品号,
+TD005 品名,
+TD006 规格,
+TD007 仓库编号,
+TD008 订单数量,
+TD009 已交数量,
+TD010 单位,
+TD011 单价,
+TD012 金额,
+TD013 预交货日,
+TD014 客户品号,
+TD016 结束,
+TD037 税率,
+TD038 税前金额,
+TD039 税额,
+COPTD.UDF01 PC交期,
+COPTD.UDF02 MC交期,
+COPTD.UDF03 采购交期,
+COPTD.UDF04 客户原始交期,
+COPTD.UDF05 交货日期,
+COPTD.UDF06 是否液晶
+FROM COPTD 
+INNER JOIN COPTC ON TC001 = TD001 AND TC002 = TD002 
+INNER JOIN COPMA ON MA001 = TC004
+INNER JOIN LSSJ..CustomerBasic ON custNo = TC004
+WHERE TC027 = 'Y'
+AND TD021 = 'Y'
+
+SELECT * FROM LSSJ..CustomerBasic
+="INSERT INTO LSSJ..CustomerBasic(custNo) VALUES('"&&"');"
+
+DELETE FROM LSSJ..CustomerBasic

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourcePerFileMappings">
+    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/ea81cbfa-961b-4e88-a51c-15d0d172a267/console.sql" value="ea81cbfa-961b-4e88-a51c-15d0d172a267" />
+    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/ea81cbfa-961b-4e88-a51c-15d0d172a267/console_1.sql" value="ea81cbfa-961b-4e88-a51c-15d0d172a267" />
+    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/ea81cbfa-961b-4e88-a51c-15d0d172a267/console_2.sql" value="ea81cbfa-961b-4e88-a51c-15d0d172a267" />
+    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/ea81cbfa-961b-4e88-a51c-15d0d172a267/console_3.sql" value="ea81cbfa-961b-4e88-a51c-15d0d172a267" />
+    <file url="file://$PROJECT_DIR$/tmp.sql" value="ea81cbfa-961b-4e88-a51c-15d0d172a267" />
+    <file url="file://$PROJECT_DIR$/排产计划表.sql" value="ea81cbfa-961b-4e88-a51c-15d0d172a267" />
+    <file url="file://$PROJECT_DIR$/进销存/可生产订单锚定系统.sql" value="ea81cbfa-961b-4e88-a51c-15d0d172a267" />
+    <file url="file://$PROJECT_DIR$/../SQL/单价更新/采购-3473单价金额维护(单号单价更新).sql" value="ea81cbfa-961b-4e88-a51c-15d0d172a267" />
+    <file url="file://$PROJECT_DIR$/../SQL/单价更新/销售-2304单价维护.sql" value="ea81cbfa-961b-4e88-a51c-15d0d172a267" />
+    <file url="file://$PROJECT_DIR$/../SQL/单价更新/销售-指定单号更新销货单单价.sql" value="ea81cbfa-961b-4e88-a51c-15d0d172a267" />
+    <file url="file://$PROJECT_DIR$/../SQL/单价更新/销售-更新销退单单价.sql" value="ea81cbfa-961b-4e88-a51c-15d0d172a267" />
+    <file url="file://$PROJECT_DIR$/../SQL/异常处理/WMS单据同步ERP异常处理.sql" value="ea81cbfa-961b-4e88-a51c-15d0d172a267" />
+    <file url="file://$PROJECT_DIR$/../SQL/异常处理/WMS单据回写异常数据信息推送.sql" value="ea81cbfa-961b-4e88-a51c-15d0d172a267" />
+    <file url="file://$PROJECT_DIR$/../SQL/物料用量生产领料导出-事业部领用、替代量.sql" value="ea81cbfa-961b-4e88-a51c-15d0d172a267" />
+  </component>
+</project>

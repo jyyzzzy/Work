@@ -1,0 +1,48 @@
+/******工单在产品材料明细表******/
+--CREATE AT 2025/12/1 BY ZION
+
+SELECT 
+TA001 工单单别,
+TA002 工单单号,
+TA003 开单日期,
+TA006 产品品号,
+TA034 产品品名,
+TA035 产品规格,
+TA007 单位,
+TA012 实际开工,
+TA015 预计产量,
+TA016 已领套数,
+TA017 已生产量,
+TA015 - TA017 在产品数量,
+TA021 工作中心编号,
+MD002 工作中心名称,
+TB003 材料品号,
+TB012 材料品名,
+TB013 材料规格,
+TB007 材料单位,
+TB006 材料工艺编号,
+ISNULL(MW002,'') 材料工艺名称,
+TB009 仓库编号,
+MC002 仓库名称,
+
+--在产品标准成本,
+--单位标准成本	,
+TB004 需领用量,
+TB005 已领用量,
+IIF(TA015 = 0,0,TB005*TA017/TA015) 已耗用量,
+TA024 源工单单别,
+TA025 源工单单号,
+TA026 订单单别,
+TA027 订单单号,
+TA028 订单序号
+--急料,
+FROM MOCTB
+INNER JOIN MOCTA ON TA001 = TB001 AND TA002 = TB002
+LEFT OUTER JOIN CMSMD ON MD001 = TA021
+LEFT OUTER JOIN CMSMC ON MC001 = TB009
+LEFT OUTER JOIN CMSMW ON MW001 = TB006
+WHERE TA013 = 'Y'
+AND TA011 IN ('1','2','3')
+AND TA015 > 0
+AND LEFT(TA035,4) = 'HXKT'
+ORDER BY TA003,TA002,TA001,TB003,TB006

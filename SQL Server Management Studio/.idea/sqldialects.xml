@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/tmp.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/作业日程.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/排产计划表.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/进销存/可生产订单锚定系统.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/../SQL/单价更新/采购-3473单价金额维护(单号单价更新).sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/../SQL/单价更新/销售-2304单价维护.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/../SQL/单价更新/销售-指定单号更新销货单单价.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/../SQL/单价更新/销售-更新销退单单价.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/../SQL/异常处理/WMS单据同步ERP异常处理.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/../SQL/异常处理/WMS单据回写异常数据信息推送.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/../SQL/物料用量生产领料导出-事业部领用、替代量.sql" dialect="TSQL" />
+    <file url="PROJECT" dialect="TSQL" />
+  </component>
+  <component name="SqlResolveMappings">
+    <file url="file://$PROJECT_DIR$/进销存/可生产订单锚定系统.sql" scope="{&quot;node&quot;:{  &quot;@negative&quot;:&quot;1&quot;,  &quot;group&quot;:{   &quot;@kind&quot;:&quot;root&quot;,   &quot;node&quot;:{    &quot;@negative&quot;:&quot;1&quot;   }  } }}" />
+  </component>
+</project>

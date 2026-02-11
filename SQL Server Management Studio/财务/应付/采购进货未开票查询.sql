@@ -1,0 +1,18 @@
+/******采购进货未开票查询******/
+--CREATE AT 2026/2/4
+SELECT TH001 单别,
+TH002 单号,
+TH003 序号,
+TH004 品号,
+TH005 品名,
+TH006 规格,
+TH031 开票码,
+TH034 进货数量,
+TH054 已开票数量,
+TH043 生成分录
+FROM PURTH
+WHERE TH030 = 'Y'
+AND TH034 > TH054
+ORDER BY CREATE_DATE 
+
+USE SDRD

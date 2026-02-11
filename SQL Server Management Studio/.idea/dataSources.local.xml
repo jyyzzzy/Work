@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="dataSourceStorageLocal" created-in="DB-252.26830.46">
+    <data-source name="@192.168.8.168" uuid="ef386663-8ed9-4e98-b560-0ff77fe291ea">
+      <database-info product="MariaDB" version="10.4.24-MariaDB-log" jdbc-version="4.2" driver-name="MariaDB Connector/J" driver-version="3.3.3" dbms="MARIADB" exact-version="10.4.24" exact-driver-version="3.3">
+        <extra-name-characters>#@</extra-name-characters>
+        <identifier-quote-string>`</identifier-quote-string>
+      </database-info>
+      <case-sensitivity plain-identifiers="lower" quoted-identifiers="lower" />
+      <secret-storage>master_key</secret-storage>
+      <user-name>root</user-name>
+      <schema-mapping>
+        <introspection-scope>
+          <node kind="schema" negative="1" />
+        </introspection-scope>
+      </schema-mapping>
+      <introspection-level>3</introspection-level>
+      <load-sources>user_and_system_sources</load-sources>
+    </data-source>
+    <data-source name="@192.168.8.5" uuid="ea81cbfa-961b-4e88-a51c-15d0d172a267">
+      <database-info product="Microsoft SQL Server" version="15.00.2000" jdbc-version="4.3" driver-name="Microsoft JDBC Driver 13.2 for SQL Server" driver-version="13.2.0.0" dbms="MSSQL" exact-version="15.0.2000" exact-driver-version="13.2">
+        <extra-name-characters>$#@</extra-name-characters>
+        <identifier-quote-string>&quot;</identifier-quote-string>
+      </database-info>
+      <case-sensitivity plain-identifiers="mixed" quoted-identifiers="mixed" />
+      <secret-storage>master_key</secret-storage>
+      <user-name>sa</user-name>
+      <schema-mapping>
+        <introspection-scope>
+          <node negative="1">
+            <node kind="database" negative="1" />
+            <node kind="database" qname="@">
+              <node kind="schema" qname="@" />
+            </node>
+            <node kind="database">
+              <name qname="AHRD" />
+              <name qname="LSSJ" />
+              <name qname="RDSJK" />
+              <name qname="SDRD" />
+              <node kind="schema" negative="1" />
+            </node>
+          </node>
+        </introspection-scope>
+        <substitutions use-mini-cat="false">
+          <substitution snapshot-id="minicat" base-path="database/&quot;&quot;">
+            <node kind="database" qname="RDWL" />
+          </substitution>
+          <substitution snapshot-id="minicat" base-path="database/&quot;&quot;">
+            <node kind="database" qname="SDRD" />
+          </substitution>
+        </substitutions>
+      </schema-mapping>
+      <introspection-level>3</introspection-level>
+    </data-source>
+  </component>
+</project>

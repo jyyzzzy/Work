@@ -1,0 +1,102 @@
+USE [SDRD]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[Fn_GetKCMX]    Script Date: 2025/11/6 15:45:39 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE Function [dbo].[Fn_GetKCMX](@LC002 CHAR(20),@LC001  CHAR(20) )    
+Returns @IDs Table (ORD INT IDENTITY(1,1), MC01 CHAR(20),MC02 CHAR(4),MC07 numeric(15, 6),MC08 numeric(15, 6))    
+As    
+Begin    
+ declare @LC2 as CHAR(8)    
+  select @LC2=max(LC002)+'01' from INVLC --最新库存年月日
+
+ select @LC2=max(LC002)+'01' --取三月前最新库存
+ from INVLC 
+ where LC002<=LEFT(CONVERT(VARCHAR ,DATEADD(MONTH,-3 ,@LC002),112),6) --剔除年前三月
+ AND LC002<=LEFT(CONVERT(VARCHAR ,DATEADD(MONTH,-3 ,@LC2),112),6) -- LEFT(@LC002,6)    -剔除近三月
+     --三个月前库存年月日
+    
+ IF ISNULL(@LC001,'')=''    
+ BEGIN    
+  Insert @IDs      
+   SELECT LC001 MC001 ,LC003 MC002,SUM(LC004) MC007,SUM(LC005) MC008  
+   FROM(    
+     select LC001,LC003,LC004,LC005 
+     from INVLC 
+     WHERE LC002=LEFT(@LC2,6)    
+
+     UNION ALL    
+
+     select LA001 ,LA009, LA011*LA005,LA013*LA005 
+     FROM INVLA 
+     WHERE LA004 >=@LC2  AND  LA004 <= @LC002    
+    )AS  HB    
+    GROUP BY  LC001 ,LC003 HAVING(SUM(LC004)<>0 or SUM(LC005)<>0 )    
+ END       
+ ELSE    
+ BEGIN    
+  Insert @IDs      
+   SELECT LC001 MC001 ,LC003 MC002,SUM(LC004) MC007,SUM(LC005) MC008  FROM(    
+     select LC001,LC003,LC004,LC005 from INVLC WHERE LC002=LEFT(@LC2,6)    
+     UNION ALL    
+     select LA001 ,LA009, LA011*LA005,LA013*LA005   FROM  INVLA WHERE  LA004 >= @LC2  AND  LA004 <= @LC002    
+    )AS  HB WHERE  LC001 =@LC001    
+    GROUP BY  LC001 ,LC003  HAVING(SUM(LC004)<>0 or SUM(LC005)<>0 )    
+ END     
+ Return    
+End 
+GO
+
+DROP TABLE #KC
+
+SELECT MX.* 
+INTO #KC 
+FROM [Fn_GetKCMX]('20251231','') MX 
+
+
+UPDATE INVML 
+SET  ML005= 0,
+ML006=0
+
+UPDATE INVML 
+SET  ML005= MC07,
+ML006=0 
+FROM  INVML 
+JOIN   #KC ON MC01=ML001 AND MC02=ML002
+WHERE MC07<>ML005 
+
+
+ UPDATE INVMC 
+ SET  MC007= 0,
+ MC008=0,
+ MC014=0 
+ FROM  INVMC 
+
+UPDATE INVMC 
+SET  MC007= MC07,
+MC008=MC08,
+MC014=0 
+FROM  INVMC 
+JOIN   #KC ON MC01=MC001 AND MC02=MC002
+WHERE MC07<>MC007  OR MC008<>MC08
+
+
+UPDATE  INVMB SET MB064=0  from INVMB 
+UPDATE  INVMB SET MB064=MC07  
+from INVMB 
+JOIN (
+	select MC01,sum(MC07)MC07 
+	from  #KC 
+	join  CMSMC on  MC001=MC02 
+	where(
+		CMSMC.UDF01 like '%-良品%'
+	)
+	group by MC01
+)MC ON MB001=MC01   
+

@@ -1,0 +1,224 @@
+/******工单领用查询******/
+SELECT
+    '广东瑞德' AS 帐套,
+    TA001 + '-' + TA002 AS 工单,
+    LA001 AS 材料编号,
+    RTRIM(MB1.MB002) AS 材料名称,
+    RTRIM(MB1.MB003) AS 材料规格,
+    LEFT(LA004, 6) AS 月份,
+    LA011 AS 领用数量,
+    MOCTB.TB004 AS 需领用量, CAST(IIF(MOCTB.TB004 = 0,0,MOCTB.TB004/MOCTA.TA015) AS NUMERIC(15,6)) AS 单位用量, 
+    TE006 AS 单位,
+    LA012 AS 单价,
+    LA013 AS 交易金额,
+    RTRIM(TC005) + '|' + RTRIM(MD002) AS 工作中心,
+    TA006 AS 产品编码,
+    RTRIM(MB2.MB002) AS 产品名称,
+    RTRIM(MB2.MB003) AS 产品规格
+FROM (
+    SELECT
+        LA001,
+        LEFT(LA004, 6) AS LA004,
+        TE006,
+        TC005,
+        LA024,
+        LA012,
+        SUM(LA011) AS LA011,
+        SUM(LA013) AS LA013
+    FROM SDRD.dbo.INVLA
+    LEFT JOIN SDRD.dbo.MOCTC
+        ON LA006 = TC001
+       AND LA007 = TC002
+    LEFT JOIN SDRD.dbo.MOCTE
+        ON LA006 = TE001
+       AND LA007 = TE002
+       AND LA008 = TE003
+    WHERE LA006 = '5408'
+      AND LEFT(LA004, 6) >= '202601'
+      AND LEFT(LA004, 6) <= '202601'
+    GROUP BY
+        LA001,
+        LEFT(LA004, 6),
+        TE006,
+        LA012,
+        TC005,
+        LA024
+) AS MOC
+LEFT JOIN SDRD.dbo.CMSMD
+    ON TC005 = MD001
+LEFT JOIN SDRD.dbo.MOCTA
+    ON TA001 = LEFT(LA024, 4)
+   AND TA002 = RIGHT(RTRIM(LA024), 11)
+LEFT OUTER JOIN (SELECT TB001,TB002,TB003,SUM(TB004) AS TB004 FROM SDRD.dbo.MOCTB GROUP BY TB001,TB002,TB003) AS MOCTB ON MOCTB.TB001 = MOCTA.TA001 AND MOCTB.TB002 = MOCTA.TA002 AND MOCTB.TB003 = MOC.LA001
+LEFT JOIN SDRD.dbo.INVMB AS MB1
+    ON MB1.MB001 = LA001
+LEFT JOIN SDRD.dbo.INVMB AS MB2
+    ON MB2.MB001 = TA006
+
+UNION ALL
+
+SELECT
+    '浙江瑞德' AS 帐套,
+    TA001 + '-' + TA002 AS 工单,
+    LA001 AS 材料编号,
+    RTRIM(MB1.MB002) AS 材料名称,
+    RTRIM(MB1.MB003) AS 材料规格,
+    LEFT(LA004, 6) AS 月份,
+    LA011 AS 领用数量,
+    TE006 AS 单位,
+    LA012 AS 单价,
+    LA013 AS 交易金额,
+    RTRIM(TC005) + '|' + RTRIM(MD002) AS 工作中心,
+    TA006 AS 产品编码,
+    RTRIM(MB2.MB002) AS 产品名称,
+    RTRIM(MB2.MB003) AS 产品规格
+FROM (
+    SELECT
+        LA001,
+        LEFT(LA004, 6) AS LA004,
+        TE006,
+        TC005,
+        LA024,
+        LA012,
+        SUM(LA011) AS LA011,
+        SUM(LA013) AS LA013
+    FROM ZJRD.dbo.INVLA
+    LEFT JOIN ZJRD.dbo.MOCTC
+        ON LA006 = TC001
+       AND LA007 = TC002
+    LEFT JOIN ZJRD.dbo.MOCTE
+        ON LA006 = TE001
+       AND LA007 = TE002
+       AND LA008 = TE003
+    WHERE LA006 = '5478'
+      AND LEFT(LA004, 6) >= '202601'
+      AND LEFT(LA004, 6) <= '202601'
+    GROUP BY
+        LA001,
+        LEFT(LA004, 6),
+        TE006,
+        LA012,
+        TC005,
+        LA024
+) AS MOC
+LEFT JOIN ZJRD.dbo.CMSMD
+    ON TC005 = MD001
+LEFT JOIN ZJRD.dbo.MOCTA
+    ON TA001 = LEFT(LA024, 4)
+   AND TA002 = RIGHT(RTRIM(LA024), 11)
+LEFT JOIN ZJRD.dbo.INVMB AS MB1
+    ON MB1.MB001 = LA001
+LEFT JOIN ZJRD.dbo.INVMB AS MB2
+    ON MB2.MB001 = TA006
+
+UNION ALL
+
+SELECT
+    '安徽瑞德' AS 帐套,
+    TA001 + '-' + TA002 AS 工单,
+    LA001 AS 材料编号,
+    RTRIM(MB1.MB002) AS 材料名称,
+    RTRIM(MB1.MB003) AS 材料规格,
+    LEFT(LA004, 6) AS 月份,
+    LA011 AS 领用数量,
+    TE006 AS 单位,
+    LA012 AS 单价,
+    LA013 AS 交易金额,
+    RTRIM(TC005) + '|' + RTRIM(MD002) AS 工作中心,
+    TA006 AS 产品编码,
+    RTRIM(MB2.MB002) AS 产品名称,
+    RTRIM(MB2.MB003) AS 产品规格
+FROM (
+    SELECT
+        LA001,
+        LEFT(LA004, 6) AS LA004,
+        TE006,
+        TC005,
+        LA024,
+        LA012,
+        SUM(LA011) AS LA011,
+        SUM(LA013) AS LA013
+    FROM AHRD.dbo.INVLA
+    LEFT JOIN AHRD.dbo.MOCTC
+        ON LA006 = TC001
+       AND LA007 = TC002
+    LEFT JOIN AHRD.dbo.MOCTE
+        ON LA006 = TE001
+       AND LA007 = TE002
+       AND LA008 = TE003
+    WHERE LA006 = '5478'
+      AND LEFT(LA004, 6) >= '202601'
+      AND LEFT(LA004, 6) <= '202601'
+    GROUP BY
+        LA001,
+        LEFT(LA004, 6),
+        TE006,
+        LA012,
+        TC005,
+        LA024
+) AS MOC
+LEFT JOIN AHRD.dbo.CMSMD
+    ON TC005 = MD001
+LEFT JOIN AHRD.dbo.MOCTA
+    ON TA001 = LEFT(LA024, 4)
+   AND TA002 = RIGHT(RTRIM(LA024), 11)
+LEFT JOIN AHRD.dbo.INVMB AS MB1
+    ON MB1.MB001 = LA001
+LEFT JOIN AHRD.dbo.INVMB AS MB2
+    ON MB2.MB001 = TA006
+
+UNION ALL
+
+SELECT
+    '越南瑞德' AS 帐套,
+    TA001 + '-' + TA002 AS 工单,
+    LA001 AS 材料编号,
+    RTRIM(MB1.MB002) AS 材料名称,
+    RTRIM(MB1.MB003) AS 材料规格,
+    LEFT(LA004, 6) AS 月份,
+    LA011 AS 领用数量,
+    TE006 AS 单位,
+    LA012 AS 单价,
+    LA013 AS 交易金额,
+    RTRIM(TC005) + '|' + RTRIM(MD002) AS 工作中心,
+    TA006 AS 产品编码,
+    RTRIM(MB2.MB002) AS 产品名称,
+    RTRIM(MB2.MB003) AS 产品规格
+FROM (
+    SELECT
+        LA001,
+        LEFT(LA004, 6) AS LA004,
+        TE006,
+        TC005,
+        LA024,
+        LA012,
+        SUM(LA011) AS LA011,
+        SUM(LA013) AS LA013
+    FROM YNRD.dbo.INVLA
+    LEFT JOIN YNRD.dbo.MOCTC
+        ON LA006 = TC001
+       AND LA007 = TC002
+    LEFT JOIN YNRD.dbo.MOCTE
+        ON LA006 = TE001
+       AND LA007 = TE002
+       AND LA008 = TE003
+    WHERE LA006 = '5478'
+      AND LEFT(LA004, 6) >= '202601'
+      AND LEFT(LA004, 6) <= '202601'
+    GROUP BY
+        LA001,
+        LEFT(LA004, 6),
+        TE006,
+        LA012,
+        TC005,
+        LA024
+) AS MOC
+LEFT JOIN YNRD.dbo.CMSMD
+    ON TC005 = MD001
+LEFT JOIN YNRD.dbo.MOCTA
+    ON TA001 = LEFT(LA024, 4)
+   AND TA002 = RIGHT(RTRIM(LA024), 11)
+LEFT JOIN YNRD.dbo.INVMB AS MB1
+    ON MB1.MB001 = LA001
+LEFT JOIN YNRD.dbo.INVMB AS MB2
+    ON MB2.MB001 = TA006;

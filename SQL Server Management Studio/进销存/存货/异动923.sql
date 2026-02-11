@@ -1,0 +1,185 @@
+/******原材料最后/异动信息-研发中心-金旭/赖斯巧******/
+--2025/9/22 BY ZIYANG ZHANG
+
+
+--SELECT m.MB001,
+--       l.LA001, l.LA004, l.LA006, l.LA007, l.LA008
+--FROM dbo.INVMB AS m
+--CROSS APPLY (
+--    SELECT TOP (1) v.*
+--    FROM dbo.INVLA AS v
+--    WHERE v.LA001 = m.MB001
+--      AND NOT (
+--            (v.LA006 >= '34' AND v.LA006 < '35' AND EXISTS (
+--                SELECT 1
+--                FROM dbo.PURTG AS t
+--                WHERE t.TG001 = v.LA006
+--                  AND t.TG002 = v.LA007
+--                  AND t.TG016 IN (N'代管料转月月初入库单', N'采购月末退货月初进仓')
+--            ))
+--         OR (v.LA006 >= '35' AND v.LA006 < '36' AND EXISTS (
+--                SELECT 1
+--                FROM dbo.PURTI AS i
+--                WHERE i.TI001 = v.LA006
+--                  AND i.TI002 = v.LA007
+--                  AND i.TI012 IN (N'代管料转月月末退货单', N'月末批量开退货单')
+--            ))
+--      )
+--    ORDER BY v.LA004 DESC, v.LA006, v.LA007, v.LA008
+--) AS l
+--ORDER BY m.MB001;
+
+
+WITH MC0 AS (  -- 取库存数量
+  SELECT MC.MC001, MC.MC002, MC.MC007
+  FROM SDRD..INVMC AS MC
+  JOIN SDRD..CMSMC AS C ON MC.MC002 = C.MC001
+  WHERE MC.MC007 > 0
+    AND C.UDF01 NOT LIKE N'%不良品%'
+    UNION ALL 
+    SELECT MC.MC001, MC.MC002, MC.MC007
+  FROM AHRD..INVMC AS MC
+  JOIN AHRD..CMSMC AS C ON MC.MC002 = C.MC001
+  WHERE MC.MC007 > 0
+    AND C.UDF01 NOT LIKE N'%不良品%'
+    UNION ALL 
+    SELECT MC.MC001, MC.MC002, MC.MC007
+  FROM ZJRD..INVMC AS MC
+  JOIN ZJRD..CMSMC AS C ON MC.MC002 = C.MC001
+  WHERE MC.MC007 > 0
+    AND C.UDF01 NOT LIKE N'%不良品%'
+    UNION ALL 
+    SELECT MC.MC001, MC.MC002, MC.MC007
+  FROM YNRD..INVMC AS MC
+  JOIN YNRD..CMSMC AS C ON MC.MC002 = C.MC001
+  WHERE MC.MC007 > 0
+    AND C.UDF01 NOT LIKE N'%不良品%'
+),
+V1 AS (  -- 仅保留有效异动
+  SELECT V.*
+  FROM (
+    SELECT * FROM SDRD..INVLA WHERE LA004>CONVERT(VARCHAR(6),DATEADD(MONTH,-25,GETDATE()),112) + '01'
+    UNION ALL
+    SELECT * FROM AHRD..INVLA WHERE LA004>CONVERT(VARCHAR(6),DATEADD(MONTH,-25,GETDATE()),112) + '01'
+    UNION ALL
+    SELECT * FROM ZJRD..INVLA WHERE LA004>CONVERT(VARCHAR(6),DATEADD(MONTH,-25,GETDATE()),112) + '01'
+    UNION ALL
+    SELECT * FROM YNRD..INVLA WHERE LA004>CONVERT(VARCHAR(6),DATEADD(MONTH,-25,GETDATE()),112) + '01'
+  ) AS V
+  JOIN MC0 AS M ON M.MC001 = V.LA001
+  WHERE NOT (
+        (V.LA006 >= '34' AND V.LA006 < '35' AND EXISTS (
+            SELECT 1 FROM SDRD..PURTG AS T
+            WHERE T.TG001 = V.LA006 AND T.TG002 = V.LA007
+              AND T.TG016 IN (N'代管料转月月初入库单', N'采购月末退货月初进仓')
+        ))
+     OR (V.LA006 >= '35' AND V.LA006 < '36' AND EXISTS (
+            SELECT 1 FROM SDRD..PURTI AS I
+            WHERE I.TI001 = V.LA006 AND I.TI002 = V.LA007
+              AND I.TI012 IN (N'代管料转月月末退货单', N'月末批量开退货单')
+        ))
+  )
+),
+LAST_V AS (  -- 每品号取最新一条
+    SELECT  V.*,
+         ROW_NUMBER() OVER (
+           PARTITION BY V.LA001
+           ORDER BY V.LA004 DESC, V.LA006, V.LA007, V.LA008
+         ) AS RN
+  FROM V1 AS V 
+),
+BASE AS (  -- 合并库存数量
+  SELECT M.MC001, M.MC002, M.MC007,
+         LV.*
+  FROM MC0 AS M
+  JOIN LAST_V AS LV ON LV.LA001 = M.MC001 AND LV.RN = 1
+),
+U AS (  -- 递归向上找顶层主件
+  SELECT B.LA001 AS COMP, M.MD001 AS P
+  FROM BASE AS B
+  LEFT JOIN BOMMD AS M ON M.MD003 = B.LA001
+  UNION ALL
+  SELECT U.COMP, M.MD001
+  FROM U
+  JOIN BOMMD AS M ON M.MD003 = U.P
+),
+FATHER AS (  -- 只保留最顶层主件
+  SELECT DISTINCT U.P AS 主件, U.COMP AS 元件
+  FROM U
+  WHERE U.P IS NOT NULL
+    AND NOT EXISTS (SELECT 1 FROM BOMMD Z WHERE Z.MD003 = U.P)
+    AND SUBSTRING(U.P,1,1) IN ('1','A')
+),
+FATHER_COUNTS AS ( --取顶阶主件数量
+  SELECT 元件, COUNT(DISTINCT 主件) AS CNT
+  FROM FATHER
+  GROUP BY 元件
+),
+HIT AS (  -- 合并顶阶主件数量
+  SELECT B.*,
+         ISNULL(FC.CNT,0) AS ITEMCNT
+  FROM BASE AS B
+  LEFT JOIN FATHER_COUNTS AS FC ON FC.元件 = B.LA001
+)
+SELECT 
+  H.LA001 AS 品号,
+  MB.MB002 AS 品名,
+  MB.MB003 AS 规格,
+  MB.MB004 AS 库存单位,
+  SUM(MC.MC007) AS 库存总数量,
+  H.ITEMCNT AS 顶阶主件数量,
+  MB.UDF05 AS 采购选型,
+  H.CREATE_DATE AS 创建时间,
+  MB.MB109 AS 核准状况,
+  H.CREATOR AS 创建者名称,
+  H.LA006 AS 最后交易单别,
+  H.LA007 AS 最后交易单号,
+  H.LA004 AS 最后交易日,
+  H.LA011 AS 最后交易数量
+FROM MC0 AS MC
+JOIN HIT AS H          ON H.MC001 = MC.MC001
+JOIN SDRD..INVMB AS MB ON MB.MB001 = H.LA001
+GROUP BY 
+  H.LA001, MB.MB002, MB.MB003, MB.MB004, 
+  H.ITEMCNT, MB.UDF05, H.CREATE_DATE, MB.MB109, 
+  H.CREATOR, H.LA006, H.LA007, H.LA004, H.LA011
+ORDER BY H.LA001;
+
+
+
+
+
+
+
+
+--SELECT s.*
+--FROM (
+--  SELECT  v.*,
+--         ROW_NUMBER() OVER (
+--           PARTITION BY v.LA001
+--           ORDER BY v.LA004 DESC, v.LA006, v.LA007, v.LA008
+--         ) AS rn
+--  FROM (
+--  SELECT * FROM SDRD..INVLA WHERE LA004>convert(varchar(6),DateAdd(Month,-25,getdate()),112) + '01'
+--  --UNION ALL
+--  --SELECT * FROM AHRD..INVLA WHERE LA004>convert(varchar(6),DateAdd(Month,-25,getdate()),112) + '01'
+--  --UNION ALL
+--  --SELECT * FROM ZJRD..INVLA WHERE LA004>convert(varchar(6),DateAdd(Month,-25,getdate()),112) + '01'
+--  --UNION ALL
+--  --SELECT * FROM YNRD..INVLA WHERE LA004>convert(varchar(6),DateAdd(Month,-25,getdate()),112) + '01'
+--  ) AS v 
+--) s
+--WHERE rn = 1
+
+--SELECT * FROM INVLA WHERE LA004>convert(varchar(6),DateAdd(Month,-25,getdate()),112)+'01' GROUP BY LA001 
+
+
+--SELECT SUBSTRING(MB001,1,1),COUNT(MB001) FROM INVMB GROUP BY SUBSTRING(MB001,1,1) ORDER BY SUBSTRING(MB001,1,1)
+
+--SELECT * FROM INVMB WHERE SUBSTRING(MB001,1,1) = '1' ORDER BY MB001
+
+--SELECT LA001, COUNT(LA001) FROM INVLA GROUP BY LA001 ORDER BY LA001
+
+
+
+
