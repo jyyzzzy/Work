@@ -1,0 +1,235 @@
+
+SELECT *FROM SDRD..ASTMB WHERE MB001 = 'F0030458'
+
+SELECT *FROM SDRD..ASTMC WHERE MC001 = 'F0030458'
+
+SELECT *FROM  LSSJ..GDZC
+
+delete  FROM LSSJ..GDZC
+----    资产编号,部门编号,保管人工号,放置地点,资产名称,资产规格,金额, 预计净残
+--="INSERT INTO [LSSJ].[dbo].[GDZC]([资产编号],[资产名称],[资产规格],[部门编号],[部门名称],[保管人工号],[保管人姓名],[放置地点],[备注],[折旧代码],[折旧名称],[金额],[预计净残值],[数量],[供应商],[耐用月数],[取得日期],[销账日期],[原币取得成本],[取得成本],[改良成本],[开始计提],[累积折旧],[资产科目],[取得单别],[取得单号],[供应商简称])VALUES('"&&"','"&&"','"&&"','"&&"','"&&"','"&&"','"&&"','"&&"','"&&"','"&&"','"&&"',"&&","&&","&&",'"&&"',"&&",'"&&"','"&&"',"&&","&&","&&",'"&&"',"&&",'"&&"','"&&"','"&&"','"&&"');"
+
+insert into ASTMC
+--SELECT *FROM SDRD..ASTMC WHERE MC001 = 'M0011144' 
+--union all
+
+SELECT COMPANY,CREATOR,USR_GROUP,CREATE_DATE,MODIFIER,MODI_DATE,FLAG,资产编号,部门编号,保管人工号,MC004,MC005,放置地点,MC007,MC008,MC009,MC010,MC011,MC012,UDF01,UDF02,UDF03,UDF04,UDF05,UDF06,UDF51,UDF52,UDF53,UDF54,UDF55,UDF56  FROM  ASTMC,LSSJ..GDZC WHERE MC001 = 'E0011407' and 资产编号<>'E0011407'
+
+AND 资产编号 IN('E0012381')
+
+
+insert into  ASTMB
+
+--SELECT *FROM SDRD..ASTMB WHERE MB001 = 'M0011144' 
+--union all
+
+SELECT COMPANY,CREATOR,USR_GROUP,CREATE_DATE,MODIFIER,MODI_DATE,FLAG,资产编号,资产名称,资产规格,MB004,资产编号,MB006,MB007,LEFT(供应商,10),MB009,LEFT(供应商,10),MB011,MB012,MB013,MB014,MB015,MB016,MB017,MB018,金额,金额,MB021, 预计净残值,MB023,MB024,MB025,MB026,MB027,MB028,MB029,MB030,MB031,MB032,MB033,MB034,MB035,MB036,MB037,MB038,MB039,MB040,MB041,MB042,MB043,MB044,MB045,MB046,MB047,MB048,MB049,MB050,MB051,MB052,MB053,MB054,MB055,MB056,MB057,MB058,MB059,MB060,MB061,MB062,MB063,UDF01,UDF02,UDF03,UDF04,UDF05,UDF06,UDF51,UDF52,UDF53,UDF54,UDF55,UDF56  FROM  ASTMB,LSSJ..GDZC WHERE MB001 = 'E0011407'and 资产编号<>'E0011407'
+
+
+AND 资产编号  IN('E0012381')
+
+
+
+select *from ASTMB where (select count(*) from LSSJ..GDZC WHERE 资产编号= MB001)>0
+
+
+--delete from ASTMB where (select count(*) from LSSJ..GDZC WHERE 资产编号= MB001)>0
+
+
+--delete from ASTMC where (select count(*) from LSSJ..GDZC WHERE 资产编号= MC001)>0
+--update ASTMB  set MB039 = 'N',MB016 = '20200701'  where (select count(*) from LSSJ..GDZC WHERE 资产编号= MB001)>0
+--(ASTMB.MB001 = 'E0011786')
+--  AND (ASTMB.MB039 = 'N')
+--  AND (ASTMB.MB016 = '20200701')
+
+
+--="INSERT INTO LSSJ..GDZC(资产编号,部门编号,保管人编号,放置地点) VALUES('"&&"','"&&"','"&&"','"&&"')"
+
+
+update ASTMB  set MB008  = '启程'  where (select count(*) from LSSJ..GDZC WHERE 资产编号= MB001)>0
+
+ALTER TABLE GDZC ALTER COLUMN 放置地点 VARCHAR(255)
+SELECT LEN(放置地点),* FROM LSSJ..GDZC WHERE LEN(放置地点)>10
+UPDATE LSSJ..GDZC SET 放置地点 = REPLACE(放置地点,' ','')
+DELETE from LSSJ..GDZC
+EXEC sp_help GDZC
+select ASTMC.*from LSSJ..GDZC JOIN ASTMC ON 资产编号=MC001 AND MC002=部门编号 AND MC003=保管人工号
+UPDATE ASTMC SET MC006=放置地点,UDF01='DATA UPDATED ON 2025-11-14' from LSSJ..GDZC JOIN ASTMC ON 资产编号=MC001 AND MC002=部门编号 AND MC003=保管人工号
+WHERE  MC006<>放置地点
+
+
+UPDATE SDRD.dbo.ASTMC SET  MC003=保管人工号,UDF01='20210812数据更新' from GDZC JOIN SDRD.dbo.ASTMC ON 资产编号=MC001
+
+SELECT *FROM  SDRD.dbo.ASTMC
+SELECT MC001 MC01,MC003 MC03, MC006 MC06,MC005 MC05 into #GDZC FROM  SDRD.dbo.ASTMC where 1=2
+
+UPDATE ASTMC SET  MC003= MC03, MC006 =MC06,MC005 =MC05  FROM  SDRD.dbo.ASTMC JOIN   #GDZC ON  MC001 =MC01
+
+
+="('"&B7&"','"&G7&"','"&H7&"','"&I7&"'),"
+
+INSERT INTO #GDZC VALUES
+
+('E0990598','10008601','管理中心人力资源办公',''),
+('E0990820','10008601','二楼会议室八楼培训室',''),
+('E0990821','10008601','二楼会议室八楼培训室',''),
+
+
+
+
+
+;
+DELETE FROM [LSSJ].[dbo].[GDZC]
+--="INSERT INTO [LSSJ].[dbo].[GDZC]([资产编号],[资产名称],[资产规格],[部门编号],[部门名称],[保管人工号],[保管人姓名],[放置地点],[备注],[折旧代码],[折旧名称],[金额],[预计净残值],[数量],[供应商],[耐用月数],[取得日期],[销账日期],[原币取得成本],[取得成本],[改良成本],[开始计提],[累积折旧],[资产科目],[取得单别],[取得单号],[供应商简称])VALUES('"&A2&"','"&B2&"','"&C2&"','"&R2&"','"&S2&"','"&T2&"','"&U2&"','"&W2&"','"&O2&"','"&N2&"','累计折旧',0,"&J2&",1,'"&X2&"',"&D2&",'"&E2&"','"&F2&"',"&G2&","&H2&","&I2&",'"&K2&"',"&L2&",'"&M2&"','"&P2&"','"&Q2&"','"&Y2&"');"
+INSERT INTO [dbo].[ASTMB] (
+  [COMPANY],[CREATOR],[USR_GROUP],[CREATE_DATE],[MODIFIER],[MODI_DATE],[FLAG],
+  [MB001],[MB002],[MB003],[MB004],[MB005],[MB006],[MB007],[MB008],[MB009],[MB010],[MB011],
+  [MB012],[MB013],[MB014],[MB015],[MB016],[MB017],[MB018],[MB019],[MB020],[MB021],[MB022],
+  [MB023],[MB024],[MB025],[MB026],[MB027],[MB028],[MB029],[MB030],[MB031],[MB032],[MB033],
+  [MB034],[MB035],[MB036],[MB037],[MB038],[MB039],[MB040],[MB041],[MB042],[MB043],[MB044],
+  [MB045],[MB046],[MB047],[MB048],[MB049],[MB050],[MB051],[MB052],[MB053],[MB054],[MB055],
+  [MB056],[MB057],[MB058],[MB059],[MB060],[MB061],[MB062],[MB063],
+  [UDF01],[UDF02],[UDF03],[UDF04],[UDF05],[UDF06],[UDF51],[UDF52],[UDF53],[UDF54],[UDF55],[UDF56]
+)
+SELECT
+  '0011'  AS COMPANY,
+  '10105978'  AS CREATOR,
+  '90001'  AS USR_GROUP,
+  FORMAT(GETDATE(),'yyyyMMddHHmmssfff')  AS CREATE_DATE,
+  ''  AS MODIFIER,
+  ''  AS MODI_DATE,
+  1   AS FLAG,
+  资产编号  AS MB001,
+  资产名称  AS MB002,
+  资产规格  AS MB003,
+  '1'  AS MB004,
+  资产编号  AS MB005,
+  SUBSTRING(资产编号,1,1)  AS MB006,
+  供应商  AS MB007,
+  供应商简称  AS MB008,
+  供应商  AS MB009,
+  供应商简称  AS MB010,
+  ''  AS MB011,--单位
+  数量   AS MB012,
+  ''  AS MB013,
+  耐用月数   AS MB014,
+  耐用月数   AS MB015,
+  取得日期  AS MB016,
+  销账日期  AS MB017,
+  'RMB'  AS MB018,
+  原币取得成本   AS MB019,
+  取得成本   AS MB020,
+  改良成本   AS MB021,
+  预计净残值   AS MB022,
+  '1'  AS MB023,
+  '1'  AS MB024,
+  'N'  AS MB025,
+  0   AS MB026,
+  0   AS MB027,
+  开始计提  AS MB028,
+  累积折旧   AS MB029,
+  资产科目  AS MB030,
+  折旧代码  AS MB031,
+  备注  AS MB032,
+  '1'  AS MB033,
+  0   AS MB034,
+  ''  AS MB035,
+  ''  AS MB036,
+  ''  AS MB037,
+  ''  AS MB038,
+  'N'  AS MB039,
+  ''  AS MB040,
+  0   AS MB041,
+  ''  AS MB042,
+  ''  AS MB043,
+  ''  AS MB044,
+  ''  AS MB045,
+  ''  AS MB046,
+  ''  AS MB047,
+  ''  AS MB048,
+  0   AS MB049,
+  'N'  AS MB050,
+  ''  AS MB051,
+  0   AS MB052,
+  0   AS MB053,
+  'N'  AS MB054,
+  ''  AS MB055,
+  0   AS MB056,
+  ''  AS MB057,
+  ''  AS MB058,
+  ''  AS MB059,
+  0   AS MB060,
+  0   AS MB061,
+  0   AS MB062,
+  ''  AS MB063,
+  ''  AS UDF01,
+  ''  AS UDF02,
+  ''  AS UDF03,
+  ''  AS UDF04,
+  ''  AS UDF05,
+  ''  AS UDF06,
+  0   AS UDF51,
+  0   AS UDF52,
+  0   AS UDF53,
+  0   AS UDF54,
+  0   AS UDF55,
+  0   AS UDF56
+FROM [LSSJ].[dbo].[GDZC];
+
+sp_help [GDZC]
+
+ALTER TABLE [LSSJ].[dbo].[GDZC] ALTER COLUMN [金额]     NUMERIC(15,2)
+COLLATE Chinese_PRC_BIN 
+NULL;
+
+
+INSERT INTO [dbo].[ASTMC] (
+  [COMPANY],[CREATOR],[USR_GROUP],[CREATE_DATE],[MODIFIER],[MODI_DATE],[FLAG],
+  [MC001],[MC002],[MC003],[MC004],[MC005],[MC006],[MC007],[MC008],[MC009],
+  [MC010],[MC011],[MC012],
+  [UDF01],[UDF02],[UDF03],[UDF04],[UDF05],[UDF06],
+  [UDF51],[UDF52],[UDF53],[UDF54],[UDF55],[UDF56]
+)
+SELECT
+  CAST('0011' AS CHAR(10))    AS COMPANY,
+  CAST('10105978' AS CHAR(10))    AS CREATOR,
+  CAST('90001' AS CHAR(10))    AS USR_GROUP,
+  CAST(FORMAT(GETDATE(),'yyyyMMddHHmmssfff') AS CHAR(17))    AS CREATE_DATE,
+  CAST('' AS CHAR(10))    AS MODIFIER,
+  CAST('' AS CHAR(17))    AS MODI_DATE,
+  CAST(1  AS NUMERIC(3,0))  AS FLAG,
+  CAST(资产编号 AS CHAR(20))    AS MC001,
+  CAST(部门编号 AS CHAR(6))     AS MC002,
+  CAST(保管人工号 AS CHAR(10))    AS MC003,
+  CAST(1  AS NUMERIC(5,0))  AS MC004,
+  CAST(备注 AS VARCHAR(255)) AS MC005,
+  CAST(放置地点 AS CHAR(20))    AS MC006,
+  CAST('' AS CHAR(1))     AS MC007,
+  CAST('' AS CHAR(8))     AS MC008,
+  CAST('' AS VARCHAR(30)) AS MC009,
+  CAST(0  AS NUMERIC(13,2)) AS MC010,
+  CAST(0  AS NUMERIC(13,2)) AS MC011,
+  CAST(0  AS NUMERIC(13,2)) AS MC012,
+  CAST('' AS VARCHAR(255)) AS UDF01,
+  CAST('' AS VARCHAR(255)) AS UDF02,
+  CAST('' AS VARCHAR(255)) AS UDF03,
+  CAST('' AS VARCHAR(255)) AS UDF04,
+  CAST('' AS VARCHAR(255)) AS UDF05,
+  CAST('' AS VARCHAR(255)) AS UDF06,
+  CAST(0  AS NUMERIC(15,6)) AS UDF51,
+  CAST(0  AS NUMERIC(15,6)) AS UDF52,
+  CAST(0  AS NUMERIC(15,6)) AS UDF53,
+  CAST(0  AS NUMERIC(15,6)) AS UDF54,
+  CAST(0  AS NUMERIC(15,6)) AS UDF55,
+  CAST(0  AS NUMERIC(15,6)) AS UDF56
+  FROM LSSJ..GDZC;
+
+UPDATE ASTMB SET MB054='N'WHERE (ASTMB.MB001 >= 'F0010096')
+  AND (ASTMB.MB001 <= 'F0010151')
+
+  SELECT * FROM ASTMB ORDER BY CREATE_DATE DESC
+
+  DELETE FROM ASTMC WHERE CREATE_DATE = '20251203092138537'
+
+  SELECT * FROM LSSJ..GDZC;
+  UPDATE ASTMB SET MB011 = '台'WHERE CREATE_DATE = '20251203093123910' AND MB002 LIKE '%贴片机%'

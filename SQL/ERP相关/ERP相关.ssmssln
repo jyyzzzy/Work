@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# SQL Server Management Studio Solution File, Format Version 18.00
+VisualStudioVersion = 15.0.28307.421
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "ERP相关", "ERP相关\ERP相关.ssmssqlproj", "{7DFFC049-E949-4EA0-93AF-394D6378756D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewFolder1", "NewFolder1", "{980907BF-01A8-4BC8-A8F2-B6FA1E51E76F}"
+	ProjectSection(SolutionItems) = preProject
+		..\1.易飞采购降价表-处理基表数据-新.sql = ..\1.易飞采购降价表-处理基表数据-新.sql
+		..\未来订单成本占比情况.sql = ..\未来订单成本占比情况.sql
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Default|Default = Default|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7DFFC049-E949-4EA0-93AF-394D6378756D}.Default|Default.ActiveCfg = Default
+		{2DBEFA35-234E-4DC7-81A5-1F68DFB9F7BF}.Default|Default.ActiveCfg = Default
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B77512E8-A1B9-4332-AF07-7AD96D63357B}
+	EndGlobalSection
+EndGlobal

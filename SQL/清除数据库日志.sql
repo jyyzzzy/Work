@@ -1,0 +1,382 @@
+﻿USE EF2KWeb
+GO
+DBCC SHRINKDATABASE(N'EF2KWeb', 3, TRUNCATEONLY)
+GO
+USE EF2KWeb
+GO
+DBCC SHRINKDATABASE(N'EF2KWeb', 3, TRUNCATEONLY)
+GO
+USE [RDGH]
+GO
+DBCC SHRINKDATABASE(N'RDGH', 3, TRUNCATEONLY)
+GO
+USE [RWDZ]
+GO
+DBCC SHRINKDATABASE(N'RWDZ', 3, TRUNCATEONLY)
+GO
+USE [RDCS]
+GO
+DBCC SHRINKDATABASE(N'RDCS', 3, TRUNCATEONLY)
+GO
+USE [SDRJ]
+GO
+DBCC SHRINKDATABASE(N'SDRJ', 3, TRUNCATEONLY)
+GO
+USE SDRD
+GO
+DBCC SHRINKDATABASE(N'SDRD', 3, TRUNCATEONLY)
+go
+USE ZJRD
+GO
+DBCC SHRINKDATABASE(N'ZJRD', 3, TRUNCATEONLY)
+
+
+
+[ZJRDBAK]
+EF2KWeb_Log
+
+USE [master]
+GO
+ALTER DATABASE SDRD SET RECOVERY SIMPLE WITH NO_WAIT
+GO
+ALTER DATABASE SDRD SET RECOVERY SIMPLE --简单模式
+GO
+USE SDRD
+GO
+DBCC SHRINKFILE (N'SDRD_Log' , 300, TRUNCATEONLY) 
+GO
+USE [master]
+GO
+ALTER DATABASE SDRD SET RECOVERY FULL WITH NO_WAIT
+GO
+ALTER DATABASE SDRD SET RECOVERY FULL --还原为完全模式
+GO
+
+GO
+
+
+USE [master]
+GO
+ALTER DATABASE LSSJ SET RECOVERY SIMPLE WITH NO_WAIT ----blog为需要清除日志的数据库名称
+GO
+ALTER DATABASE LSSJ SET RECOVERY SIMPLE --简单模式 ----blog为需要清除日志的数据库名称
+GO
+USE LSSJ ----blog为需要清除日志的数据库名称
+GO
+DBCC SHRINKFILE (N'LSSJ_log' , 11, TRUNCATEONLY) ----blog_Log为需要清除日志的数据库名日志名称
+GO
+USE [master]
+GO
+
+ALTER DATABASE LSSJ SET RECOVERY FULL WITH NO_WAIT ----blog为需要清除日志的数据库名称
+
+GO
+
+ALTER DATABASE LSSJ SET RECOVERY FULL --还原为完全模式 ----blog为需要清除日志的数据库名称
+
+
+
+select * from sysfiles
+
+DBCC SHRINKFILE(2)
+
+
+
+alter database [tempdb] modify file ( name = tempdp_mssql_2, filename = 'G:\database\tempdp_mssql_2.ndf');
+
+
+select filename,* from master..sysdatabases where name = 'student_database';
+
+
+   
+
+ D:\Program Files\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQL\DATA\tempdb_mssql_2.ndf
+ G:\database\templog.ldf
+
+ SELECT name, physical_name
+FROM sys.master_files
+
+ select* from sys.master_files 
+
+ALTER DATABASE [tempdb] MODIFY FILE (NAME = templog,FILENAME = 'G:\TempDB\templog.ldf')
+
+ALTER DATABASE [tempdb] MODIFY FILE (NAME = tempdb_mssql_8,FILENAME = 'G:\database\tempdb_mssql_8.ndf')
+ 
+ALTER DATABASE mydb MODIFY FILE (NAME = LZMISGH40_log,FILENAME = 'F:\SQLServerDB\DATA\mydb_1.ldf')
+ 
+
+
+ --修改到指定路径
+ALTER DATABASE tempdb MODIFY FILE (NAME = 'tempdev',  FILENAME = 'G:\TempDB\tempdb.mdf')
+ALTER DATABASE tempdb MODIFY FILE (NAME = 'templog',  FILENAME = 'G:\TempDB\templog.ldf')
+ALTER DATABASE tempdb MODIFY FILE (NAME = 'temp2',  FILENAME = 'G:\TempDB\tempdb_mssql_2.ndf')
+ALTER DATABASE tempdb MODIFY FILE (NAME = 'temp3',  FILENAME = 'G:\TempDB\tempdb_mssql_3.ndf')
+ALTER DATABASE tempdb MODIFY FILE (NAME = 'temp4',  FILENAME = 'G:\TempDB\tempdb_mssql_4.ndf')
+ALTER DATABASE tempdb MODIFY FILE (NAME = 'temp5',  FILENAME = 'G:\TempDB\tempdb_mssql_5.ndf')
+ALTER DATABASE tempdb MODIFY FILE (NAME = 'temp6',  FILENAME = 'G:\TempDB\tempdb_mssql_6.ndf')
+ALTER DATABASE tempdb MODIFY FILE (NAME = 'temp7',  FILENAME = 'G:\TempDB\tempdb_mssql_7.ndf')
+ALTER DATABASE tempdb MODIFY FILE (NAME = 'tempdb_mssql_8',  FILENAME = 'G:\TempDB\tempdb_mssql_8.ndf')  
+
+
+
+ select* from sys.master_files where name LIKE 'temp%'
+ update  sys.master_files set physical_name='G:\TempDB\tempdb_mssql_2.ndf' where name='temp2'
+
+
+
+
+
+
+ --清空日志
+DUMP TRANSACTION SDRD WITH NO_LOG
+
+--收缩数据库文件
+DBCC SHRINKFILE ('SDRD_Log',1) 
+
+--截断事务日志
+BACKUP LOG SDRD WITH NO_LOG
+
+ --1.清空日志
+DUMP TRANSACTION ZJRD WITH NO LOG
+
+ DUMP TRANSACTION ZJRD WITH NO LOG 
+--2.截新事务日志:
+BACKUP LOG AHRD WITH NO_LOG
+--3.收缩数据库文件(如果不压缩,数据库的文件不会减小企业管理器--右键你要压缩的数据库--所有任务--收缩数据库--收缩文件-选择日志文件--在收缩方式里选择收缩至XXM,这里会给出一个允许收缩到的最小数，直接输入这个数,确定就可以了选择数据文件--在收缩方式里选择收缩至XXM,这里会给出一个允许收缩到的最小数,直接输入这个数,确定就可以了
+--也可以用SOL语向来完成(注:根据我的实践，用企业管理器执行收缩操作后，1df文件大小并没有发生变化，用下面的50L指令就可以)
+
+
+
+USE SDRD; 
+GO
+
+-- Truncate the log by changing the database recovery model to SIMPLE.
+
+ALTER DATABASE SDRD SET RECOVERY SIMPLE;
+
+GO
+
+-- Shrink the trun cated log file to 1 MB.
+
+DBCC SHRINKFILE (SDRD_Log, 300); 
+GO
+
+-- Reset the database recovery model.
+
+ALTER DATABASE SDRD SET RECOVERY FULL; 
+
+
+
+
+USE master; 
+GO 
+DECLARE @SQL VARCHAR(MAX); 
+SET @SQL='' 
+SELECT @SQL=@SQL+'; KILL '+RTRIM(SPID) 
+FROM master..sysprocesses 
+WHERE dbid=DB_ID('ZJRD'); 
+EXEC(@SQL); 
+GO 
+ALTER DATABASE ZJRD SET  MULTI_USER;
+
+
+
+
+
+
+
+
+
+
+
+
+USE [master]
+GO
+BACKUP LOG DSCSYS TO DISK='NUL:' --  – 备份事务日志，备份成NUL，就不用占硬盘空间
+GO
+USE DSCSYS;
+GO
+DBCC SHRINKFILE (DSCSYS_Log,100);     --收缩数据库日志文件
+
+GO
+BACKUP LOG RDSJK TO DISK='NUL:' --  – 备份事务日志，备份成NUL，就不用占硬盘空间
+GO
+USE RDSJK;
+GO
+DBCC SHRINKFILE (RDSJK_Log,100);     --收缩数据库日志文件
+
+GO
+BACKUP LOG RWDZ TO DISK='NUL:' --  – 备份事务日志，备份成NUL，就不用占硬盘空间
+GO
+USE RWDZ;
+GO
+DBCC SHRINKFILE (RWDZ_Log,100);     --收缩数据库日志文件
+
+GO
+BACKUP LOG ZJRD TO DISK='NUL:' --  – 备份事务日志，备份成NUL，就不用占硬盘空间
+GO
+USE ZJRD;
+GO
+DBCC SHRINKFILE (ZJRD_Log,100);     --收缩数据库日志文件
+
+GO
+BACKUP LOG SDRD TO DISK='NUL:' --  – 备份事务日志，备份成NUL，就不用占硬盘空间
+GO
+USE SDRD;
+GO
+DBCC SHRINKFILE (SDRD_Log,100);     --收缩数据库日志文件
+
+GO
+BACKUP LOG AHRD TO DISK='NUL:' --  – 备份事务日志，备份成NUL，就不用占硬盘空间
+GO
+USE AHRD;
+GO
+DBCC SHRINKFILE (AHRD_Log,100);     --收缩数据库日志文件
+
+
+GO
+BACKUP LOG RDZNCS TO DISK='NUL:' --  – 备份事务日志，备份成NUL，就不用占硬盘空间
+GO
+USE RDZNCS;
+GO
+DBCC SHRINKFILE (SDRD_Log,100);     --收缩数据库日志文件
+--ALTER DATABASE [DSCSYS] SET RECOVERY SIMPLE WITH NO_WAIT
+--GO
+--ALTER DATABASE [DSCSYS] SET RECOVERY SIMPLE --简单模式
+--GO
+--USE [DSCSYS]
+--GO
+--DBCC SHRINKFILE (N'DSCSYS_Log' , 300, TRUNCATEONLY) 
+--GO
+--USE [master]
+--GO
+--ALTER DATABASE [DSCSYS] SET RECOVERY FULL WITH NO_WAIT
+--GO
+--ALTER DATABASE [DSCSYS] SET RECOVERY FULL --还原为完全模式
+--GO
+
+--GO
+--ALTER DATABASE [RDSJK] SET RECOVERY SIMPLE WITH NO_WAIT
+--GO
+--ALTER DATABASE [RDSJK] SET RECOVERY SIMPLE --简单模式
+--GO
+--USE [RDSJK]
+--GO
+--DBCC SHRINKFILE (N'RDSJK_Log' , 300, TRUNCATEONLY) 
+--GO
+--USE [master]
+--GO
+--ALTER DATABASE [RDSJK] SET RECOVERY FULL WITH NO_WAIT
+--GO
+--ALTER DATABASE [RDSJK] SET RECOVERY FULL --还原为完全模式
+--GO
+
+--GO
+--ALTER DATABASE [RWDZ] SET RECOVERY SIMPLE WITH NO_WAIT
+--GO
+--ALTER DATABASE [RWDZ] SET RECOVERY SIMPLE --简单模式
+--GO
+--USE [RWDZ]
+--GO
+--DBCC SHRINKFILE (N'RWDZ_Log' , 300, TRUNCATEONLY) 
+--GO
+--USE [master]
+--GO
+--ALTER DATABASE [RWDZ] SET RECOVERY FULL WITH NO_WAIT
+--GO
+--ALTER DATABASE [RWDZ] SET RECOVERY FULL --还原为完全模式
+--GO
+--GO
+--ALTER DATABASE [ZJRD] SET RECOVERY SIMPLE WITH NO_WAIT
+--GO
+--ALTER DATABASE [ZJRD] SET RECOVERY SIMPLE --简单模式
+--GO
+--USE [ZJRD]
+--GO
+--DBCC SHRINKFILE (N'ZJRD_Log' , 300, TRUNCATEONLY) 
+--GO
+--USE [master]
+--GO
+--ALTER DATABASE [ZJRD] SET RECOVERY FULL WITH NO_WAIT
+--GO
+--ALTER DATABASE [ZJRD] SET RECOVERY FULL --还原为完全模式
+--GO
+--GO
+--ALTER DATABASE [SDRD] SET RECOVERY SIMPLE WITH NO_WAIT
+--GO
+--ALTER DATABASE [SDRD] SET RECOVERY SIMPLE --简单模式
+--GO
+--USE [SDRD]
+--GO
+--DBCC SHRINKFILE (N'SDRD_Log' , 300, TRUNCATEONLY) 
+--GO
+--USE [master]
+--GO
+--ALTER DATABASE [SDRD] SET RECOVERY FULL WITH NO_WAIT
+--GO
+--ALTER DATABASE [SDRD] SET RECOVERY FULL --还原为完全模式
+--GO
+--USE [master]
+--GO
+--ALTER DATABASE AHRD SET RECOVERY SIMPLE WITH NO_WAIT
+--GO
+--ALTER DATABASE AHRD SET RECOVERY SIMPLE --简单模式
+--GO
+--USE AHRD
+--GO
+--DBCC SHRINKFILE (N'AHRD_Log' , 300, TRUNCATEONLY) 
+--GO
+--USE [master]
+--GO
+--ALTER DATABASE AHRD SET RECOVERY FULL WITH NO_WAIT
+--GO
+--ALTER DATABASE AHRD SET RECOVERY FULL --还原为完全模式
+--GO
+
+
+--USE RD08DZ
+--GO
+--DBCC SHRINKFILE (N'RD08DZ_Log' , 300, TRUNCATEONLY) 
+--GO
+--USE [master]
+--GO
+--ALTER DATABASE RD08DZ SET RECOVERY FULL WITH NO_WAIT
+--GO
+--ALTER DATABASE RD08DZ SET RECOVERY FULL --还原为完全模式
+--GO
+USE [master]
+GO
+BACKUP LOG SDRJ TO DISK='NUL:' --  – 备份事务日志，备份成NUL，就不用占硬盘空间
+GO
+USE SDRJ;
+GO
+DBCC SHRINKFILE (SDRJ_Log,100);     --收缩数据库日志文件
+go
+USE [master]
+GO
+BACKUP LOG FSRE TO DISK='NUL:' --  – 备份事务日志，备份成NUL，就不用占硬盘空间
+GO
+USE FSRE;
+GO
+DBCC SHRINKFILE (FSRE_Log,100);     --收缩数据库日志文件
+
+
+GO
+USE [master]
+GO
+BACKUP LOG YNRD TO DISK='NUL:' --  – 备份事务日志，备份成NUL，就不用占硬盘空间
+GO
+USE YNRD;
+GO
+DBCC SHRINKFILE (YNRD_Log,100);     --收缩数据库日志文件
+go
+USE [master]
+GO
+BACKUP LOG AHRDCS TO DISK='NUL:' --  – 备份事务日志，备份成NUL，就不用占硬盘空间
+GO
+USE AHRDCS;
+GO
+DBCC SHRINKFILE (AHRDCS_log,100);     --收缩数据库日志文件
+
+
+AHRDCS_log

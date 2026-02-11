@@ -1,0 +1,161 @@
+delete from   LSSJ..zjcgrk WHERE cgdh ='订单单别'
+
+
+
+delete from   LSSJ..zjcgrk
+--insert into  LSSJ..zjcgrk(cgdh,dj) --select'2201-20230608002-0001',15
+--values
+
+--="INSERT INTO LSSJ..zjcgrk(cgdh,dj)values('"&A2&"',"&L2&")"
+delete from   LSSJ..zjcgrk
+INSERT INTO LSSJ..zjcgrk(cgdh,dj)values('2224-20250122014-0001',24.83)
+INSERT INTO LSSJ..zjcgrk(cgdh,dj)values('2224-20250122015-0001',9.1)
+INSERT INTO LSSJ..zjcgrk(cgdh,dj)values('22A9-20250621003-0001',4.7799)
+
+
+select TD001+'-'+TD002+'-'+TD003,TD011 from  YNRD..COPTC join YNRD..COPTD on TC001=TD001 and TC002=TD002 where TC009<>1
+
+
+
+SELECT *FROM   LSSJ..zjcgrk WHERE cgdh LIKE '23%'
+
+UPDATE dbo.COPTC SET  TC009=1
+--select*
+FROM (
+SELECT TD001,TD002,SUM(TD012) AS TD029,SUM(TD039) AS TD030 
+FROM dbo.COPTD  JOIN LSSJ..zjcgrk ON  TD001+'-'+TD002+'-'+TD003=cgdh-- TD001=cgdh AND TD002=供应商
+GROUP BY TD001,TD002
+)AA 
+WHERE COPTC.TC001=AA.TD001 AND dbo.COPTC.TC002=TD002  ---越南
+
+
+
+
+
+
+UPDATE COPTD 
+SET 
+TD011=AA.单价,--单价
+TD012=AA.改后金额,--金额
+TD038=AA.改后税前金额,--税前金额
+TD039=AA.改后税额 --税额
+FROM (
+	SELECT 
+	TD001,--单别
+	TD002,--单号
+	TD003,--序号
+	TD011,--单价
+	TD012,-- '原金额',
+	CAST(dj AS NUMERIC(17,8)) AS '单价',
+	CAST(dj*TD008 AS NUMERIC(15,2)) '改后金额',
+	CONVERT(NUMERIC(15,2),TD008*TD011/(TC041+1)) '原税前金额',
+	CONVERT(NUMERIC(15,2),TD008*dj/(TC041+1)) '改后税前金额',
+	TD012-CONVERT(NUMERIC(15,2),TD008*TD011/(TC041+1)) '原税额',
+	dj*TD008-CONVERT(NUMERIC(15,2),TD008*dj/(TC041+1)) '改后税额'
+	FROM COPTD 
+	JOIN LSSJ..zjcgrk ON  TD001+'-'+TD002+'-'+TD003=cgdh
+	JOIN dbo.COPTC ON TD001=TC001 AND TD002=TC002
+	--AND (TD011<>dj OR  TD012<>dj*TD008 OR TD008*TD011*TD037<>TD008*dj*TD037)
+) AS AA
+INNER JOIN COPTD ON COPTD.TD001 = AA.TD001
+AND COPTD.TD002 = AA.TD002 
+AND COPTD.TD003 = AA.TD003
+WHERE
+COPTD.TD001=AA.TD001 
+AND dbo.COPTD.TD002=AA.TD002
+AND( COPTD.TD011 <> AA.单价 --单价
+OR COPTD.TD012 <> AA.改后金额 --金额
+OR COPTD.TD038 <> AA.改后税前金额 --税前金额
+OR COPTD.TD039 <> AA.改后税额 --税额
+)
+
+
+UPDATE dbo.COPTC 
+SET  TC029=TD029,
+TC030=TD030
+--select*
+FROM (
+	SELECT 
+	TD001,
+	TD002,
+	SUM(TD012) AS TD029,
+	SUM(TD039) AS TD030 
+	FROM dbo.COPTD  
+	JOIN LSSJ..zjcgrk ON  TD001+'-'+TD002+'-'+TD003=cgdh-- TD001=cgdh AND TD002=供应商
+	GROUP BY 
+	TD001,
+	TD002
+)AA 
+WHERE 
+COPTC.TC001=AA.TD001 
+AND dbo.COPTC.TC002=TD002
+
+
+
+
+SELECT TD001,TD002,SUM(TD012) AS TD029,SUM(TD039) AS TD030 
+FROM dbo.COPTD  JOIN LSSJ..zjcgrk ON  TD001=cgdh AND TD002=供应商
+GROUP BY TD001,TD002
+
+
+--UPDATE COPTC
+--SET COPTC.TC029 = AA.TD029,
+--    COPTC.TC030 = AA.TD030
+--FROM dbo.COPTC
+--JOIN (
+--    SELECT TD001, TD002, SUM(TD012) AS TD029, SUM(TD039) AS TD030
+--    FROM dbo.COPTD
+--    JOIN LSSJ..zjcgrk ON TD001 + '-' + TD002 + '-' + TD003 = cgdh
+--    GROUP BY TD001, TD002
+--) AS AA ON COPTC.TC001 = AA.TD001 AND COPTC.TC002 = AA.TD002;
+
+--select a.* 
+--update a set a.TC006='10048884',TC005='210050'
+--from COPTC a 
+--join LSSJ..zjcgrk b on b.cgdh like  a.TC001+ '-' + TC002+'%'   --and a.TC002=b.供应商
+
+
+
+
+
+
+
+ SELECT * FROM ACRTA WHERE TA002='24050040'
+
+
+ UPDATE ACRTA SET TA025='U' WHERE TA002='24050040'
+ SELECT * FROM dbo.ACRTB  WHERE TB002='24050040' AND TB012='Y'
+
+
+
+
+ --DROP TABLE CPZLB
+ 
+ --SELECT *  FROM web_lnk.RDSJK.dbo.CPZLB WHERE CPZL017 = '2023-06-13 00:00:00'
+
+
+ 
+ select left(TH014,8) ,TG005,MA002,TH014,TH004,TH005,TH006,(TH007),(TH017) from(
+select TG005,TH004,TH005,TH006,TH008,TH016,TH018,TH047,left(TH014,8) TH014,TH017,TH007
+ from PURTH INNER JOIN PURTG on TH001=TG001 AND TH002=TG002 --AND TG016 <> '采购月末退货月初进仓' 
+WHERE TH030 = 'Y'  AND TH014 >= '20241101' AND TH014 <= '20241131' 
+ ) as cgsl JOIN PURMA ON MA001=cgsl.TG005 where LEFT(TH004,1) IN ('3','5','6','7') 
+
+
+-- select *from  update PURTJ set TJ024=0 where TJ002 in ('20241111011','20241111012','20241111013','20241111014') and TJ001='3503'
+
+ --select *from
+ update a set TG005='215400',TG006='10094269'
+ from COPTG a
+join LSSJ..zjcgrk b on b.cgdh like a.TG001+ '-' + a.TG002 +'%'
+
+
+select *from COPTC where  TC005='215400'
+
+ update a set TC005='210051'--,TC006='10053752'
+ from COPTC a
+join LSSJ..zjcgrk b on b.cgdh like a.TC001+ '-' + a.TC002 +'%'
+
+
+--exec sp_executesql N'SELECT * FROM ZJRDCS..CMSMH WHERE MH001=@P1 ORDER BY MH005
+--',N'@P1 varchar(1)','1'

@@ -1,0 +1,242 @@
+/*统计月度代管料进货数据*/
+SELECT *FROM  LSSJ..LSDGL
+UPDATE LSSJ..LSDGL SET 单号='20200700110'
+
+
+SELECT RIGHT(RTRIM([序号]),4),* FROM LSSJ..LSDGL
+--UPDATE LSSJ..LSDGL SET [序号]=RIGHT(RTRIM([序号]),4)
+
+SELECT MAX(TA002)  FROM SDRD..INVTA  WHERE TA001='1201' AND LEFT(TA002,6)='202007'
+--SELECT TA002  FROM SDRD..INVTA  WHERE TA001='1112' AND LEFT(TA003,6)='201701' ORDER BY TA002 DESC
+
+
+--SELECT COMPANY , CREATOR , USR_GROUP , CREATE_DATE , MODIFIER , MODI_DATE , FLAG , 
+--TA001 , TA002 , TA003 , TA004 , TA005 , TA006 , TA007 , TA008 , TA009 , TA010 , 
+--TA011 , TA012 , TA013 , TA014 , TA015 , TA016 , TA017 , TA018 , TA021 , TA023 , TA025 , 
+--UDF01 , UDF02 , UDF03 , UDF04 , UDF05 , UDF06 , UDF51 , UDF52 , UDF53 , UDF54 , UDF55 , UDF56  FROM  SDRD..INVTA WHERE 1=2
+--UNION ALL
+
+CREATE TABLE LSSJ..
+
+
+INSERT INTO SDRD..INVTA(
+	[COMPANY]
+	,[CREATOR]
+	,[USR_GROUP]
+	,[CREATE_DATE]
+	,[MODIFIER]
+	,[MODI_DATE]
+	,[FLAG]
+	,[TA001]
+	,[TA002]
+	,[TA003]
+	,[TA004]
+	,[TA005]
+	,[TA006]
+	,[TA007]
+	,[TA008]
+	,[TA009]
+	,[TA010]
+	,[TA011]
+	,[TA012]
+	,[TA013]
+	,[TA014]
+	,[TA015]
+	,[TA016]
+	,[TA017]
+	,[TA018]
+	,[TA019]
+	,[TA020]
+	,[TA021]
+	,[TA022]
+	,[TA023]
+	,[TA024]
+	,[TA025]
+	,[TA026]
+	,[TA027]
+	,[TA028]
+	,[TA029]
+	,[TA030]
+	,[TA031]
+	,[UDF01]
+	,[UDF02]
+	,[UDF03]
+	,[UDF04]
+	,[UDF05]
+	,[UDF06]
+	,[UDF51]
+	,[UDF52]
+	,[UDF53]
+	,[UDF54]
+	,[UDF55]
+	,[UDF56]
+) 
+ SELECT 
+	 '0001' AS COMPANY,
+	 '10105978' AS CREATOR,
+	 '90001' AS USR_GROUP,
+	 FORMAT(GETDATE(), 'yyyyMMddHHmmssfff') AS CREATE_DATE,
+	 '' AS MODIFIER,
+	 '' AS MODI_DATE,
+	 1 AS FLAG,
+	'1201' AS TA001,
+	单号 AS TA002,
+	FORMAT(GETDATE(), 'yyyyMMdd') AS TA003,
+	'120800' AS TA004,
+	'调整负库存' AS TA005,--备注
+	'N' AS TA006,
+	0 AS TA007,
+	'000101' AS TA008,
+	'12' AS TA009,
+	0 AS TA010,
+	SUM(数量) AS TA011,
+	SUM(数量*单价) AS TA012,
+	'N' AS TA013,
+	FORMAT(GETDATE(), 'yyyyMMdd') AS TA014,
+	'' AS TA015,
+	0 AS TA016,--总包装数量
+	'N' AS TA017,
+	'' AS TA018,
+	'' AS TA019,
+	'' AS TA020,
+	'' AS TA021,
+	'' AS TA022,
+	'' AS TA023,
+	'' AS TA024,
+	'1' AS TA025,
+	'' AS TA026,
+	'' AS TA027,
+	'' AS TA028,
+	0 AS TA029,
+	0 AS TA030,
+	0 AS TA031,
+	'' AS UDF01,
+	'' AS UDF02,
+	'' AS UDF03,
+	'' AS UDF04,
+	'' AS UDF05,
+	'' AS UDF06,
+	0 AS UDF51,
+	0 AS UDF52,
+	0 AS UDF53,
+	0 AS UDF54,
+	0 AS UDF55,
+	0 AS UDF56
+FROM LSSJ..LSDGL
+GROUP BY 单号
+
+
+
+INSERT INTO SDRD..INVTB(
+	COMPANY, 
+	CREATOR, 
+	USR_GROUP, 
+	CREATE_DATE, 
+	MODIFIER, 
+	MODI_DATE, FLAG, 
+	TB001, 
+	TB002, 
+	TB003, 
+	TB004, 
+	TB005, 
+	TB006, 
+	TB007, 
+	TB008, 
+	TB009, 
+	TB010, 
+	TB011, 
+	TB012, 
+	TB013, 
+	TB014, 
+	TB015, 
+	TB016, 
+	TB017, 
+	TB018, 
+	TB019, 
+	TB020, 
+	TB021, 
+	TB022, 
+	TB023, 
+	TB024, 
+	TB025, 
+	TB026, 
+	TB027, 
+	TB028, 
+	TB029, 
+	TB030, 
+	TB031, 
+	UDF01, 
+	UDF02, 
+	UDF03, 
+	UDF04, 
+	UDF05, 
+	UDF06, 
+	UDF51, 
+	UDF52, 
+	UDF53, 
+	UDF54, 
+	UDF55, 
+	UDF56
+)
+SELECT
+	'0001',
+	'01001',
+	'01001',
+	FORMAT(GETDATE(), 'yyyyMMddHHmmssfff'),
+	'',
+	'',
+	1,
+	'1201',
+	单号,
+	序号,
+	品号,
+	MB002,
+	MB003,
+	数量,
+	MB004,
+	0,
+	单价,
+	单价*数量,
+	类别 转出仓,
+	仓别 转入仓,
+	'********************',
+	'',
+	'',
+	'',
+	'N',
+	'20200711',
+	'',
+	'',
+	0,
+	MB090,
+	'',
+	0,
+	0,
+	0,
+	'',
+	'##########',
+	'##########',
+	'',
+	'',
+	'',
+	'',
+	'',
+	'',
+	'',
+	0,
+	0,
+	0,
+	0,
+	0,
+	0 
+FROM LSSJ..LSDGL 
+INNER JOIN SDRD..INVMB ON MB001 = 品号 
+
+
+
+
+
+
+
+
+SELECT *FROM   LSSJ..LSDGL WHERE  类别='052'
