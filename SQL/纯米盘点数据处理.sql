@@ -1,11 +1,11 @@
  drop table #TEM
  SELECT DISTINCT  TB004 ZJ,''+TB004 CL,1 YL INTO #TEM FROM (
 
- select  TB004 from SDRD..INVTA join SDRD..INVTB ON TA001=TB001 AND TA002=TB002 where  (INVTA.TA001 = '1102') AND (INVTA.TA005 like '%CM%' or INVTA.TA005 like '%´¿Ã×%' or INVTA.UDF01 like '%´¿Ã×%') or TB002='20180600083'
+ select  TB004 from SDRD..INVTA join SDRD..INVTB ON TA001=TB001 AND TA002=TB002 where  (INVTA.TA001 = '1102') AND (INVTA.TA005 like '%CM%' or INVTA.TA005 like '%çº¯ç±³%' or INVTA.UDF01 like '%çº¯ç±³%') or TB002='20180600083'
  UNION ALL 
- SELECT  TH004 FROM  SDRD..PURTG JOIN SDRD..PURTH ON TG001=TH001 AND TG002=TH002 JOIN  SDRD..PURMA ON MA001=TG005 where (PURMA.MA002 like '%´¿Ã×%')and TH015 > 0
+ SELECT  TH004 FROM  SDRD..PURTG JOIN SDRD..PURTH ON TG001=TH001 AND TG002=TH002 JOIN  SDRD..PURMA ON MA001=TG005 where (PURMA.MA002 like '%çº¯ç±³%')and TH015 > 0
  UNION ALL 
- SELECT  TH004 FROM  SDRD..PURTG JOIN SDRD..PURTH ON TG001=TH001 AND TG002=TH002 JOIN  SDRD..PURMA ON MA001=TG005 where (PURMA.MA002 like '%µÂ°Â%')and TH015 > 0
+ SELECT  TH004 FROM  SDRD..PURTG JOIN SDRD..PURTH ON TG001=TH001 AND TG002=TH002 JOIN  SDRD..PURMA ON MA001=TG005 where (PURMA.MA002 like '%å¾·å¥¥%')and TH015 > 0
  ) AS CMLH
 
 
@@ -23,7 +23,7 @@
 
 
 delete from  #TEM
-insert into  #TEM select ÄÚ²¿ÁÏºÅ,ÄÚ²¿ÁÏºÅ,1 from LSSJ..Sh11 where left(ÄÚ²¿ÁÏºÅ,1) in('3','6')--¼ÓÈë²ÄÁÏ
+insert into  #TEM select å†…éƒ¨æ–™å·,å†…éƒ¨æ–™å·,1 from LSSJ..Sh11 where left(å†…éƒ¨æ–™å·,1) in('3','6')--åŠ å…¥ææ–™
 
 DROP TABLE #COPINVMB
 
@@ -33,39 +33,43 @@ drop table #COPINVMB
 SELECT DISTINCT rtrim(TH004) MB01,TH005 MB02,TH006 MB03 into #COPINVMB
  FROM (
 
-SELECT '¹ã¶«' SZD,LEFT(TG003,6) TG003,TH004,TH005,TH006,TH008, TH037+TH038 TH012,MA002 FROM SDRD..COPTG JOIN SDRD..COPTH ON  TG001=TH001  AND TG002=TH002  JOIN SDRD..COPMA ON TG004=MA001 WHERE  TG003 >='20250701' AND TG003 <='20251231'AND LEFT(TH004,1) IN ('A','1')  AND TG023 = 'Y' 
+SELECT 'å¹¿ä¸œ' SZD,LEFT(TG003,6) TG003,TH004,TH005,TH006,TH008, TH037+TH038 TH012,MA002 
+FROM SDRD..COPTG JOIN SDRD..COPTH ON  TG001=TH001  AND TG002=TH002  JOIN SDRD..COPMA ON TG004=MA001 
+WHERE  TG003 >='20250701' AND TG003 <='20251231'AND LEFT(TH004,1) IN ('A','1')  AND TG023 = 'Y' 
 union all
-SELECT '¹ã¶«',LEFT(TI003,6)  AS ÈÕÆÚ, TJ004,TJ005,TJ006,-TJ039, -(TJ033+TJ034)*(case TI009 when 1 then 1 else 1 end ) AS ½ð¶î,MA002 
+SELECT 'å¹¿ä¸œ',LEFT(TI003,6)  AS æ—¥æœŸ, TJ004,TJ005,TJ006,-TJ039, -(TJ033+TJ034)*(case TI009 when 1 then 1 else 1 end ) AS é‡‘é¢,MA002 
 FROM SDRD..COPTI INNER JOIN SDRD..COPTJ ON TI001 = TJ001 AND TI002 = TJ002 
 inner JOIN SDRD..COPMA ON MA001 = TI004
 where TI019 = 'Y' AND TI003 >='20250701' AND TI003 <='20251231'AND LEFT(TJ004,1) IN ('A','1') 
 
 UNION ALL
 
-SELECT '°²»Õ',LEFT(TG003,6) TG003,TH004,TH005,TH006,TH008, TH037+TH038 TH012,MA002  FROM AHRD..COPTG JOIN AHRD..COPTH ON  TG001=TH001  AND TG002=TH002   JOIN AHRD..COPMA ON TG004=MA001 WHERE  TG003 >='20250701' AND TG003 <='20251231' AND LEFT(TH004,1) IN ('A','1') AND TG023 = 'Y' 
+SELECT 'å®‰å¾½',LEFT(TG003,6) TG003,TH004,TH005,TH006,TH008, TH037+TH038 TH012,MA002  
+FROM AHRD..COPTG JOIN AHRD..COPTH ON  TG001=TH001  AND TG002=TH002   JOIN AHRD..COPMA ON TG004=MA001 
+WHERE  TG003 >='20250701' AND TG003 <='20251231' AND LEFT(TH004,1) IN ('A','1') AND TG023 = 'Y' 
 union all
-SELECT '°²»Õ',LEFT(TI003,6)  AS ÈÕÆÚ, TJ004,TJ005,TJ006,-TJ039, -(TJ033+TJ034)*(case TI009 when 1 then 1 else 1 end ) AS ½ð¶î,MA002 
+SELECT 'å®‰å¾½',LEFT(TI003,6)  AS æ—¥æœŸ, TJ004,TJ005,TJ006,-TJ039, -(TJ033+TJ034)*(case TI009 when 1 then 1 else 1 end ) AS é‡‘é¢,MA002 
 FROM AHRD..COPTI INNER JOIN AHRD..COPTJ ON TI001 = TJ001 AND TI002 = TJ002 
 inner JOIN AHRD..COPMA ON MA001 = TI004
 where TI019 = 'Y' AND TI003 >='20250701' AND TI003 <='20251231'AND LEFT(TJ004,1) IN ('A','1') 
 
-) AS COPINV   where ( MA002 LIKE '%´¿Ã×%') -- and TH006 NOT LIKE 'CM%'
+) AS COPINV   where ( MA002 LIKE '%çº¯ç±³%') -- and TH006 NOT LIKE 'CM%'
 
 GROUP BY SZD,TG003,TH004,TH005,TH006 HAVING(SUM(TH008))>0
 
 
- select rtrim(MB001),MB002,MB003 from  #TEM A JOIN INVMB ON MB001=ZJ where  MB003 not LIKE '%ËÕ²´¶û%'
+ select rtrim(MB001),MB002,MB003 from  #TEM A JOIN INVMB ON MB001=ZJ where  MB003 not LIKE '%è‹æ³Šå°”%'
 
-select DISTINCT TB011, TB003,TB013  from MOCTA JOIN MOCTB ON TA001=TB001 AND TA002=TB002 WHERE TB011<>'5' AND  ((SELECT COUNT(*) FROM #TEM WHERE ZJ=TB003)>0 OR TB013 LIKE '%´¿Ã×%¿Í¹©%' )
+select DISTINCT TB011, TB003,TB013  from MOCTA JOIN MOCTB ON TA001=TB001 AND TA002=TB002 WHERE TB011<>'5' AND  ((SELECT COUNT(*) FROM #TEM WHERE ZJ=TB003)>0 OR TB013 LIKE '%çº¯ç±³%å®¢ä¾›%' )
  select A.*,MB002,MB003 from  #TEM A JOIN INVMB ON MB001=ZJ where ZJ='361000227502'
  
  drop table #GDS
  select distinct --TA001,TA002,
  TA006,TA034,TA035,  TB003,TB012,TB013,TB004/TA015 SL, CAST(TB004/TA015  AS INT) SL1,TA017 into #GDS from MOCTA JOIN MOCTB ON TA001=TB001 AND TA002=TB002 where (SELECT COUNT(*) FROM #TEM WHERE ZJ=TB003)>0 AND TA015>0 AND TB004>0-- AND TB004/TA015 <> CAST(TB004/TA015 AS INT) ORDER BY SL
 
---select*  from  #GDS  WHERE (select COUNT(*) from #GDS B WHERE  B.SL=B.SL1 AND B.TA006=TA006 AND B.TB003= TB003 )>0 AND  SL<>SL1 --É¾³ýÒì³£Êý¾Ý
+--select*  from  #GDS  WHERE (select COUNT(*) from #GDS B WHERE  B.SL=B.SL1 AND B.TA006=TA006 AND B.TB003= TB003 )>0 AND  SL<>SL1 --åˆ é™¤å¼‚å¸¸æ•°æ®
 
-DELETE  from  #GDS  WHERE (select COUNT(*) from #GDS B WHERE  B.SL=B.SL1 AND B.TA006=TA006 AND B.TB003= TB003 )>0 AND  SL<>SL1 --É¾³ýÒì³£Êý¾Ý
+DELETE  from  #GDS  WHERE (select COUNT(*) from #GDS B WHERE  B.SL=B.SL1 AND B.TA006=TA006 AND B.TB003= TB003 )>0 AND  SL<>SL1 --åˆ é™¤å¼‚å¸¸æ•°æ®
 
 select *from   #GDS  WHERE  SL<>SL1 AND (select COUNT(*) from #GDS B WHERE  B.SL=B.SL1 AND B.TA006=TA006 AND B.TB003= TB003 )>0  
 
@@ -168,7 +172,7 @@ INSERT INTO  #TEM select *   from #GDBOM2 where (select count(*) from #TEM where
 	select rtrim(CL) from  #TEM 
 	)as a
 
-		select A.* ,B.MB002,B.MB003,C.MB002,C.MB003 from  #TEM A join INVMB B ON ZJ=B.MB001  JOIN INVMB C ON CL=C.MB001 WHERE (B.MB003 NOT LIKE 'CM%' and C.MB003 NOT LIKE '%´¿Ã×¿Í¹©%')
+		select A.* ,B.MB002,B.MB003,C.MB002,C.MB003 from  #TEM A join INVMB B ON ZJ=B.MB001  JOIN INVMB C ON CL=C.MB001 WHERE (B.MB003 NOT LIKE 'CM%' and C.MB003 NOT LIKE '%çº¯ç±³å®¢ä¾›%')
 
 
 
@@ -245,43 +249,46 @@ declare @TB003 nvarchar(12)  ,@CLPH VARCHAR(12),@YL int
 
 
 
-/***µ¼Êý¾Ý¿ªÊ¼**/
+/***å¯¼æ•°æ®å¼€å§‹**/
 
  --drop table #TEM
 
  --SELECT DISTINCT  TB004 ZJ,''+TB004 CL, 1  YL INTO #TEM FROM (
 
- --select TB004 from SDRD..INVTA join SDRD..INVTB ON TA001=TB001 AND TA002=TB002 where  (INVTA.TA001 = '1102') AND (INVTA.TA005 like '%´¿Ã×%' or INVTA.UDF01 like '%´¿Ã×%')
+ --select TB004 from SDRD..INVTA join SDRD..INVTB ON TA001=TB001 AND TA002=TB002 where  (INVTA.TA001 = '1102') AND (INVTA.TA005 like '%çº¯ç±³%' or INVTA.UDF01 like '%çº¯ç±³%')
  --UNION ALL 
- --SELECT  TH004 FROM  SDRD..PURTG JOIN SDRD..PURTH ON TG001=TH001 AND TG002=TH002 JOIN  SDRD..PURMA ON MA001=TG005 where (PURMA.MA002 like '%´¿Ã×%')
+ --SELECT  TH004 FROM  SDRD..PURTG JOIN SDRD..PURTH ON TG001=TH001 AND TG002=TH002 JOIN  SDRD..PURMA ON MA001=TG005 where (PURMA.MA002 like '%çº¯ç±³%')
  --UNION ALL 
- --SELECT  TH004 FROM  SDRD..PURTG JOIN SDRD..PURTH ON TG001=TH001 AND TG002=TH002 JOIN  SDRD..PURMA ON MA001=TG005 where (PURMA.MA002 like '%µÂ°Â%')
+ --SELECT  TH004 FROM  SDRD..PURTG JOIN SDRD..PURTH ON TG001=TH001 AND TG002=TH002 JOIN  SDRD..PURMA ON MA001=TG005 where (PURMA.MA002 like '%å¾·å¥¥%')
  --) AS CMLH
 
 
-  drop table #TEM
- SELECT DISTINCT  TB004 ZJ,''+TB004 CL,1 YL INTO #TEM FROM (
+drop table #TEM
+SELECT DISTINCT  TB004 ZJ,''+TB004 CL,1 YL INTO #TEM FROM (
 
- select  TB004 from SDRD..INVTA join SDRD..INVTB ON TA001=TB001 AND TA002=TB002 where  (INVTA.TA001 = '1102') AND (INVTA.TA005 like '%´¿Ã×%' or INVTA.UDF01 like '%´¿Ã×%') and TB002<>'20180600083'
- UNION ALL 
- SELECT  TH004 FROM  SDRD..PURTG JOIN SDRD..PURTH ON TG001=TH001 AND TG002=TH002 JOIN  SDRD..PURMA ON MA001=TG005 where (PURMA.MA002 like '%´¿Ã×%')and TH015 > 0
- UNION ALL 
- SELECT  TH004 FROM  SDRD..PURTG JOIN SDRD..PURTH ON TG001=TH001 AND TG002=TH002 JOIN  SDRD..PURMA ON MA001=TG005 where (PURMA.MA002 like '%µÂ°Â%')and TH015 > 0
- ) AS CMLH
-
-
-
- insert into  #TEM select MB001,MB001,1 from INVMB WHERE  (MB003 LIKE '%CM%¿Í¹©%' or  MB003 LIKE '%´¿Ã×%¿Í¹©%' )and (select count(*) from    #TEM where   ZJ=MB001)=0 and left(MB001,1) in('3','6')--¼ÓÈë²ÄÁÏ
-
+	select  TB004 from SDRD..INVTA join SDRD..INVTB ON TA001=TB001 AND TA002=TB002 
+	where  (INVTA.TA001 = '1102') AND (INVTA.TA005 like '%çº¯ç±³%' or INVTA.UDF01 like '%çº¯ç±³%')-- and TB002<>'20180600083'
+	UNION ALL 
+	SELECT  TH004 FROM  SDRD..PURTG JOIN SDRD..PURTH ON TG001=TH001 AND TG002=TH002 JOIN  SDRD..PURMA ON MA001=TG005 
+	where (PURMA.MA002 like '%çº¯ç±³%')and TH015 > 0
+	--UNION ALL 
+	--SELECT  TH004 FROM  SDRD..PURTG JOIN SDRD..PURTH ON TG001=TH001 AND TG002=TH002 JOIN  SDRD..PURMA ON MA001=TG005 
+	--where (PURMA.MA002 like '%å¾·å¥¥%')and TH015 > 0
+) AS CMLH
 
 
 
-  select   CASE LA005  WHEN '1' THEN 'Èë¿â' else '³ö¿â' end ¶¯×÷, LA004 ½»Ò×ÈÕÆÚ,LA006 µ¥±ð,LA007 µ¥ºÅ,LA008 ÐòºÅ,rtrim(MB001) Æ·ºÅ, MB002 Æ·Ãû,MB003 ¹æ¸ñ,-(LA011*LA005) ½»Ò×ÊýÁ¿,LA024 ½»Ò×¶ÔÏó 
+ insert into  #TEM select MB001,MB001,1 from INVMB WHERE  (MB003 LIKE '%CM%å®¢ä¾›%' or  MB003 LIKE '%çº¯ç±³%å®¢ä¾›%' )and (select count(*) from    #TEM where   ZJ=MB001)=0 and left(MB001,1) in('3','6')--åŠ å…¥ææ–™
+
+
+
+
+  select   CASE LA005  WHEN '1' THEN 'å…¥åº“' else 'å‡ºåº“' end åŠ¨ä½œ, LA004 äº¤æ˜“æ—¥æœŸ,LA006 å•åˆ«,LA007 å•å·,LA008 åºå·,rtrim(MB001) å“å·, MB002 å“å,MB003 è§„æ ¼,-(LA011*LA005) äº¤æ˜“æ•°é‡,LA024 äº¤æ˜“å¯¹è±¡ 
   from  SDRD..INVLA LA JOIN SDRD..INVMB ON MB001=LA001 join SDRD..CMSMC C  on LA009=MC001 
 --join SDRD..MOCTA ON TA001+'-'+TA002=LA024
 where (select count(*) from #TEM where ZJ=rtrim(MB001))>0
 --left join SDRD..CMSMD on LA.UDF06 LIKE RTRIM(MD001)+'|%'
---where (LA004 >= '20190101'  and  LA004 <= '20211231' ) AND (MB002 LIKE '%¼¯³ÉµçÂ·%' or MB002 LIKE '%   %')  AND C.UDF01 LIKE '%-Á¼Æ·%' AND LA006 NOT LIKE ('1%')  AND LEFT(LA006,2) IN('54','56' 
+--where (LA004 >= '20190101'  and  LA004 <= '20211231' ) AND (MB002 LIKE '%é›†æˆç”µè·¯%' or MB002 LIKE '%   %')  AND C.UDF01 LIKE '%-è‰¯å“%' AND LA006 NOT LIKE ('1%')  AND LEFT(LA006,2) IN('54','56' 
 --) and (LA011*LA005)<>0
  --select * from  #TEM
 
@@ -295,48 +302,48 @@ drop table #COPINVMB
 SELECT DISTINCT rtrim(TH004) MB01  into #COPINVMB
  FROM (
 
-SELECT '¹ã¶«' SZD,LEFT(TG003,6) TG003,TH004,TH005,TH006,TH008, TH037+TH038 TH012,MA002 
+SELECT 'å¹¿ä¸œ' SZD,LEFT(TG003,6) TG003,TH004,TH005,TH006,TH008, TH037+TH038 TH012,MA002 
 FROM SDRD..COPTG JOIN SDRD..COPTH ON  TG001=TH001  AND TG002=TH002  JOIN SDRD..COPMA ON TG004=MA001 
 WHERE  TG003 >='20250701' AND TG003 <='20251231'AND LEFT(TH004,1) IN ('A','1')  AND TG023 = 'Y' 
 --union all
---SELECT '¹ã¶«',LEFT(TI003,6)  AS ÈÕÆÚ, TJ004,TJ005,TJ006,-TJ039, -(TJ033+TJ034)*(case TI009 when 1 then 1 else 1 end ) AS ½ð¶î,MA002 
+--SELECT 'å¹¿ä¸œ',LEFT(TI003,6)  AS æ—¥æœŸ, TJ004,TJ005,TJ006,-TJ039, -(TJ033+TJ034)*(case TI009 when 1 then 1 else 1 end ) AS é‡‘é¢,MA002 
 --FROM SDRD..COPTI INNER JOIN SDRD..COPTJ ON TI001 = TJ001 AND TI002 = TJ002 
 --inner JOIN SDRD..COPMA ON MA001 = TI004
 --where TI019 = 'Y' AND TI003 >='20250701' AND TI003 <='20251231'AND LEFT(TJ004,1) IN ('A','1') 
 
 UNION ALL
 
-SELECT '°²»Õ',LEFT(TG003,6) TG003,TH004,TH005,TH006,TH008, TH037+TH038 TH012,MA002  
+SELECT 'å®‰å¾½',LEFT(TG003,6) TG003,TH004,TH005,TH006,TH008, TH037+TH038 TH012,MA002  
 FROM AHRD..COPTG JOIN AHRD..COPTH ON  TG001=TH001  AND TG002=TH002   JOIN AHRD..COPMA ON TG004=MA001 
 WHERE  TG003 >='20250701' AND TG003 <='20251231' AND LEFT(TH004,1) IN ('A','1') AND TG023 = 'Y' 
 --union all
---SELECT '°²»Õ',LEFT(TI003,6)  AS ÈÕÆÚ, TJ004,TJ005,TJ006,-TJ039, -(TJ033+TJ034)*(case TI009 when 1 then 1 else 1 end ) AS ½ð¶î,MA002 
+--SELECT 'å®‰å¾½',LEFT(TI003,6)  AS æ—¥æœŸ, TJ004,TJ005,TJ006,-TJ039, -(TJ033+TJ034)*(case TI009 when 1 then 1 else 1 end ) AS é‡‘é¢,MA002 
 --FROM AHRD..COPTI INNER JOIN AHRD..COPTJ ON TI001 = TJ001 AND TI002 = TJ002 
 --inner JOIN AHRD..COPMA ON MA001 = TI004
 --where TI019 = 'Y' AND TI003 >='20250701' AND TI003 <='20251231'AND LEFT(TJ004,1) IN ('A','1') 
 
 UNION ALL
 
-SELECT 'Õã½­',LEFT(TG003,6) TG003,TH004,TH005,TH006,TH008, TH037+TH038 TH012,MA002  
+SELECT 'æµ™æ±Ÿ',LEFT(TG003,6) TG003,TH004,TH005,TH006,TH008, TH037+TH038 TH012,MA002  
 FROM ZJRD..COPTG JOIN ZJRD..COPTH ON  TG001=TH001  AND TG002=TH002   JOIN ZJRD..COPMA ON TG004=MA001 
 WHERE  TG003 >='20250701' AND TG003 <='20251231' AND LEFT(TH004,1) IN ('A','1') AND TG023 = 'Y' 
 
-) AS COPINV   where ( MA002 LIKE '%´¿Ã×%') -- and TH006 NOT LIKE 'CM%'
+) AS COPINV   where ( MA002 LIKE '%çº¯ç±³%') -- and TH006 NOT LIKE 'CM%'
 
 GROUP BY SZD,TG003,TH004,TH005,TH006 --HAVING(SUM(TH008))>5
 
-insert into #COPINVMB SELECT MB001 FROM SDRD..INVMB  WHERE (MB003 LIKE 'CM-%' AND LEFT(MB001,1) IN ('A','1')  or MB001='101123870000') AND (SELECT COUNT(*) FROM #COPINVMB WHERE MB01=MB001 )=0 
+insert into #COPINVMB SELECT MB001 FROM SDRD..INVMB  WHERE (MB003 LIKE 'CM-%' AND LEFT(MB001,1) IN ('A','1')/*  or MB001='101123870000'*/) AND (SELECT COUNT(*) FROM #COPINVMB WHERE MB01=MB001 )=0 
 
 
-/***Êä³ö´¿Ã×³ÉÆ·ÓëÎïÁÏ**/
+/***è¾“å‡ºçº¯ç±³æˆå“ä¸Žç‰©æ–™**/
 
-select ZJ Æ·ºÅ,MB002 Æ·Ãû,MB003 ¹æ¸ñ  from (
+select ZJ å“å·,MB002 å“å,MB003 è§„æ ¼  from (
  select ZJ from  #TEM
  union  all
  select * from  #COPINVMB B
  ) as WL  join SDRD..INVMB ON MB001=ZJ  order by ZJ 
 
-/***Êä³ö´¿Ã×³ÉÆ·ÓëÎïÁÏ**/
+/***è¾“å‡ºçº¯ç±³æˆå“ä¸Žç‰©æ–™**/
 
 select B.*,MB002,MB003 from  #COPINVMB B 
 join SDRD..INVMB ON MB001=MB01
@@ -384,7 +391,7 @@ declare @CLPH VARCHAR(12)
 
 
 
-	--SELECT RTRIM(MD01) ²úÆ·Æ·ºÅ,A.MB002 ²úÆ·Æ·Ãû,A.MB003 ²úÆ·¹æ¸ñ,RTRIM(MD03) ²ÄÁÏÆ·ºÅ,B.MB002 ²ÄÁÏÆ·Ãû,B.MB003 ²ÄÁÏ¹æ¸ñ,MD06 ÓÃÁ¿,MD07 µ×Êý FROM   #TEMQD JOIN SDRD..INVMB A ON A.MB001=MD01  JOIN  SDRD..INVMB B ON B.MB001=MD03 ORDER BY MD01,MD03 DESC
+	--SELECT RTRIM(MD01) äº§å“å“å·,A.MB002 äº§å“å“å,A.MB003 äº§å“è§„æ ¼,RTRIM(MD03) ææ–™å“å·,B.MB002 ææ–™å“å,B.MB003 ææ–™è§„æ ¼,MD06 ç”¨é‡,MD07 åº•æ•° FROM   #TEMQD JOIN SDRD..INVMB A ON A.MB001=MD01  JOIN  SDRD..INVMB B ON B.MB001=MD03 ORDER BY MD01,MD03 DESC
 	
 	--select *from  SDRD.[dbo].[Fn_GetBOMUpIDs]('303000302702')
 
@@ -401,7 +408,7 @@ declare @CLPH VARCHAR(12)
 	--SELECT *FROM    #TEM
 
 
-	/**Õ¹½×**/
+	/**å±•é˜¶**/
 	DROP TABLE #QDSC
 	SELECT * into #QDSC FROM  #TEMQD WHERE (SELECT COUNT(*) FROM    #TEM WHERE CL= MD03)>0
 
@@ -434,34 +441,34 @@ declare @CLPH VARCHAR(12)
 
 	select distinct *from #QDSC --WHERE  MD03='303000133902 ' order by CLPH ,MD01,MD03
 
-	/**Êä³öBOMÕ¹½×**/
+	/**è¾“å‡ºBOMå±•é˜¶**/
 	SELECT distinct RTRIM(MD01),RTRIM(MD03) ,MD06,MD07  FROM  (
 	select distinct MD01,MD03,MD06,MD07 from #QDSC 
 	UNION ALL
 	 select ZJ,ZJ,1,1 from  #TEM
 	 ) AS BOM
-	 /**Êä³öBOMÕ¹½×**/
+	 /**è¾“å‡ºBOMå±•é˜¶**/
 
-select RTRIM(ZJ) Æ·ºÅ,MB002 Æ·Ãû,MB003 ¹æ¸ñ  from (
+select RTRIM(ZJ) å“å·,MB002 å“å,MB003 è§„æ ¼  from (
  select ZJ from  #TEM
  union  all
  select * from  #COPINVMB B
  ) as WL  join SDRD..INVMB ON MB001=ZJ  order by ZJ 
 
- /***ÐÂÀÏ°ë³ÉÆ·**/
-    SELECT  A.MB001 ÐÂÁÏºÅ,A.MB002 ÐÂÆ·Ãû,A.MB003 ÐÂ¹æ¸ñ,B.MB001 Ô­Æ·ºÅ,B.MB002 Ô­Æ·Ãû,B.MB003 Ô­¹æ¸ñ FROM    SDRD..INVMB A JOIN  SDRD..INVMB B  ON B.MB001=REPLACE(A.MB110,'K','') AND A.MB001 LIKE '2%X_'
-
-	 SELECT  A.MB001 ÐÂÁÏºÅ,A.MB002 ÐÂÆ·Ãû,A.MB003 ÐÂ¹æ¸ñ,MB110  FROM    SDRD..INVMB A  where A.MB001 not LIKE '2%X_' AND A.MB001 LIKE '2%'
- /***ÐÂÀÏ°ë³ÉÆ·**/
-	  /*ÔÚ²úÊýÁ¿**/ 
+ /***æ–°è€åŠæˆå“**/
+    SELECT  A.MB001 æ–°æ–™å·,A.MB002 æ–°å“å,A.MB003 æ–°è§„æ ¼,B.MB001 åŽŸå“å·,B.MB002 åŽŸå“å,B.MB003 åŽŸè§„æ ¼ FROM    SDRD..INVMB A JOIN  SDRD..INVMB B  ON B.MB001=REPLACE(A.MB110,'K','') AND A.MB001 LIKE '2%X_'
+SELECT A.MB001 åŽŸåŠæˆå“å“å·,A.MB002 åŽŸåŠæˆå“å“å,A.MB003 åŽŸåŠæˆå“è§„æ ¼,B.MB001 æ–°æˆå“å“å·,B.MB002 æ–°åŠæˆå“å“å,B.MB003 æ–°åŠæˆå“è§„æ ¼ FROM  SDRD..INVMB A JOIN SDRD..INVMB B  ON B.MB001=REPLACE(A.MB110,'K','') AND A.MB001 LIKE '2%X_'
+	 SELECT  A.MB001 æ–°æ–™å·,A.MB002 æ–°å“å,A.MB003 æ–°è§„æ ¼,MB110  FROM    SDRD..INVMB A  where A.MB001 not LIKE '2%X_' AND A.MB001 LIKE '2%'
+ /***æ–°è€åŠæˆå“**/
+	  /*åœ¨äº§æ•°é‡**/ 
   drop table #TEM
  SELECT DISTINCT  TB004 ZJ,''+TB004 CL,1 YL INTO #TEM FROM (
 
- select  TB004 from SDRD..INVTA join SDRD..INVTB ON TA001=TB001 AND TA002=TB002 where  (INVTA.TA001 = '1102') AND (INVTA.TA005 like '%´¿Ã×%' or INVTA.UDF01 like '%´¿Ã×%') and TB002<>'20180600083'
+ select  TB004 from SDRD..INVTA join SDRD..INVTB ON TA001=TB001 AND TA002=TB002 where  (INVTA.TA001 = '1102') AND (INVTA.TA005 like '%çº¯ç±³%' or INVTA.UDF01 like '%çº¯ç±³%') and TB002<>'20180600083'
  UNION ALL 
- SELECT  TH004 FROM  SDRD..PURTG JOIN SDRD..PURTH ON TG001=TH001 AND TG002=TH002 JOIN  SDRD..PURMA ON MA001=TG005 where (PURMA.MA002 like '%´¿Ã×%')and TH015 > 0
+ SELECT  TH004 FROM  SDRD..PURTG JOIN SDRD..PURTH ON TG001=TH001 AND TG002=TH002 JOIN  SDRD..PURMA ON MA001=TG005 where (PURMA.MA002 like '%çº¯ç±³%')and TH015 > 0
  UNION ALL 
- SELECT  TH004 FROM  SDRD..PURTG JOIN SDRD..PURTH ON TG001=TH001 AND TG002=TH002 JOIN  SDRD..PURMA ON MA001=TG005 where (PURMA.MA002 like '%µÂ°Â%')and TH015 > 0
+ SELECT  TH004 FROM  SDRD..PURTG JOIN SDRD..PURTH ON TG001=TH001 AND TG002=TH002 JOIN  SDRD..PURMA ON MA001=TG005 where (PURMA.MA002 like '%å¾·å¥¥%')and TH015 > 0
  ) AS CMLH
  SELECT *FROM #TEM
 
@@ -471,15 +478,15 @@ select RTRIM(ZJ) Æ·ºÅ,MB002 Æ·Ãû,MB003 ¹æ¸ñ  from (
  select ZJ into #TEM from (
  select '303000676702' ZJ union all select'303060537002') b
 
-  select DISTINCT TA001+'-'+TB002 ¹¤µ¥µ¥ºÅ,TA006 ²úÆ·Æ·ºÅ,TA034 ²úÆ·Æ·Ãû,TA035 ²úÆ·¹æ¸ñ,TA015 Ô¤¼Æ²úÁ¿,TA017 ÒÑÉú²úÁ¿,
-  TB003 ²ÄÁÏÁÏºÅ,TB012 ²ÄÁÏÆ·Ãû,TB013 ²ÄÁÏ¹æ¸ñ,TB004 ÐèÁìÓÃÁ¿,TB005 ÒÑÁìÓÃÁ¿,TB005 -  TB004/TA015*TA017 ³¬ÁìÊýÁ¿  ,
-  case TA011 when '2'then '2:ÒÑ·¢ÁÏ' when '3'then '3:Éú²úÖÐ' when 'y'then 'y:Ö¸¶¨½áÊø'  when 'Y'then 'Y:ÒÑÍê¹¤' end ¹¤µ¥×´Ì¬,
-  TA014 ×îºóÈë¿âÈÕÆÚ,left(CMSMC.UDF01,4) ÊÂÒµ²¿ from  MOCTA JOIN MOCTB ON TA001 =TB001 AND TA002=TB002 
+  select DISTINCT TA001+'-'+TB002 å·¥å•å•å·,TA006 äº§å“å“å·,TA034 äº§å“å“å,TA035 äº§å“è§„æ ¼,TA015 é¢„è®¡äº§é‡,TA017 å·²ç”Ÿäº§é‡,
+  TB003 ææ–™æ–™å·,TB012 ææ–™å“å,TB013 ææ–™è§„æ ¼,TB004 éœ€é¢†ç”¨é‡,TB005 å·²é¢†ç”¨é‡,TB005 -  TB004/TA015*TA017 è¶…é¢†æ•°é‡  ,
+  case TA011 when '2'then '2:å·²å‘æ–™' when '3'then '3:ç”Ÿäº§ä¸­' when 'y'then 'y:æŒ‡å®šç»“æŸ'  when 'Y'then 'Y:å·²å®Œå·¥' end å·¥å•çŠ¶æ€,
+  TA014 æœ€åŽå…¥åº“æ—¥æœŸ,left(CMSMC.UDF01,4) äº‹ä¸šéƒ¨ from  MOCTA JOIN MOCTB ON TA001 =TB001 AND TA002=TB002 
   inner join CMSMC on MC001=TA020
   WHERE (  TA011 IN( '1', '2', '3')  or (TA011 IN( 'y', 'Y')  and TA014 >= '20250701' and TA014 <= '20251231' ))  
   AND TA015*TA017>0 AND (SELECT COUNT(*) FROM  #TEM WHERE ZJ=TB003  )>0 AND TB005>0 and TB005 -  TB004/TA015*TA017>0
   ORDER BY TA006,TB003,TA001+'-'+TB002
-  /**ÔÚ²úÊýÁ¿***/
+  /**åœ¨äº§æ•°é‡***/
 
 
 --	SELECT *FROM #COPINVMB WHERE MB01='102001310000'
@@ -504,28 +511,28 @@ select RTRIM(ZJ) Æ·ºÅ,MB002 Æ·Ãû,MB003 ¹æ¸ñ  from (
 --	SELECT A.CLPH,CASE WHEN MD07 IS NULL THEN '' ELSE END  FROM  #TEMQD A left JOIN #TEMQD B ON A.MD03=B.MD01 left JOIN #TEMQD C on B.MD03=C.MD01 left JOIN #TEMQD D on C.MD03=D.MD01
 
 
-select   left(LA004,6)YF,case when LA024 like '%ÈðµÂÖÇÄÜ%' then 'ÈðµÂÖÇÄÜ' else '±¾µØ²É¹º' end,rtrim(MB001) Æ·ºÅ,MB002,MB003,MB004,-SUM(LA011*LA005) from  INVLA JOIN INVMB ON MB001=LA001 join CMSMC C  on LA009=MC001 where (LA004 >= '20220701'  and  LA004 <= '20220930' ) AND (MB002 LIKE '%%' or MB002 LIKE '%----%')  AND C.UDF01 LIKE '%-Á¼Æ·%' AND LA006 NOT LIKE ('1%')  AND LEFT(LA006,2) NOT IN('35','18' ,'19','34') AND LEFT(LA006,2) NOT IN('1102','1112' )
+select   left(LA004,6)YF,case when LA024 like '%ç‘žå¾·æ™ºèƒ½%' then 'ç‘žå¾·æ™ºèƒ½' else 'æœ¬åœ°é‡‡è´­' end,rtrim(MB001) å“å·,MB002,MB003,MB004,-SUM(LA011*LA005) from  INVLA JOIN INVMB ON MB001=LA001 join CMSMC C  on LA009=MC001 where (LA004 >= '20220701'  and  LA004 <= '20220930' ) AND (MB002 LIKE '%%' or MB002 LIKE '%----%')  AND C.UDF01 LIKE '%-è‰¯å“%' AND LA006 NOT LIKE ('1%')  AND LEFT(LA006,2) NOT IN('35','18' ,'19','34') AND LEFT(LA006,2) NOT IN('1102','1112' )
 
 
 AND MB001  IN(SELECT t.ZJ FROM  #TEM t  )
 and LEFT(MB001,1) in('3','5','6')
- GROUP BY left(LA004,6),case when LA024 like '%ÈðµÂÖÇÄÜ%' then 'ÈðµÂÖÇÄÜ' else '±¾µØ²É¹º' end,MB001,MB002,MB003,MB004 HAVING(-SUM(LA011*LA005))>0 order by YF,MB001,MB002,case when LA024 like '%ÈðµÂÖÇÄÜ%' then 'ÈðµÂÖÇÄÜ' else '±¾µØ²É¹º' end
+ GROUP BY left(LA004,6),case when LA024 like '%ç‘žå¾·æ™ºèƒ½%' then 'ç‘žå¾·æ™ºèƒ½' else 'æœ¬åœ°é‡‡è´­' end,MB001,MB002,MB003,MB004 HAVING(-SUM(LA011*LA005))>0 order by YF,MB001,MB002,case when LA024 like '%ç‘žå¾·æ™ºèƒ½%' then 'ç‘žå¾·æ™ºèƒ½' else 'æœ¬åœ°é‡‡è´­' end
 
 
 
 
 
- SELECT SYB.YF,SYB.Æ·ºÅ,SYB.MB002,SYB.MB003 ,SYB.BM,SUM(SYB.SL) FROM  (
+ SELECT SYB.YF,SYB.å“å·,SYB.MB002,SYB.MB003 ,SYB.BM,SUM(SYB.SL) FROM  (
  SELECT YL.*,LEFT(ISNULL( MD011,DX),4) BM FROM (
  
-select   left(LA004,6)YF,rtrim(MB001) Æ·ºÅ,MB002,MB003,MB004,ISNULL( LA.UDF06,LA024) DX,-SUM(LA011*LA005) SL from  INVLA LA JOIN INVMB ON MB001=LA001 join CMSMC C  on LA009=MC001 where (LA004 >= '20180101'  and  LA004 <= '20240731' ) AND (MB002 LIKE '%%' or MB002 LIKE '%----%')  AND C.UDF01 LIKE '%-Á¼Æ·%' AND LA006 NOT LIKE ('1%')  AND LEFT(LA006,2) NOT IN('35','18' ,'19','34') AND LEFT(LA006,2) NOT IN('1102','1112' )
+select   left(LA004,6)YF,rtrim(MB001) å“å·,MB002,MB003,MB004,ISNULL( LA.UDF06,LA024) DX,-SUM(LA011*LA005) SL from  INVLA LA JOIN INVMB ON MB001=LA001 join CMSMC C  on LA009=MC001 where (LA004 >= '20180101'  and  LA004 <= '20240731' ) AND (MB002 LIKE '%%' or MB002 LIKE '%----%')  AND C.UDF01 LIKE '%-è‰¯å“%' AND LA006 NOT LIKE ('1%')  AND LEFT(LA006,2) NOT IN('35','18' ,'19','34') AND LEFT(LA006,2) NOT IN('1102','1112' )
 AND MB001  IN(SELECT t.ZJ FROM  #TEM t  )
 and LEFT(MB001,1) in('3','5','6')
- GROUP BY left(LA004,6),case when LA024 like '%ÈðµÂÖÇÄÜ%' then 'ÈðµÂÖÇÄÜ' else '±¾µØ²É¹º' end,MB001,MB002,MB003,MB004,ISNULL( LA.UDF06,LA024) HAVING(-SUM(LA011*LA005))>0-- order by YF,MB001,MB002,case when LA024 like '%ÈðµÂÖÇÄÜ%' then 'ÈðµÂÖÇÄÜ' else '±¾µØ²É¹º' END
+ GROUP BY left(LA004,6),case when LA024 like '%ç‘žå¾·æ™ºèƒ½%' then 'ç‘žå¾·æ™ºèƒ½' else 'æœ¬åœ°é‡‡è´­' end,MB001,MB002,MB003,MB004,ISNULL( LA.UDF06,LA024) HAVING(-SUM(LA011*LA005))>0-- order by YF,MB001,MB002,case when LA024 like '%ç‘žå¾·æ™ºèƒ½%' then 'ç‘žå¾·æ™ºèƒ½' else 'æœ¬åœ°é‡‡è´­' END
  
  )  YL LEFT  JOIN 
  dbo.CMSMD ON  DX LIKE RTRIM(MD001)+'%' 
- )SYB GROUP BY  SYB.YF,SYB.Æ·ºÅ,SYB.MB002,SYB.MB003 ,SYB.BM
+ )SYB GROUP BY  SYB.YF,SYB.å“å·,SYB.MB002,SYB.MB003 ,SYB.BM
  
 
 
@@ -533,8 +540,8 @@ and LEFT(MB001,1) in('3','5','6')
  --SELECT * FROM INVLA WHERE LA001='303000127002' AND LA004 LIKE '202207%'
 
 
- /**±¨·ÏÃ÷Ï¸*/
- select  TM001 µ¥±ð,TM002 µ¥ºÅ,TM003 ÐòºÅ,TM004 Æ·ºÅ,TM005 Æ·Ãû,TM006 ¹æ¸ñ,TM007 ÊýÁ¿,ME002 ËùÊôµ¥Î»,TL015 ÈÕÆÚ from  INVTM join INVTL on TM001=TL001 AND TM002=TL002
+ /**æŠ¥åºŸæ˜Žç»†*/
+ select  TM001 å•åˆ«,TM002 å•å·,TM003 åºå·,TM004 å“å·,TM005 å“å,TM006 è§„æ ¼,TM007 æ•°é‡,ME002 æ‰€å±žå•ä½,TL015 æ—¥æœŸ from  INVTM join INVTL on TM001=TL001 AND TM002=TL002
  LEFT JOIN CMSME ON ME001=TL006
  where TL015 >= '20180101' and TL015 <= '20240731' AND left(INVTM.TM004,1) in( '1','2','A')
-   AND (TM006 LIKE '%CM%'or  TM006 LIKE '%´¿Ã×%')
+   AND (TM006 LIKE '%CM%'or  TM006 LIKE '%çº¯ç±³%')

@@ -69,7 +69,7 @@ SELECT
     , '' AS [MODI_DATE]                   -- char(17)
     , 1  AS [FLAG]                        -- numeric(3,0)
     , '1201' AS [TB001]                   -- char(4)
-    , '20260203001' AS [TB002]            -- char(11)
+    , '20260326001' AS [TB002]            -- char(11)
     , RIGHT('0000' + CAST(
           ROW_NUMBER() OVER (
               ORDER BY IT.ItemCode, IT.FromWarehouse, IT.ToWarehouse
@@ -90,7 +90,7 @@ SELECT
     , '' AS [TB016]                       -- char(8)
     , '' AS [TB017]                       -- varchar(255)
     , 'N' AS [TB018]                       -- char(1)
-    , '20260203' AS [TB019]                       -- char(8)
+    , '20260326' AS [TB019]                       -- char(8)
     , MB072 AS [TB020]                       -- char(4)
     , '' AS [TB021]                       -- char(20)
     , 0  AS [TB022]                       -- numeric(15,6)
@@ -127,7 +127,7 @@ LEFT OUTER JOIN INVMC ON MC001 = IT.ItemCode AND MC002 = IT.FromWarehouse
 ;
 
 GO
---SELECT * FROM INVTB WHERE TB001 = '1201' AND TB002 = '20260203001'
+--SELECT * FROM INVTB WHERE TB001 = '1201' AND TB002 = '20260326001'
 
 
 
@@ -192,7 +192,7 @@ SELECT
     , 1                               AS [FLAG]         -- numeric(3,0)
     , B.TB001                         AS [TA001]        -- char(4)  调拨单别
     , B.TB002                         AS [TA002]        -- char(11) 调拨单号
-    , '20260203'  AS [TA003]        -- char(8)  单据日期
+    , '20260326'  AS [TA003]        -- char(8)  单据日期
     , '120800'                              AS [TA004]        -- char(6)
     , ''                              AS [TA005]        -- varchar(255)
     , 'N'                              AS [TA006]        -- char(1)
@@ -203,7 +203,7 @@ SELECT
     , B.TB007                               AS [TA011]        -- numeric(15,6)
     , B.TB011                               AS [TA012]        -- numeric(15,2)
     , 'N'                              AS [TA013]        -- char(1)
-    , '20260203'                              AS [TA014]        -- char(8)
+    , '20260326'                              AS [TA014]        -- char(8)
     , ''                              AS [TA015]        -- char(10)
     , TB022                               AS [TA016]        -- numeric(15,6)
     , 'N'                              AS [TA017]        -- char(1)
@@ -237,6 +237,6 @@ FROM (
     -- 一张单据头对应多行明细时，用 DISTINCT/分组保证每个单号只插一条头
     SELECT COMPANY, CREATOR, USR_GROUP, TB001, TB002,SUM(TB007) AS TB007,SUM(TB011) AS TB011,SUM(TB022) AS TB022
     FROM   dbo.INVTB
-    WHERE TB001 = '1201' AND TB002 = '20260203001'
+    WHERE TB001 = '1201' AND TB002 = '20260326001'
     GROUP BY COMPANY, CREATOR, USR_GROUP, TB001, TB002
 ) AS B;

@@ -85,13 +85,13 @@ select*from   LSSJ..MonPrice_Update where isnull(单价,0)=0 AND 规格 LIKE '%�
 
 --查看币种不为RMB的数据
 SELECT * FROM LSSJ..MonPrice_Update WHERE 供应商='20533537'
-SELECT * FROM LSSJ..MonPrice_Update WHERE 币种='USD' AND 品号='305030034200'
+SELECT * FROM LSSJ..MonPrice_Update WHERE 币种<> 'RMB' AND 品号='305030034200'
 --DELETE FROM LSSJ..MonPrice_Update WHERE 币种='USD'
 --插入转月临时表
 delete FROM LSSJ..LSCGTH
 
 INSERT LSSJ..LSCGTH (单号,序号,供应商,品号,单价,数量,仓库,币种,汇率)
-SELECT '20260131001','0001',供应商,品号,单价,SUM(数量 )数量,仓库,币种,汇率 FROM  LSSJ..MonPrice_Update INNER JOIN AHRD..PURMA ON 供应商 = PURMA.MA001
+SELECT '20260228001','0001',供应商,品号,单价,SUM(数量 )数量,仓库,币种,汇率 FROM  LSSJ..MonPrice_Update INNER JOIN AHRD..PURMA ON 供应商 = PURMA.MA001
 GROUP BY 供应商,品号,单价,仓库,币种,汇率 
 
 SELECT * FROM LSSJ..LSCGTH 
@@ -100,7 +100,7 @@ ORDER BY 单号,序号
 declare @No int--单号编号
 declare @FormNo varchar(11)--单号前缀
 
-set @FormNo='202601'--本月月份
+set @FormNo='202602'--本月月份
 select @No=right(rtrim(isnull(MAX(TI002),'00000')),5) FROM AHRD..PURTI  where TI001='3573' and left(TI002,6)=@FormNo
 
  update B set 单号=xindan ,序号=xinxu
@@ -144,9 +144,10 @@ TI031,TI032,TI033,TI034,TI035,TI036,TI037,TI038,TI039,TI040,
 TI041,TI042,TI043,TI044,TI045,
 UDF01,UDF02,UDF03,UDF04,UDF05,UDF06,UDF51,UDF52,UDF53,UDF54,UDF55,UDF56) 
 SELECT
-'0001','10105978','90001',FORMAT(GETDATE(), 'yyyyMMddHHmmssfff'),'','',1,
-'3573',单号,'20260131',供应商,'000301','RMB',1,'S','1',0,
-SUM(单价*数量)/1.13,'月末批量开退货单','N','20260131',SUM(单价*数量)-SUM(单价*数量)/1.13,PURMA.MA003,PURMA.MA005,'','',''
+'0001','10105978','90001','20260228000000000'--FORMAT(GETDATE(), 'yyyyMMddHHmmssfff')
+,'','',1,
+'3573',单号,'20260228',供应商,'000301','RMB',1,'S','1',0,
+SUM(单价*数量)/1.13,'月末批量开退货单','N','20260228',SUM(单价*数量)-SUM(单价*数量)/1.13,PURMA.MA003,PURMA.MA005,'','',''
 ,0,SUM(数量),'','N','','',0.13,SUM(单价*数量)/1.13,SUM(单价*数量)-SUM(单价*数量)/1.13,PURMA.MA055
 ,0,'N','',0,'N','N','','','','N'
 ,'N','',0,0,0,'','','','','','',0,0,0,0,0,0
@@ -168,7 +169,8 @@ insert into AHRD..PURTJ
 	TJ051,TJ052,TJ053,TJ054,TJ055,TJ056,
 	UDF01,UDF02,UDF03,UDF04,UDF05,UDF06,UDF51,UDF52,UDF53,UDF54,UDF55,UDF56)
 SELECT 
-'0001','10105978','90001',FORMAT(GETDATE(), 'yyyyMMddHHmmssfff'),'','',1,
+'0001','10105978','90001','20260228000000000'--FORMAT(GETDATE(), 'yyyyMMddHHmmssfff')
+,'','',1,
 '3573',单号,序号,品号,INVMB.MB002,INVMB.MB003,INVMB.MB004,单价,数量,单价*数量
 ,仓库,'********************','','','','','','','','N'
 ,'N',数量,'',0,'','','','N','',单价*数量/1.13

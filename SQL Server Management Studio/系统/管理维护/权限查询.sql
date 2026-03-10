@@ -16,9 +16,15 @@ AND MG004 = 'Y'
 AND SUBSTRING(MG006,2,1) = 'Y';
 -- Chinese_PRC_BIN
 
+SELECT MG001,MA002
+FROM ADMMG
+	INNER JOIN DSCSYS..DSCMA ON MA001 = MG001
+WHERE MG002 = 'INVI05'
+AND SUBSTRING(MG006,4,1) <> 'N'
+AND MA005 = 'Y'
 
 
-SELECT MF001,MF002,MG002,MB002, MG004 ø…∑Ò‘À––,SUBSTRING(MG006,7,1) ≤…π∫µ•º€,SUBSTRING(MG006,8,1)≤…π∫Ω∂Ó FROM ADMMG AS M JOIN ADMMF ON MG001=MF001 JOIN  DSCSYS..ADMMB  ON MB001=MG002 
+SELECT MF001,MF002,MG002,MB002, MG004 ÂèØÂê¶ËøêË°å,SUBSTRING(MG006,7,1) ÈááË¥≠Âçï‰ª∑,SUBSTRING(MG006,8,1)ÈááË¥≠ÈáëÈ¢ù FROM ADMMG AS M JOIN ADMMF ON MG001=MF001 JOIN  DSCSYS..ADMMB  ON MB001=MG002 
 WHERE EXISTS ( SELECT 1 FROM WORKERS AS W 
 WHERE W.workcode COLLATE CHINESE_PRC_CI_AS = M.MG001 COLLATE CHINESE_PRC_CI_AS 
 ) 	AND SUBSTRING(M.MG002,1,5) <> 'PURAB'
@@ -45,7 +51,7 @@ WHERE W.workcode COLLATE CHINESE_PRC_CI_AS = M.MG001 COLLATE CHINESE_PRC_CI_AS
 
 AND SUBSTRING(MG006,2,1) = 'Y'
 AND MG004 = 'Y'  AND (SUBSTRING(MG006,7,1)='Y' OR SUBSTRING(MG006,8,1)='Y')
-AND MF002 LIKE '%ÀŒ∞Ææ¸%'
+AND MF002 LIKE '%ÂÆãÁà±ÂÜõ%'
 
 
 
@@ -60,23 +66,23 @@ SELECT DISTINCT
 	DEPT.departmentcode,
 	--DEPT.departmentID,
 	DEPT.departmentname,
-	DEPT.subcompanyname--,
-	--SUBSTRING(MG006,1,1) AS ≤È—Ø,
-	--SUBSTRING(MG006,2,1) AS ∏¸∏ƒ,
-	--SUBSTRING(MG006,3,1) AS …æ≥˝,
-	--SUBSTRING(MG006,4,1) AS …Û∫À,
-	--SUBSTRING(MG006,5,1) AS ≥∑œ˙…Û∫À,
-	--SUBSTRING(MG006,6,1) AS  ‰≥ˆ,
-	--SUBSTRING(MG006,7,1) AS ≥…±æ,
-	--SUBSTRING(MG006,8,1) AS  €º€,
-	--SUBSTRING(MG006,9,1) AS –¬‘ˆ,
-	--SUBSTRING(MG006,10,1) AS ÀÕ«©,
-	--SUBSTRING(MG006,11,1),
-	--SUBSTRING(MG006,12,1) AS ◊˜∑œ,
-	--SUBSTRING(MG006,13,1),
-	--SUBSTRING(MG006,14,1),
-	--SUBSTRING(MG006,15,1),
-	--SUBSTRING(MG006,16,1)
+	DEPT.subcompanyname,
+	SUBSTRING(MG006,1,1) AS Êü•ËØ¢,
+	SUBSTRING(MG006,2,1) AS Êõ¥Êîπ,
+	SUBSTRING(MG006,3,1) AS Âà†Èô§,
+	SUBSTRING(MG006,4,1) AS ÂÆ°Ê†∏,
+	SUBSTRING(MG006,5,1) AS Êí§ÈîÄÂÆ°Ê†∏,
+	SUBSTRING(MG006,6,1) AS ËæìÂá∫,
+	SUBSTRING(MG006,7,1) AS ÊàêÊú¨,
+	SUBSTRING(MG006,8,1) AS ÂîÆ‰ª∑,
+	SUBSTRING(MG006,9,1) AS Êñ∞Â¢û,
+	SUBSTRING(MG006,10,1) AS ÈÄÅÁ≠æ,
+	SUBSTRING(MG006,11,1),
+	SUBSTRING(MG006,12,1) AS ‰ΩúÂ∫ü,
+	SUBSTRING(MG006,13,1),
+	SUBSTRING(MG006,14,1),
+	SUBSTRING(MG006,15,1),
+	SUBSTRING(MG006,16,1)
 FROM 
 	ADMMG AS M 
 	INNER JOIN ADMMF ON MG001 = MF001 
@@ -122,7 +128,7 @@ WHERE
 ORDER BY departmentcode,workcode ASC
 
 
-SELECT DISTINCT MG001,HRM.lastname,MG002,MB002, MG004 ø…∑Ò‘À––,SUBSTRING(MG006,7,1) ≤…π∫µ•º€,SUBSTRING(MG006,8,1)≤…π∫Ω∂Ó 
+SELECT DISTINCT MG001,HRM.lastname,MG002,MB002, MG004 ÂèØÂê¶ËøêË°å,SUBSTRING(MG006,7,1) ÈááË¥≠Âçï‰ª∑,SUBSTRING(MG006,8,1)ÈááË¥≠ÈáëÈ¢ù 
 FROM 	(
 		SELECT * FROM SDRD..ADMMG
 		UNION ALL
@@ -193,12 +199,12 @@ ORDER BY M.MG002
 
 
 
-SELECT DISTINCT MG001 AS ”√ªß±‡∫≈,HRM.lastname ”√ªß√˚≥∆,
-	HrmJobTitles.jobtitlename AS ÷∞Œª√˚≥∆,
-	DEPT.departmentcode AS ≤ø√≈±‡∫≈,
-	DEPT.departmentname AS ≤ø√≈√˚≥∆,
-	DEPT.subcompanyname AS π´Àæ√˚≥∆,
-	MG002 ≥Ã–Ú±‡∫≈,MB002 ≥Ã–Ú√˚≥∆,SUBSTRING(MG006,7,1) µ•º€»®œﬁ,SUBSTRING(MG006,8,1) Ω∂Ó»®œﬁ
+SELECT DISTINCT MG001 AS Áî®Êà∑ÁºñÂè∑,HRM.lastname Áî®Êà∑ÂêçÁß∞,
+	HrmJobTitles.jobtitlename AS ËÅå‰ΩçÂêçÁß∞,
+	DEPT.departmentcode AS ÈÉ®Èó®ÁºñÂè∑,
+	DEPT.departmentname AS ÈÉ®Èó®ÂêçÁß∞,
+	DEPT.subcompanyname AS ÂÖ¨Âè∏ÂêçÁß∞,
+	MG002 Á®ãÂ∫èÁºñÂè∑,ADMMB.MB002 Á®ãÂ∫èÂêçÁß∞,SUBSTRING(MG006,7,1) Âçï‰ª∑ÊùÉÈôê,SUBSTRING(MG006,8,1) ÈáëÈ¢ùÊùÉÈôê,M.COMPANY,DSCMB.MB002
 FROM 	(
 		SELECT * FROM SDRD..ADMMG
 		UNION ALL
@@ -216,30 +222,75 @@ INNER JOIN  DSCSYS..ADMMB  ON MB001=MG002
 INNER JOIN [192.168.8.24].[ecology].[dbo].OA_Hrm AS HRM ON workcode COLLATE Chinese_PRC_BIN = MG001
 	LEFT OUTER JOIN [192.168.8.24].[ecology].dbo.OA_COMPLETEDEP_Vcode AS DEPT ON DEPT.departmentID = HRM.departmentid 
 	LEFT OUTER JOIN [192.168.8.24].[ecology].[dbo].HrmJobTitles on HRM.jobtitle=HrmJobTitles.id
+LEFT OUTER JOIN DSCSYS..DSCMB ON DSCMB.MB001=M.COMPANY
 WHERE 
-	LEFT(M.MG002,3) IN ('COP')
-	AND SUBSTRING(M.MG002,1,4) <> 'COPB'
+	LEFT(M.MG002,3) IN ('PUR')
+	AND SUBSTRING(M.MG002,1,5) <> 'PURAB'
+	AND SUBSTRING(M.MG002,1,4) <> 'PURB' 
+	AND SUBSTRING(M.MG002,1,4) <> 'PURQ' 
 	AND M.MG002 NOT IN(
-		'COPI01',
-		'COPI03',
-		'COPI10',
-		'COPI10',
-		'COPI11',
-		'COPI12',
-		'COPI13',
-		'COPI14',
-		'COPR01',
-		'COPR02',
-		'COPR03',
-		'COPR26',
-		'COPR33',
-		'COPR34',
-		'COPR36',
-		'COPR50',
-		'COPR51',
-		'COPR52',
-		'COPR53',
-		'COPR60'
+		'PURI01',
+		'PURI04',
+		'PURI05',
+		'PURI10',
+		'PURI12',
+		'PURI13',
+		'PURR01',
+		'PURR02',
+		'PURR03',
+		'PURR10',
+		'PURR11',
+		'PURR12',
+		'PURR19',
+		'PURR20',
+		'PURR36',
+		'PURR39'
+	)
+	AND MG004 = 'Y'  
+	AND (
+		SUBSTRING(MG006,7,1)='Y' 
+		OR SUBSTRING(MG006,8,1)='Y'
+	)
+ORDER BY M.MG002
+
+
+
+SELECT DISTINCT MG001 AS Áî®Êà∑ÁºñÂè∑,HRM.lastname Áî®Êà∑ÂêçÁß∞,
+	HrmJobTitles.jobtitlename AS ËÅå‰ΩçÂêçÁß∞,
+	DEPT.departmentcode AS ÈÉ®Èó®ÁºñÂè∑,
+	DEPT.departmentname AS ÈÉ®Èó®ÂêçÁß∞,
+	DEPT.subcompanyname AS ÂÖ¨Âè∏ÂêçÁß∞,
+	MG002 Á®ãÂ∫èÁºñÂè∑,ADMMB.MB002 Á®ãÂ∫èÂêçÁß∞,SUBSTRING(MG006,7,1) Âçï‰ª∑ÊùÉÈôê,SUBSTRING(MG006,8,1) ÈáëÈ¢ùÊùÉÈôê--,M.COMPANY,DSCMB.MB002
+FROM 	(
+		SELECT * FROM ADMMG
+	) AS M  
+INNER JOIN  DSCSYS..ADMMB  ON MB001=MG002 
+INNER JOIN [192.168.8.24].[ecology].[dbo].OA_Hrm AS HRM ON workcode COLLATE Chinese_PRC_BIN = MG001
+	LEFT OUTER JOIN [192.168.8.24].[ecology].dbo.OA_COMPLETEDEP_Vcode AS DEPT ON DEPT.departmentID = HRM.departmentid 
+	LEFT OUTER JOIN [192.168.8.24].[ecology].[dbo].HrmJobTitles on HRM.jobtitle=HrmJobTitles.id
+--LEFT OUTER JOIN DSCSYS..DSCMB ON DSCMB.MB001=M.COMPANY
+WHERE 
+	LEFT(M.MG002,3) IN ('PUR')
+	AND SUBSTRING(M.MG002,1,5) <> 'PURAB'
+	AND SUBSTRING(M.MG002,1,4) <> 'PURB' 
+	AND SUBSTRING(M.MG002,1,4) <> 'PURQ' 
+	AND M.MG002 NOT IN(
+		'PURI01',
+		'PURI04',
+		'PURI05',
+		'PURI10',
+		'PURI12',
+		'PURI13',
+		'PURR01',
+		'PURR02',
+		'PURR03',
+		'PURR10',
+		'PURR11',
+		'PURR12',
+		'PURR19',
+		'PURR20',
+		'PURR36',
+		'PURR39'
 	)
 	AND MG004 = 'Y'  
 	AND (

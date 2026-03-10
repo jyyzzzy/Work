@@ -1,32 +1,32 @@
 
-/**20240307»ñÈ¡µ¥¾ÝÉÏµÄµ¥¼ÛÊý¾Ý£¬
-ÁÙÊ±±í:
-MonPrice_Update   ´æ´¢¿É×ªÔÂÊý¾Ý¼ì²é
-LSSJ..LSCGTH    ×ªÔÂµ¥¾Ý
+/**20240307èŽ·å–å•æ®ä¸Šçš„å•ä»·æ•°æ®ï¼Œ
+ä¸´æ—¶è¡¨:
+MonPrice_Update   å­˜å‚¨å¯è½¬æœˆæ•°æ®æ£€æŸ¥
+LSSJ..LSCGTH    è½¬æœˆå•æ®
 
-1.Í¨Öª²É¹º³ö×îºóÒ»¸å²É¹ºµ¥¼Û¡£
-2.½«¶ÔÓ¦µÄ²É¹ºµ¥ºÅ±£´æ£¬¼ì²é½»Ò×ÊýÁ¿=ÊýÁ¿£¨×ªÔÂÊýÁ¿£©¡£
-3.ÊýÁ¿ÏàµÈ£¬¹ØÁª²É¹ºµ¥ÉÏµÄ±ÒÖÖ¡¢µ¥¼Û¡¢²Ö¿â¡¢»ãÂÊ¡£
-4.¿Í¹©ÎÞµ¥¼Û£¬É¾³ýÊý¾Ý¡£
-5.²é¿´±ÒÖÖ²»ÎªRMBµÄÊý¾Ý£¬ÐèÒªÍ¨Öª²É¹ºÈ·ÈÏÊÇ·ñ×ªÔÂ¡£
-6.²åÈëÁÙÊ±±í LSSJ..LSCGTH ¸üÐÂµ¥ºÅ
-7.²åÈë²É¹ºµ¥¾Ý£¬ERPÇ°¶ËÉóºË¡£
-8.ÉóºËÍê±ÏÉú³ÉÈðµÂ²É¹º½µ¼Û±í£¬Ìá¹©¸ø²É¹º²é¿´£¬È·ÈÏºÃºó²ÆÎñ½øÐÐ×ªÔÂ¼Æ»®
+1.é€šçŸ¥é‡‡è´­å‡ºæœ€åŽä¸€ç¨¿é‡‡è´­å•ä»·ã€‚
+2.å°†å¯¹åº”çš„é‡‡è´­å•å·ä¿å­˜ï¼Œæ£€æŸ¥äº¤æ˜“æ•°é‡=æ•°é‡ï¼ˆè½¬æœˆæ•°é‡ï¼‰ã€‚
+3.æ•°é‡ç›¸ç­‰ï¼Œå…³è”é‡‡è´­å•ä¸Šçš„å¸ç§ã€å•ä»·ã€ä»“åº“ã€æ±‡çŽ‡ã€‚
+4.å®¢ä¾›æ— å•ä»·ï¼Œåˆ é™¤æ•°æ®ã€‚
+5.æŸ¥çœ‹å¸ç§ä¸ä¸ºRMBçš„æ•°æ®ï¼Œéœ€è¦é€šçŸ¥é‡‡è´­ç¡®è®¤æ˜¯å¦è½¬æœˆã€‚
+6.æ’å…¥ä¸´æ—¶è¡¨ LSSJ..LSCGTH æ›´æ–°å•å·
+7.æ’å…¥é‡‡è´­å•æ®ï¼ŒERPå‰ç«¯å®¡æ ¸ã€‚
+8.å®¡æ ¸å®Œæ¯•ç”Ÿæˆç‘žå¾·é‡‡è´­é™ä»·è¡¨ï¼Œæä¾›ç»™é‡‡è´­æŸ¥çœ‹ï¼Œç¡®è®¤å¥½åŽè´¢åŠ¡è¿›è¡Œè½¬æœˆè®¡åˆ’
 */ 
-SELECT * FROM LSSJ..MonPrice_Update WHERE Æ·ºÅ='315009088800'
+SELECT * FROM LSSJ..MonPrice_Update WHERE å“å·='315009088800'
 
-="insert into  LSSJ..MonPrice_Update(cgdh,Æ·ºÅ,¹©Ó¦ÉÌ,ÊýÁ¿,µ¥¼Û)values('"&A2&"','"&B2&"','"&C2&"',"&D2&","&E2&")"
+="insert into  LSSJ..MonPrice_Update(cgdh,å“å·,ä¾›åº”å•†,æ•°é‡,å•ä»·)values('"&A2&"','"&B2&"','"&C2&"',"&D2&","&E2&")"
 
---É¾³ý²»ÐèÒª×ªÔÂµÄÊý¾Ý:ÊýÁ¿¶ÔÓ¦×ªÔÂÊýÁ¿
-DELETE  LSSJ..MonPrice_Update WHERE ISNULL(ÊýÁ¿,0)=0
-
-
+--åˆ é™¤ä¸éœ€è¦è½¬æœˆçš„æ•°æ®:æ•°é‡å¯¹åº”è½¬æœˆæ•°é‡
+DELETE  LSSJ..MonPrice_Update WHERE ISNULL(æ•°é‡,0)=0
 
 
-SELECT * FROM LSSJ..MonPrice_Update WHERE ISNULL(½»Ò×ÊýÁ¿,0)<>ISNULL(ÊýÁ¿,0)
 
---¶ÔÓ¦±ÒÖÖ¡¢µ¥¼Û¡¢²Ö¿â¡¢»ãÂÊ²éÑ¯
-select cgdh,Æ·ºÅ,ISNULL(ÊýÁ¿,0),DH,TH018,TG008,TG007,TH009,TH031,TH015,TH054
+
+SELECT * FROM LSSJ..MonPrice_Update WHERE ISNULL(äº¤æ˜“æ•°é‡,0)<>ISNULL(æ•°é‡,0)
+
+--å¯¹åº”å¸ç§ã€å•ä»·ã€ä»“åº“ã€æ±‡çŽ‡æŸ¥è¯¢
+select cgdh,å“å·,ISNULL(æ•°é‡,0),DH,TH018,TG008,TG007,TH009,TH031,TH015,TH054
  from   LSSJ..MonPrice_Update
  JOIN 
  (
@@ -34,12 +34,12 @@ select cgdh,Æ·ºÅ,ISNULL(ÊýÁ¿,0),DH,TH018,TG008,TG007,TH009,TH031,TH015,TH054
 UNION ALL
 SELECT TB001+'-'+TB002+'-'+TB003,TB007,TB010,'1.0000000','RMB',TB012 AS DH,'',0 FROM ZJRD.dbo.INVTB)A ON cgdh=A.DH
 WHERE 
---Æ·ºÅ IN ('309000002700','309000039900','309000056200','309000057700','309000074400','309000085600','309000089300','309010000600')
+--å“å· IN ('309000002700','309000039900','309000056200','309000057700','309000074400','309000085600','309000089300','309010000600')
 --and
 TH015=TH054
 
-----¸üÐÂ¶ÔÓ¦±ÒÖÖ¡¢µ¥¼Û¡¢²Ö¿â¡¢»ãÂÊ
-UPDATE LSSJ..MonPrice_Update SET µ¥¼Û=TH018,±ÒÖÖ=TG007,»ãÂÊ=TG008
+----æ›´æ–°å¯¹åº”å¸ç§ã€å•ä»·ã€ä»“åº“ã€æ±‡çŽ‡
+UPDATE LSSJ..MonPrice_Update SET å•ä»·=TH018,å¸ç§=TG007,æ±‡çŽ‡=TG008
  from   LSSJ..MonPrice_Update
  JOIN 
  (
@@ -50,70 +50,70 @@ SELECT TB001+'-'+TB002+'-'+TB003,TB010,'1.0000000','RMB',TB012 AS DH,'' FROM ZJR
 WHERE LSSJ..MonPrice_Update.cgdh=A.DH
  
 
-/**¸üÐÂ²Ö¿â*/
-update LSSJ..MonPrice_Update  set ²Ö¿â=MB017
+/**æ›´æ–°ä»“åº“*/
+update LSSJ..MonPrice_Update  set ä»“åº“=MB017
 --select *
-from LSSJ..MonPrice_Update  join  ZJRD..INVMB on Æ·ºÅ=MB001 
+from LSSJ..MonPrice_Update  join  ZJRD..INVMB on å“å·=MB001 
 
 
-SELECT * FROM  LSSJ..MonPrice_Update WHERE Æ·ºÅ='309000002700'
+SELECT * FROM  LSSJ..MonPrice_Update WHERE å“å·='309000002700'
 
---¿Í¹©ÎÞµ¥¼Û£¬É¾³ýÊý¾Ý
-select*from   LSSJ..MonPrice_Update where isnull(µ¥¼Û,0)=0 AND ¹æ¸ñ LIKE '%¿Í¹©%'
---DELETE from   LSSJ..MonPrice_Update where isnull(µ¥¼Û,0)=0 AND ¹æ¸ñ LIKE '%¿Í¹©%'
+--å®¢ä¾›æ— å•ä»·ï¼Œåˆ é™¤æ•°æ®
+select*from   LSSJ..MonPrice_Update where isnull(å•ä»·,0)=0 AND è§„æ ¼ LIKE '%å®¢ä¾›%'
+--DELETE from   LSSJ..MonPrice_Update where isnull(å•ä»·,0)=0 AND è§„æ ¼ LIKE '%å®¢ä¾›%'
 
---²é¿´±ÒÖÖ²»ÎªRMBµÄÊý¾Ý
-SELECT * FROM LSSJ..MonPrice_Update WHERE ¹©Ó¦ÉÌ='20533537'
-SELECT * FROM LSSJ..MonPrice_Update WHERE ±ÒÖÖ='USD' AND Æ·ºÅ='305030034200'
---DELETE FROM LSSJ..MonPrice_Update WHERE ±ÒÖÖ='USD'
---²åÈë×ªÔÂÁÙÊ±±í
+--æŸ¥çœ‹å¸ç§ä¸ä¸ºRMBçš„æ•°æ®
+SELECT * FROM LSSJ..MonPrice_Update WHERE ä¾›åº”å•†='20533537'
+SELECT * FROM LSSJ..MonPrice_Update WHERE å¸ç§<>'RMB' AND å“å·='305030034200'
+--DELETE FROM LSSJ..MonPrice_Update WHERE å¸ç§='USD'
+--æ’å…¥è½¬æœˆä¸´æ—¶è¡¨
 delete FROM LSSJ..LSCGTH
 
-INSERT LSSJ..LSCGTH (µ¥ºÅ,ÐòºÅ,¹©Ó¦ÉÌ,Æ·ºÅ,µ¥¼Û,ÊýÁ¿,²Ö¿â,±ÒÖÖ,»ãÂÊ)
-SELECT '20251231001','0001',¹©Ó¦ÉÌ,Æ·ºÅ,µ¥¼Û,SUM(ÊýÁ¿ )ÊýÁ¿,²Ö¿â,±ÒÖÖ,»ãÂÊ FROM  LSSJ..MonPrice_Update INNER JOIN ZJRD..PURMA ON ¹©Ó¦ÉÌ = PURMA.MA001
-GROUP BY ¹©Ó¦ÉÌ,Æ·ºÅ,µ¥¼Û,²Ö¿â,±ÒÖÖ,»ãÂÊ
+INSERT LSSJ..LSCGTH (å•å·,åºå·,ä¾›åº”å•†,å“å·,å•ä»·,æ•°é‡,ä»“åº“,å¸ç§,æ±‡çŽ‡)
+SELECT '20260228001','0001',ä¾›åº”å•†,å“å·,å•ä»·,SUM(æ•°é‡ )æ•°é‡,ä»“åº“,å¸ç§,æ±‡çŽ‡ FROM  LSSJ..MonPrice_Update INNER JOIN ZJRD..PURMA ON ä¾›åº”å•† = PURMA.MA001
+GROUP BY ä¾›åº”å•†,å“å·,å•ä»·,ä»“åº“,å¸ç§,æ±‡çŽ‡
 
 SELECT * FROM LSSJ..LSCGTH 
-ORDER BY µ¥ºÅ,ÐòºÅ
---¸üÐÂµ¥ºÅ
-declare @No int--µ¥ºÅ±àºÅ
-declare @FormNo varchar(11)--µ¥ºÅÇ°×º
+ORDER BY å•å·,åºå·
+--æ›´æ–°å•å·
+declare @No int--å•å·ç¼–å·
+declare @FormNo varchar(11)--å•å·å‰ç¼€
 
-set @FormNo='202512'--±¾ÔÂÔÂ·Ý
+set @FormNo='202602'--æœ¬æœˆæœˆä»½
 select @No=right(rtrim(isnull(MAX(TI002),'00000')),5) FROM ZJRD..PURTI  where TI001='3573' and left(TI002,6)=@FormNo
 
- update B set µ¥ºÅ=xindan ,ÐòºÅ=xinxu
+ update B set å•å·=xindan ,åºå·=xinxu
   --select xindan ,xinxu,*
- from (select µ¥ºÅ dan,ÐòºÅ xu,@FormNo + right(cast((100000+@No+DENSE_RANK() OVER(ORDER BY ¹©Ó¦ÉÌ asc,±ÒÖÖ,»ãÂÊ )) as varchar(6)),5) xindan,10000+ROW_NUMBER() over(partition by  ¹©Ó¦ÉÌ,±ÒÖÖ,»ãÂÊ  order by Æ·ºÅ) xinxu,Æ·ºÅ ph,¹©Ó¦ÉÌ gys,±ÒÖÖ bz,»ãÂÊ hl,µ¥¼Û dj,ÊýÁ¿ sl
-FROM  LSSJ..LSCGTH) AS A join LSSJ..LSCGTH B on  µ¥ºÅ=A.dan AND Æ·ºÅ= ph and ¹©Ó¦ÉÌ= gys and ±ÒÖÖ= bz and »ãÂÊ =hl and ÊýÁ¿=sl AND µ¥¼Û=dj
+ from (select å•å· dan,åºå· xu,@FormNo + right(cast((100000+@No+DENSE_RANK() OVER(ORDER BY ä¾›åº”å•† asc,å¸ç§,æ±‡çŽ‡ )) as varchar(6)),5) xindan,10000+ROW_NUMBER() over(partition by  ä¾›åº”å•†,å¸ç§,æ±‡çŽ‡  order by å“å·) xinxu,å“å· ph,ä¾›åº”å•† gys,å¸ç§ bz,æ±‡çŽ‡ hl,å•ä»· dj,æ•°é‡ sl
+FROM  LSSJ..LSCGTH) AS A join LSSJ..LSCGTH B on  å•å·=A.dan AND å“å·= ph and ä¾›åº”å•†= gys and å¸ç§= bz and æ±‡çŽ‡ =hl and æ•°é‡=sl AND å•ä»·=dj
 
 
---×ªÔÂÊý¾Ý¼ì²é¿ªÊ¼
-SELECT * FROM LSSJ..LSCGTH ORDER BY µ¥ºÅ,ÐòºÅ
-SELECT SUM(ÊýÁ¿) FROM LSSJ..LSCGTH 
+--è½¬æœˆæ•°æ®æ£€æŸ¥å¼€å§‹
+SELECT * FROM LSSJ..LSCGTH ORDER BY å•å·,åºå·
+SELECT SUM(æ•°é‡) FROM LSSJ..LSCGTH 
 --
 
-UPDATE LSSJ..LSCGTH SET ÐòºÅ = RIGHT(ÐòºÅ,4)
+UPDATE LSSJ..LSCGTH SET åºå· = RIGHT(åºå·,4)
 
---²é¿´¹©Ó¦ÉÌÊÇ·ñ´æÔÚ»ù´¡×ÊÁÏÖÐ
-SELECT ¹©Ó¦ÉÌ,MA002 from LSSJ.dbo.LSCGTH INNER JOIN ZJRD.dbo.PURMA ON ¹©Ó¦ÉÌ=MA001
+--æŸ¥çœ‹ä¾›åº”å•†æ˜¯å¦å­˜åœ¨åŸºç¡€èµ„æ–™ä¸­
+SELECT ä¾›åº”å•†,MA002 from LSSJ.dbo.LSCGTH INNER JOIN ZJRD.dbo.PURMA ON ä¾›åº”å•†=MA001
 
---²é¿´Æ·ºÅÊÇ·ñ´æÔÚ»ù´¡×ÊÁÏÖÐ
-SELECT * FROM LSSJ..LSCGTH WHERE Æ·ºÅ NOT IN (SELECT  MB001 FROM ZJRD..INVMB) 
+--æŸ¥çœ‹å“å·æ˜¯å¦å­˜åœ¨åŸºç¡€èµ„æ–™ä¸­
+SELECT * FROM LSSJ..LSCGTH WHERE å“å· NOT IN (SELECT  MB001 FROM ZJRD..INVMB) 
 
---²é¿´±¾ÔÂ×î´óµ¥ºÅ
+--æŸ¥çœ‹æœ¬æœˆæœ€å¤§å•å·
 select MAX(TI002) FROM ZJRD..PURTI  where TI001='3573'  AND TI002 LIKE '202512%'
 
-select * from   LSSJ..LSCGTH WHERE µ¥ºÅ='20240300046'
+select * from   LSSJ..LSCGTH WHERE å•å·='20240300046'
  
-select * from   LSSJ..LSCGTH WHERE  »ãÂÊ<>1
+select * from   LSSJ..LSCGTH WHERE  æ±‡çŽ‡<>1
 
-select DISTINCT µ¥ºÅ from   LSSJ..LSCGTH order  by µ¥ºÅ DESC
+select DISTINCT å•å· from   LSSJ..LSCGTH order  by å•å· DESC
 
 SELECT DISTINCT TI002 FROM dbo.PURTI WHERE TI001='3505' AND CREATE_DATE='20231130113934473'
 
 
---²É¹ºÍË»õµ¥Í·
+--é‡‡è´­é€€è´§å•å¤´
 insert into ZJRD.dbo.PURTI
 	(COMPANY,CREATOR,USR_GROUP,CREATE_DATE,MODIFIER,MODI_DATE,FLAG,
 TI001,TI002,TI003,TI004,TI005,TI006,TI007,TI008,TI009,TI010,
@@ -123,19 +123,20 @@ TI031,TI032,TI033,TI034,TI035,TI036,TI037,TI038,TI039,TI040,
 TI041,TI042,TI043,TI044,TI045,
 UDF01,UDF02,UDF03,UDF04,UDF05,UDF06,UDF51,UDF52,UDF53,UDF54,UDF55,UDF56) 
 SELECT
-'0001','90001','10105978',FORMAT(GETDATE(), 'yyyyMMddHHmmssfff'),'','',1,
-'3573',µ¥ºÅ,'20251231',¹©Ó¦ÉÌ,'000201','RMB',1,'S','1',0,
-SUM(µ¥¼Û*ÊýÁ¿)/1.13,'ÔÂÄ©ÅúÁ¿¿ªÍË»õµ¥','N','20251231',SUM(µ¥¼Û*ÊýÁ¿)-SUM(µ¥¼Û*ÊýÁ¿)/1.13,PURMA.MA003,PURMA.MA005,'','',''
-,0,SUM(ÊýÁ¿),'','N','','',0.13,SUM(µ¥¼Û*ÊýÁ¿)/1.13,SUM(µ¥¼Û*ÊýÁ¿)-SUM(µ¥¼Û*ÊýÁ¿)/1.13,PURMA.MA055
+'0001','10105978','90001','20260228000000000'--FORMAT(GETDATE(), 'yyyyMMddHHmmssfff')
+,'','',1,
+'3573',å•å·,'20260228',ä¾›åº”å•†,'000201','RMB',1,'S','1',0,
+SUM(å•ä»·*æ•°é‡)/1.13,'æœˆæœ«æ‰¹é‡å¼€é€€è´§å•','N','20260228',SUM(å•ä»·*æ•°é‡)-SUM(å•ä»·*æ•°é‡)/1.13,PURMA.MA003,PURMA.MA005,'','',''
+,0,SUM(æ•°é‡),'','N','','',0.13,SUM(å•ä»·*æ•°é‡)/1.13,SUM(å•ä»·*æ•°é‡)-SUM(å•ä»·*æ•°é‡)/1.13,PURMA.MA055
 ,0,'N','',0,'N','N','','','','N'
 ,'N','',0,0,0,'','','','','','',0,0,0,0,0,0
-FROM LSSJ..LSCGTH INNER JOIN ZJRD..PURMA ON ¹©Ó¦ÉÌ = PURMA.MA001
-INNER JOIN ZJRD..INVMB ON Æ·ºÅ = INVMB.MB001  where µ¥¼Û is not null
-GROUP BY µ¥ºÅ,¹©Ó¦ÉÌ,PURMA.MA003,PURMA.MA055,PURMA.MA005
+FROM LSSJ..LSCGTH INNER JOIN ZJRD..PURMA ON ä¾›åº”å•† = PURMA.MA001
+INNER JOIN ZJRD..INVMB ON å“å· = INVMB.MB001  where å•ä»· is not null
+GROUP BY å•å·,ä¾›åº”å•†,PURMA.MA003,PURMA.MA055,PURMA.MA005
 
 
  
---²É¹ºÍË»õµ¥Éí
+--é‡‡è´­é€€è´§å•èº«
 insert into ZJRD..PURTJ
   (COMPANY, CREATOR, USR_GROUP, CREATE_DATE, MODIFIER, MODI_DATE, FLAG,
 	TJ001,TJ002,TJ003,TJ004,TJ005,TJ006,TJ007,TJ008,TJ009,TJ010
@@ -147,42 +148,43 @@ insert into ZJRD..PURTJ
 	TJ051,TJ052,TJ053,TJ054,TJ055,TJ056,
 	UDF01,UDF02,UDF03,UDF04,UDF05,UDF06,UDF51,UDF52,UDF53,UDF54,UDF55,UDF56)
 SELECT 
-'0001','90001','10105978',FORMAT(GETDATE(), 'yyyyMMddHHmmssfff'),'','',1,
-'3573',µ¥ºÅ,ÐòºÅ,Æ·ºÅ,INVMB.MB002,INVMB.MB003,INVMB.MB004,µ¥¼Û,ÊýÁ¿,µ¥¼Û*ÊýÁ¿
-,²Ö¿â,'********************','','','','','','','','N'
-,'N',ÊýÁ¿,'',0,'','','','N','',µ¥¼Û*ÊýÁ¿/1.13
-,µ¥¼Û*ÊýÁ¿-µ¥¼Û*ÊýÁ¿/1.13,µ¥¼Û*ÊýÁ¿/1.13,µ¥¼Û*ÊýÁ¿-µ¥¼Û*ÊýÁ¿/1.13,'','1',0,'','',0,0
+'0001','10105978','90001','20260228000000000'--FORMAT(GETDATE(), 'yyyyMMddHHmmssfff')
+,'','',1,
+'3573',å•å·,åºå·,å“å·,INVMB.MB002,INVMB.MB003,INVMB.MB004,å•ä»·,æ•°é‡,å•ä»·*æ•°é‡
+,ä»“åº“,'********************','','','','','','','','N'
+,'N',æ•°é‡,'',0,'','','','N','',å•ä»·*æ•°é‡/1.13
+,å•ä»·*æ•°é‡-å•ä»·*æ•°é‡/1.13,å•ä»·*æ•°é‡/1.13,å•ä»·*æ•°é‡-å•ä»·*æ•°é‡/1.13,'','1',0,'','',0,0
 
-,0.13,'','','','','##########',INVMB.MB004,ÊýÁ¿,INVMB.MB004,''
+,0.13,'','','','','##########',INVMB.MB004,æ•°é‡,INVMB.MB004,''
 ,'','',0,0,0,''
 ,'','','','','','',0,0,0,0,0,0
-FROM LSSJ..LSCGTH INNER JOIN ZJRD..PURMA ON ¹©Ó¦ÉÌ = PURMA.MA001
-INNER JOIN ZJRD..INVMB ON Æ·ºÅ = INVMB.MB001 where   isnull(µ¥¼Û,0)>0
+FROM LSSJ..LSCGTH INNER JOIN ZJRD..PURMA ON ä¾›åº”å•† = PURMA.MA001
+INNER JOIN ZJRD..INVMB ON å“å· = INVMB.MB001 where   isnull(å•ä»·,0)>0
 
 --select * delete from PURTJ where TJ002 in (
---select TI002 from PURTI where (PURTI.TI012 = 'ÔÂÄ©ÅúÁ¿¿ªÍË»õµ¥')
+--select TI002 from PURTI where (PURTI.TI012 = 'æœˆæœ«æ‰¹é‡å¼€é€€è´§å•')
 --  AND (PURTI.TI013 = 'N')) and TJ001='3573'
 
---  select TI002 delete from PURTI where (PURTI.TI012 = 'ÔÂÄ©ÅúÁ¿¿ªÍË»õµ¥')
+--  select TI002 delete from PURTI where (PURTI.TI012 = 'æœˆæœ«æ‰¹é‡å¼€é€€è´§å•')
 --  AND (PURTI.TI013 = 'N')
 
 
-select distinct ¹©Ó¦ÉÌ from   LSSJ..LSCGTH
+select distinct ä¾›åº”å•† from   LSSJ..LSCGTH
 select *from   LSSJ..LSCGTH
 
 select *from PURTJ join PURTI on TJ001=TI001 AND TJ002=TI002 
-WHERE PURTI.TI012 in( 'ÔÂÄ©ÅúÁ¿¿ªÍË»õµ¥')  AND (PURTI.TI014 = '20251231')
+WHERE PURTI.TI012 in( 'æœˆæœ«æ‰¹é‡å¼€é€€è´§å•')  AND (PURTI.TI014 = '20260228')
 
 
 DELETE FROM  LSSJ..zjcgrk 
 INSERT INTO   LSSJ..zjcgrk(cgdh,dj)
-select TJ001+'-'+TJ002+'-'+TJ003,µ¥¼Û
--- select µ¥¼Û,TJ008,¹©Ó¦ÉÌ AA,Æ·ºÅ BBB,*
+select TJ001+'-'+TJ002+'-'+TJ003,å•ä»·
+-- select å•ä»·,TJ008,ä¾›åº”å•† AA,å“å· BBB,*
 from PURTJ join PURTI on TJ001=TI001 AND TJ002=TI002 
-JOIN  LSSJ..LSCGTH ON  TI004=¹©Ó¦ÉÌ AND TJ004=Æ·ºÅ-- AND ÊýÁ¿=TJ009
-WHERE PURTI.TI012 in( 'ÔÂÄ©ÅúÁ¿¿ªÍË»õµ¥')  AND (PURTI.TI014 = '20251231')
-AND µ¥¼Û<>TJ008 
-AND ¹©Ó¦ÉÌ+''+Æ·ºÅ IN('20500031304090033800',
+JOIN  LSSJ..LSCGTH ON  TI004=ä¾›åº”å•† AND TJ004=å“å·-- AND æ•°é‡=TJ009
+WHERE PURTI.TI012 in( 'æœˆæœ«æ‰¹é‡å¼€é€€è´§å•')  AND (PURTI.TI014 = '20260228')
+AND å•ä»·<>TJ008 
+AND ä¾›åº”å•†+''+å“å· IN('20500031304090033800',
 '20500031304090111300',
 '20500031304090129000',
 '20500031304090136200',
@@ -201,19 +203,19 @@ AND ¹©Ó¦ÉÌ+''+Æ·ºÅ IN('20500031304090033800',
 '29001198307010124700',
 '29001651304110023200'
 )
-ORDER BY ¹©Ó¦ÉÌ,Æ·ºÅ
+ORDER BY ä¾›åº”å•†,å“å·
 
 
 
 
 INSERT INTO   LSSJ..zjcgrk(cgdh,dj)
-select TH001+'-'+TH002+'-'+TH003,µ¥¼Û
--- select µ¥¼Û,TH018,¹©Ó¦ÉÌ AA,Æ·ºÅ BBB,*
+select TH001+'-'+TH002+'-'+TH003,å•ä»·
+-- select å•ä»·,TH018,ä¾›åº”å•† AA,å“å· BBB,*
 from PURTG join PURTH on TH001=TG001 AND TH002=TG002 
-JOIN  LSSJ..LSCGTH ON  TG005=¹©Ó¦ÉÌ AND TH004=Æ·ºÅ-- AND ÊýÁ¿=TJ009
-WHERE PURTG.TG016 in( '²É¹ºÔÂÄ©ÍË»õÔÂ³õ½ø²Ö')AND (TG014 = '20251101')
-AND µ¥¼Û<>TH018
-AND ¹©Ó¦ÉÌ+''+Æ·ºÅ IN('20500031304090033800',
+JOIN  LSSJ..LSCGTH ON  TG005=ä¾›åº”å•† AND TH004=å“å·-- AND æ•°é‡=TJ009
+WHERE PURTG.TG016 in( 'é‡‡è´­æœˆæœ«é€€è´§æœˆåˆè¿›ä»“')AND (TG014 = '20251101')
+AND å•ä»·<>TH018
+AND ä¾›åº”å•†+''+å“å· IN('20500031304090033800',
 '20500031304090111300',
 '20500031304090129000',
 '20500031304090136200',
@@ -232,4 +234,4 @@ AND ¹©Ó¦ÉÌ+''+Æ·ºÅ IN('20500031304090033800',
 '29001198307010124700',
 '29001651304110023200'
 )
-ORDER BY ¹©Ó¦ÉÌ,Æ·ºÅ
+ORDER BY ä¾›åº”å•†,å“å·

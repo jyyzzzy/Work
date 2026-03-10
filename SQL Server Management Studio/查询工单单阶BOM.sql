@@ -94,11 +94,25 @@ ISSUE AS ( -- 领用数量：用工单唯一集去连 MOCTB，避免重复累加
         O.TG004,
         O.DEPT,
         B.TB003,
-        SUM(B.TB005) AS ISSUE_QTY
+        SUM(B.TB005) AS ISSUE_QTY,
+        C.TC004,
+        MA.MA002
     FROM ORD O
     INNER JOIN MOCTB B
         ON B.TB001 = O.TG014 AND B.TB002 = O.TG015
-    GROUP BY O.TG004, O.DEPT, B.TB003
+    INNER JOIN MOCTA A
+        ON A.TA001 = B.TB001 AND A.TA002 = B.TB002
+    INNER JOIN COPTD D 
+        ON D.TD001 = A.TA026 
+        AND D.TD002 = A.TA027
+        AND D.TD003 = A.TA028
+    INNER JOIN COPTC C
+        ON C.TC001 = D.TD001 
+        AND C.TC002 = D.TD002
+    INNER JOIN COPMA MA
+        ON MA.MA001 = C.TC004
+    GROUP BY O.TG004, O.DEPT, B.TB003,C.TC004,
+        MA.MA002
 ),
 QTY AS (
     SELECT
@@ -106,7 +120,9 @@ QTY AS (
         I.TB003,
         I.DEPT,
         R.RECEIVE_CNT,
-        I.ISSUE_QTY
+        I.ISSUE_QTY,
+        I.TC004,
+        I.MA002
     FROM ISSUE I
     INNER JOIN RECV R
         ON R.TG004 = I.TG004 AND R.DEPT = I.DEPT
@@ -124,7 +140,9 @@ SELECT DISTINCT
     MATL.MB003 材料规格,
     MATL.MB004 材料单位,
     BOM.QTY_PER 单位用量,
-    QTY.ISSUE_QTY 领用总数量
+    QTY.ISSUE_QTY 领用总数量,
+    QTY.TC004 客户编号,
+    QTY.MA002 客户简称
 FROM BOM
 INNER JOIN QTY
     ON BOM.MD001 = QTY.TG004
@@ -136,7 +154,7 @@ INNER JOIN INVMB AS MATL
 WHERE
     LEFT(QTY.TB003, 1) IN ('3', '5', '6', '7')
     AND BOM.QTY_PER > 0
-    AND QTY.DEPT = '事业一部'
+    --AND QTY.DEPT = '事业一部'
 GROUP BY
     QTY.DEPT,
     BOM.MD001,
@@ -149,7 +167,9 @@ GROUP BY
     MATL.MB003,
     MATL.MB004,
     BOM.QTY_PER,
-    QTY.ISSUE_QTY
+    QTY.ISSUE_QTY,
+    QTY.TC004,
+    QTY.MA002 
 ORDER BY
     BOM.MD001,
-    BOM.MD003;
+    BOM.MD003

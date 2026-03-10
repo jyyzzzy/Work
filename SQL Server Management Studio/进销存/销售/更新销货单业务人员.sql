@@ -115,44 +115,40 @@ NOT EXISTS(
 --DELETE FROM [LSSJ].[dbo].[OrderDeptSalesRep]
 --="INSERT INTO [LSSJ].[dbo].[OrderDeptSalesRep](orderKey,deptNo) VALUES('"&&"','"&&"');"
 --SELECT * FROM [LSSJ].[dbo].[OrderDeptSalesRep]
-
-UPDATE COPTC
-SET TC005 = deptNo,
-TC006 = salesRepNo
-FROM COPTC
-INNER JOIN LSSJ..OrderDeptSalesRep ON LEFT(orderKey,16) = TC001 + '-' + TC002
-WHERE TC005 <> deptNo
-OR TC006 <> salesRepNo
-
-
+--更新销售订单
 UPDATE COPTC
 SET TC005 = deptNo
---SELECT*
+--,TC006 = salesRepNo
 FROM COPTC
 INNER JOIN LSSJ..OrderDeptSalesRep ON LEFT(orderKey,16) = TC001 + '-' + TC002
 WHERE TC005 <> deptNo
+--OR TC006 <> salesRepNo
+
 
 
 --ALTER TABLE [LSSJ].[dbo].[OrderDeptSalesRep]
 --ALTER COLUMN salesRepNo CHAR(10) NULL;
 
+
+--更新销货单
 UPDATE COPTG
-SET TG005 = deptNo
---SELECT*
-FROM COPTG
+SET TG005 = deptNo 
+--,TG006 = salesRepNo
+--,TG026 = salesRepNo
+--SELECT * 
+FROM COPTG 
 INNER JOIN LSSJ..OrderDeptSalesRep ON LEFT(orderKey,16) = TG001 + '-' + TG002
 WHERE TG005 <> deptNo
+--OR TG006 <> salesRepNo
+--OR TG026 <> salesRepNo
 
+--更新销退单
 UPDATE COPTI
 SET TI005 = deptNo
+--,TI006 = salesRepNo
+--,TI022 = salesRepNo
 FROM COPTI
 INNER JOIN LSSJ..OrderDeptSalesRep ON LEFT(orderKey,16) = TI001 + '-' + TI002
 WHERE TI005 <> deptNo
-
-UPDATE COPTG
-SET TG006 = salesRepNo,
-TG026 = salesRepNo
-FROM COPTG 
-INNER JOIN LSSJ..OrderDeptSalesRep ON LEFT(orderKey,16) = TG001 + '-' + TG002
-WHERE TG006 <> salesRepNo
-OR TG026 <> salesRepNo
+--OR TI006 <> salesRepNo
+--OR TI022 <> salesRepNo

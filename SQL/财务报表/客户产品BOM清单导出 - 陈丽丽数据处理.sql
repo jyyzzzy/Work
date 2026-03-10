@@ -94,7 +94,7 @@ SELECT B.MB001 MB01,B.MB001 MD01,B.MB002 MD02,B.MB001 材料品号,B.MB002 材�
 
 -- delete from   LSSJ..Sh11 WHERE 内部料号 is null ----处理
 
---="INSERT INTO LSSJ..Sh11(内部料号) VALUES('"&A2&"');"
+--="INSERT INTO LSSJ..Sh11(内部料号) VALUES('"&TRIM(A2)&"');"
 
 -- delete from   LSSJ..Sh11
 
@@ -124,7 +124,7 @@ SELECT *FROM   #BCPXJ
 
 SELECT *FROM   LSSJ..Sh11 --WHERE 内部料号='200923160010'
 
-INSERT INTO LSSJ..Sh11(内部料号) VALUES('100704810000')
+INSERT INTO LSSJ..Sh11(内部料号) VALUES('1Z7700030000')
 
 INSERT INTO LSSJ..ITEMTMP(ITEMNO) SELECT DISTINCT 材料品号 FROM #BCPXJ WHERE LEFT(材料品号,1) IN ('3','5','6','7')
 UPDATE  #tbMC SET MB01=LTRIM(MB01)
@@ -171,6 +171,18 @@ SELECT MB01,MD01,
 1367008000000
 136700800000
 136700770000
+SELECT MB01
+	,材料品号
+	,物料用量
+	,MB057
+	--,SUM(MB057*物料用量 )
+FROM #BCPXJ B
+INNER JOIN INVMB ON B.材料品号 = MB001
+--WHERE B.MD01 IN( '251700790AX0','2Z7700030AX0' )--AND MB070 <= 0
+--GROUP BY MB01
+ORDER BY MB057
+
+SELECT * FROM INVMB WHERE 
 
 	SELECT*FROM #BCPXJ  WHERE MB01='200923160010'
 	SELECT* FROM SDRD.[dbo].[Fn_GetBOMIDs]('136700800000') 
@@ -318,8 +330,8 @@ select * from #TEMP2
 	C.MB109  元件关闭,TRIM(材料品号) AS [材料品号],材料品名, 材料规格,FORMAT(物料用量, '0.########') AS 物料用量,D.MB109  材料关闭,FORMAT(D.MB433,'0.######') AS 拼板数,MD.MD019 插件位置,MW002 工艺
 	,ISNULL(YX.MB002,WX.MB002) [最新单价供应商编号],ISNULL(YX.MA002,WX.MA002) [最新单价供应商名称],ISNULL(YX.MB003,WX.MB003) [最新单价币种],
 	ISNULL(YX.MB011,WX.MB011)[最新单价],ISNULL(YX.MB014,WX.MB014) [最新单价有效期开始],ISNULL(YX.MB015,WX.MB015) [最新单价有效期结束]
-	,WX2.MB002  [202601单价供应商编号],WX2.MA002 [202601单价供应商名称],WX2.MB003 [202601单价币种],WX2.MB011 [202601单价],
-	WX2.MB014 [202601单价有效期开始],WX2.MB015 [202601单价有效期结束]
+	,WX2.MB002  [202509单价供应商编号],WX2.MA002 [202509单价供应商名称],WX2.MB003 [202509单价币种],WX2.MB011 [202509单价],
+	WX2.MB014 [202509单价有效期开始],WX2.MB015 [202509单价有效期结束]
 	FROM #BCPXJ JOIN SDRD..INVMB B ON MB01=B.MB001 
 	JOIN INVMB C ON MD01=C.MB001 	
 	JOIN INVMB D ON 材料品号=D.MB001
@@ -346,8 +358,8 @@ select * from #TEMP2
 	SELECT *FROM (
 		SELECT ROW_NUMBER() OVER (PARTITION BY MB001 ORDER BY MB011,MB015 desc ,MB014) AS RowNum,*FROM (
 		SELECT MB001,MB002,MA002,MB003,MB004,CAST(MB011 AS FLOAT) MB011,MB014,MB015 FROM PURMB W JOIN  dbo.PURMA ON MA001=MB002 
-		WHERE (LEFT(MB015,6)<= '202601' or(LEFT(MB014,6)<='202601' and LEFT(MB015,6)>= '202601' )) 
-		AND exists( SELECT MB001+MAX(MB015) FROM PURMB N	WHERE (LEFT(MB015,6)<= '202601'or(LEFT(MB014,6)<='202601' and LEFT(MB015,6)>= '202601' )  ) AND  W.MB001=N.MB001	GROUP BY  MB001  HAVING(MAX(MB015))= W.MB015 )
+		WHERE (LEFT(MB015,6)<= '202509' or(LEFT(MB014,6)<='202509' and LEFT(MB015,6)>= '202509' )) 
+		AND exists( SELECT MB001+MAX(MB015) FROM PURMB N	WHERE (LEFT(MB015,6)<= '202509'or(LEFT(MB014,6)<='202509' and LEFT(MB015,6)>= '202509' )  ) AND  W.MB001=N.MB001	GROUP BY  MB001  HAVING(MAX(MB015))= W.MB015 )
 		)MB		 
 
 		) PURMB_GYS WHERE RowNum=1 
@@ -357,7 +369,7 @@ select * from #TEMP2
 
     
 
-	--SELECT * FROM MOCTC WHERE TC001 = '56N1' AND TC002 = '20260100411'
+	--SELECT * FROM MOCTC WHERE TC001 = '56N1' AND TC002 = '20260200411'
 
 
 	/**导指定日期之前的有效价格**/
@@ -385,3 +397,753 @@ SELECT *FROM (
 
 
 select * from ims_wo_mst
+
+
+/******取最新价与202510差价增加产品售价******/
+/*
+取产品售价优先级：
+1.客户商品价格
+2.客户订单
+3.销货单
+*/
+SELECT TRIM(MB01) 产品品号
+	,B.MB002 产品名称
+	,B.MB003 产品规格
+	,B.MB109  产品关闭
+	,CAST(ISNULL(ACTIVE_PRICE.MB008,ISNULL(INACTIVE_PRICE.MB008,ISNULL(SALES_PRICE.TD011,DELIVERY_PRICE.TH012)))AS NUMERIC(15,6)) 销售价格
+	,TRIM(MD01) 元件品号
+	,C.MB002 元件名称
+	,C.MB003 元件规格
+	,C.MB109  元件关闭
+	,TRIM(材料品号) AS [材料品号]
+	,材料品名
+	,材料规格
+	,FORMAT(物料用量, '0.########') AS 物料用量
+	,D.MB109  材料关闭
+	,FORMAT(D.MB433,'0.######') AS 拼板数
+	,MD.MD019 插件位置
+	,MW002 工艺
+	,ISNULL(YX.MB002,WX.MB002) [最新单价供应商编号]
+	,ISNULL(YX.MA002,WX.MA002) [最新单价供应商名称]
+	,ISNULL(YX.MB003,WX.MB003) [最新单价币种]
+	,ISNULL(YX.MB011,WX.MB011)[最新单价]
+	,ISNULL(YX.MB014,WX.MB014) [最新单价有效期开始]
+	,ISNULL(YX.MB015,WX.MB015) [最新单价有效期结束]
+	,WX2.MB002  [202510单价供应商编号]
+	,WX2.MA002 [202510单价供应商名称]
+	,WX2.MB003 [202510单价币种]
+	,WX2.MB011 [202510单价]
+	,WX2.MB014 [202510单价有效期开始]
+	,WX2.MB015 [202510单价有效期结束]
+	,ISNULL(YX.MB011,WX.MB011)-WX2.MB011 材料价差
+FROM #BCPXJ 
+	JOIN SDRD..INVMB B ON MB01=B.MB001 
+	JOIN INVMB C ON MD01=C.MB001 	
+	JOIN INVMB D ON 材料品号=D.MB001
+	JOIN BOMMD MD ON  MD01=MD001  AND  MD02=MD002 AND 材料品号=MD.MD003
+	LEFT JOIN CMSMW ON MD009=MW001
+	LEFT  JOIN (
+		SELECT * FROM (
+			SELECT ROW_NUMBER() OVER (PARTITION BY MB001 ORDER BY MB011,MB015 desc ,MB014) AS RowNum, * 
+			FROM (
+				SELECT MB001,MB002,MA002,MB003,MB004,CAST(MB011 AS FLOAT) MB011,MB014,MB015 
+				FROM PURMB JOIN  dbo.PURMA ON MA001=MB002 
+				WHERE (MB015='' OR  MB015>= CONVERT(varchar(100), GETDATE(), 112))--失效日期大于等于今天
+			) MB
+		) PURMB_GYS WHERE RowNum=1
+	) YX ON TRIM(材料品号)=YX.MB001
+	LEFT JOIN (
+		SELECT * FROM (
+			SELECT ROW_NUMBER() OVER (PARTITION BY MB001 ORDER BY MB011,MB015 desc ,MB014) AS RowNum, * 
+			FROM (
+				SELECT MB001,MB002,MA002,MB003,MB004,CAST(MB011 AS FLOAT) MB011,MB014,MB015 
+				FROM PURMB W JOIN  dbo.PURMA ON MA001=MB002 
+				WHERE (MB015< CONVERT(varchar(100), GETDATE(), 112) AND MB015<>'') --失效日期小于今天
+				AND exists( 
+					SELECT MB001+MAX(MB015) 
+					FROM PURMB N	
+					WHERE (MB015< CONVERT(varchar(100), GETDATE(), 112) AND MB015<>'') AND  W.MB001=N.MB001
+					GROUP BY  MB001  
+					HAVING(MAX(MB015))= W.MB015 
+				)
+			)MB
+		) PURMB_GYS WHERE RowNum=1
+	) WX ON TRIM(材料品号)=WX.MB001
+	LEFT JOIN (
+		SELECT * FROM (
+			SELECT ROW_NUMBER() OVER (PARTITION BY MB001 ORDER BY MB011,MB015 desc ,MB014) AS RowNum,* 
+			FROM (
+				SELECT MB001,MB002,MA002,MB003,MB004,CAST(MB011 AS FLOAT) MB011,MB014,MB015 
+				FROM PURMB W JOIN  dbo.PURMA ON MA001=MB002 
+				WHERE (LEFT(MB015,6)<= '202510' or(LEFT(MB014,6)<='202510' and LEFT(MB015,6)>= '202510' )) 
+				AND exists( 
+					SELECT MB001+MAX(MB015) 
+					FROM PURMB N	
+					WHERE (LEFT(MB015,6)<= '202510'or(LEFT(MB014,6)<='202510' and LEFT(MB015,6)>= '202510' )  ) AND  W.MB001=N.MB001
+					GROUP BY  MB001  
+					HAVING(MAX(MB015))= W.MB015 
+				)
+			)MB		 
+		) PURMB_GYS WHERE RowNum=1 
+	) WX2 ON TRIM(材料品号)=WX2.MB001
+	LEFT  JOIN (
+		SELECT * FROM (
+			SELECT ROW_NUMBER() OVER (PARTITION BY MB002 ORDER BY MB008,MB018 desc ,MB017) AS RowNum, * 
+			FROM (
+				SELECT MB001,MB002,MB003,MB004,CAST(MB008 AS FLOAT) MB008,MB017,MB018 
+				FROM COPMB-- JOIN  dbo.COPMA ON MA001=MB001
+				WHERE (MB018='' OR  MB018>= CONVERT(varchar(100), GETDATE(), 112))--失效日期大于等于今天
+			)MB
+		) COPMB_GYS WHERE RowNum=1
+	) ACTIVE_PRICE ON TRIM(MB01)=ACTIVE_PRICE.MB002
+	LEFT JOIN (
+		SELECT * FROM (
+			SELECT ROW_NUMBER() OVER (PARTITION BY MB002 ORDER BY MB018 desc ,MB017) AS RowNum, * 
+			FROM (
+				SELECT MB001,MB002,MB003,MB004,CAST(MB008 AS FLOAT) MB008,MB017,MB018 
+				FROM COPMB W-- JOIN  dbo.COPMA ON MA001=MB001
+				WHERE (MB018< CONVERT(varchar(100), GETDATE(), 112) AND MB018<>'') --失效日期小于今天
+				AND exists( 
+					SELECT MB002+MAX(MB018) 
+					FROM COPMB N	
+					WHERE (MB018< CONVERT(varchar(100), GETDATE(), 112) AND MB018<>'') AND  W.MB002=N.MB002
+					GROUP BY  MB002  
+					HAVING(MAX(MB018))= W.MB018 
+				)
+			)MB
+		) COPMB_GYS WHERE RowNum=1
+	) INACTIVE_PRICE ON TRIM(MB01)=INACTIVE_PRICE.MB002
+	LEFT JOIN (
+		SELECT * FROM (
+			SELECT ROW_NUMBER() OVER (PARTITION BY TD004 ORDER BY TC003 DESC) RN
+			,COPTD.*
+			FROM COPTD
+			JOIN COPTC ON TC001 = TD001 AND TC002 = TD002
+			JOIN CMSMQ ON TD001 = MQ001
+			WHERE MQ002 = '客户订单'
+		) COPTD WHERE RN = 1
+	) SALES_PRICE ON TRIM(MB01) = SALES_PRICE.TD004
+	LEFT JOIN (
+		SELECT * FROM (
+			SELECT ROW_NUMBER() OVER (PARTITION BY TH004 ORDER BY TG003 DESC) RN
+			,COPTH.*
+			FROM COPTH
+			JOIN COPTG ON TG001 = TH001 AND TG002 = TH002
+			JOIN CMSMQ ON TH001 = MQ001
+			WHERE MQ002 = '订单出货'
+		) COPTH WHERE RN = 1
+	) DELIVERY_PRICE ON TRIM(MB01) = DELIVERY_PRICE.TH004
+--WHERE TRIM(MB01) = '100705770000'
+ORDER BY 产品品号,元件品号,材料品号
+
+
+DECLARE @Today CHAR(8) = CONVERT(CHAR(8), GETDATE(), 112);
+DECLARE @YM    CHAR(6) = '202510';
+
+IF OBJECT_ID('tempdb..#BCPXJ_BASE') IS NOT NULL DROP TABLE #BCPXJ_BASE;
+IF OBJECT_ID('tempdb..#PURMB_SRC') IS NOT NULL DROP TABLE #PURMB_SRC;
+IF OBJECT_ID('tempdb..#PUR_YX') IS NOT NULL DROP TABLE #PUR_YX;
+IF OBJECT_ID('tempdb..#PUR_WX') IS NOT NULL DROP TABLE #PUR_WX;
+IF OBJECT_ID('tempdb..#PUR_WX2') IS NOT NULL DROP TABLE #PUR_WX2;
+IF OBJECT_ID('tempdb..#COPMB_SRC') IS NOT NULL DROP TABLE #COPMB_SRC;
+IF OBJECT_ID('tempdb..#COP_ACTIVE') IS NOT NULL DROP TABLE #COP_ACTIVE;
+IF OBJECT_ID('tempdb..#COP_INACTIVE') IS NOT NULL DROP TABLE #COP_INACTIVE;
+IF OBJECT_ID('tempdb..#SALES_PRICE') IS NOT NULL DROP TABLE #SALES_PRICE;
+IF OBJECT_ID('tempdb..#DELIVERY_PRICE') IS NOT NULL DROP TABLE #DELIVERY_PRICE;
+
+------------------------------------------------------------
+-- 1. 先把主表中要反复 TRIM 的字段清洗一次
+------------------------------------------------------------
+SELECT
+    TRIM(MB01)     AS 产品品号,
+    TRIM(MD01)     AS 元件品号,
+    TRIM(材料品号) AS 材料品号,
+    材料品名,
+    材料规格,
+    物料用量
+INTO #BCPXJ_BASE
+FROM #BCPXJ;
+
+------------------------------------------------------------
+-- 2. PURMB 来源一次性落地
+------------------------------------------------------------
+SELECT
+    P.MB001,
+    P.MB002,
+    M.MA002,
+    P.MB003,
+    P.MB004,
+    CAST(P.MB011 AS DECIMAL(18,6)) AS MB011,
+    P.MB014,
+    P.MB015
+INTO #PURMB_SRC
+FROM PURMB AS P
+JOIN dbo.PURMA AS M
+    ON M.MA001 = P.MB002;
+
+------------------------------------------------------------
+-- 3. 最新有效采购价
+------------------------------------------------------------
+SELECT
+    MB001, MB002, MA002, MB003, MB004, MB011, MB014, MB015
+INTO #PUR_YX
+FROM (
+    SELECT
+        ROW_NUMBER() OVER (
+            PARTITION BY MB001
+            ORDER BY MB011, MB015 DESC, MB014
+        ) AS RN,
+        MB001, MB002, MA002, MB003, MB004, MB011, MB014, MB015
+    FROM #PURMB_SRC
+    WHERE MB015 = '' OR MB015 >= @Today
+) AS X
+WHERE RN = 1;
+
+------------------------------------------------------------
+-- 4. 最新失效采购价
+-- 原逻辑是：先取最大失效日，再在同失效日里按单价/起始日取1条
+-- 用排序等价替代 EXISTS + MAX()
+------------------------------------------------------------
+SELECT
+    MB001, MB002, MA002, MB003, MB004, MB011, MB014, MB015
+INTO #PUR_WX
+FROM (
+    SELECT
+        ROW_NUMBER() OVER (
+            PARTITION BY MB001
+            ORDER BY MB015 DESC, MB011, MB014
+        ) AS RN,
+        MB001, MB002, MA002, MB003, MB004, MB011, MB014, MB015
+    FROM #PURMB_SRC
+    WHERE MB015 <> ''
+      AND MB015 < @Today
+) AS X
+WHERE RN = 1;
+
+------------------------------------------------------------
+-- 5. 202510 对应采购价
+------------------------------------------------------------
+SELECT
+    MB001, MB002, MA002, MB003, MB004, MB011, MB014, MB015
+INTO #PUR_WX2
+FROM (
+    SELECT
+        ROW_NUMBER() OVER (
+            PARTITION BY MB001
+            ORDER BY MB015 DESC, MB011, MB014
+        ) AS RN,
+        MB001, MB002, MA002, MB003, MB004, MB011, MB014, MB015
+    FROM #PURMB_SRC
+    WHERE LEFT(ISNULL(MB015,''), 6) <= @YM
+       OR (
+            LEFT(ISNULL(MB014,''), 6) <= @YM
+        AND LEFT(ISNULL(MB015,''), 6) >= @YM
+       )
+) AS X
+WHERE RN = 1;
+
+------------------------------------------------------------
+-- 6. COPMB 来源一次性落地
+------------------------------------------------------------
+SELECT
+    MB001,
+    MB002,
+    MB003,
+    MB004,
+    CAST(MB008 AS DECIMAL(18,6)) AS MB008,
+    MB017,
+    MB018
+INTO #COPMB_SRC
+FROM COPMB;
+
+------------------------------------------------------------
+-- 7. 最新有效销售底价
+------------------------------------------------------------
+SELECT
+    MB001, MB002, MB003, MB004, MB008, MB017, MB018
+INTO #COP_ACTIVE
+FROM (
+    SELECT
+        ROW_NUMBER() OVER (
+            PARTITION BY MB002
+            ORDER BY MB008, MB018 DESC, MB017
+        ) AS RN,
+        MB001, MB002, MB003, MB004, MB008, MB017, MB018
+    FROM #COPMB_SRC
+    WHERE MB018 = '' OR MB018 >= @Today
+) AS X
+WHERE RN = 1;
+
+------------------------------------------------------------
+-- 8. 最新失效销售底价
+------------------------------------------------------------
+SELECT
+    MB001, MB002, MB003, MB004, MB008, MB017, MB018
+INTO #COP_INACTIVE
+FROM (
+    SELECT
+        ROW_NUMBER() OVER (
+            PARTITION BY MB002
+            ORDER BY MB018 DESC, MB017
+        ) AS RN,
+        MB001, MB002, MB003, MB004, MB008, MB017, MB018
+    FROM #COPMB_SRC
+    WHERE MB018 <> ''
+      AND MB018 < @Today
+) AS X
+WHERE RN = 1;
+
+------------------------------------------------------------
+-- 9. 客户订单最近单价
+------------------------------------------------------------
+SELECT
+    TD004,
+    CAST(TD011 AS DECIMAL(18,6)) AS TD011
+INTO #SALES_PRICE
+FROM (
+    SELECT
+        ROW_NUMBER() OVER (
+            PARTITION BY TD004
+            ORDER BY IIF(MQ002 = N'客户订单',1,2),TC003
+        ) AS RN,
+        COPTD.TD004,
+        COPTD.TD011
+    FROM COPTD
+    JOIN COPTC
+        ON TC001 = TD001
+       AND TC002 = TD002
+    JOIN CMSMQ
+        ON TD001 = MQ001
+    WHERE --MQ002 = N'客户订单'
+		TC027 = 'Y'
+) AS X
+WHERE RN = 1;
+
+------------------------------------------------------------
+-- 10. 订单出货最近单价
+------------------------------------------------------------
+SELECT
+    TH004,
+    CAST(TH012 AS DECIMAL(18,6)) AS TH012
+INTO #DELIVERY_PRICE
+FROM (
+    SELECT
+        ROW_NUMBER() OVER (
+            PARTITION BY TH004
+            ORDER BY IIF(MQ002 = N'订单出货',1,2),TG003 DESC
+        ) AS RN,
+        COPTH.TH004,
+        COPTH.TH012
+    FROM COPTH
+    JOIN COPTG
+        ON TG001 = TH001
+       AND TG002 = TH002
+    JOIN CMSMQ
+        ON TH001 = MQ001
+    WHERE --MQ002 = N'订单出货'
+		TG023 = 'Y'
+) AS X
+WHERE RN = 1;
+
+------------------------------------------------------------
+-- 11. 最终查询
+------------------------------------------------------------
+SELECT
+    A.产品品号,
+    B.MB002 AS 产品名称,
+    B.MB003 AS 产品规格,
+    B.MB109 AS 产品关闭,
+    CAST(
+        ISNULL(CA.MB008,
+            ISNULL(CI.MB008,
+                ISNULL(SP.TD011, DP.TH012)
+            )
+        ) AS DECIMAL(15,6)
+    ) AS 销售价格,
+    A.元件品号,
+    C.MB002 AS 元件名称,
+    C.MB003 AS 元件规格,
+    C.MB109 AS 元件关闭,
+    A.材料品号,
+    A.材料品名,
+    A.材料规格,
+    CAST(A.物料用量 AS DECIMAL(38,8)) AS 物料用量,
+    D.MB109 AS 材料关闭,
+    CAST(D.MB433 AS DECIMAL(18,6)) AS 拼板数,
+    MD.MD019 AS 插件位置,
+    MW.MW002 AS 工艺,
+    ISNULL(YX.MB002, WX.MB002) AS 最新单价供应商编号,
+    ISNULL(YX.MA002, WX.MA002) AS 最新单价供应商名称,
+    ISNULL(YX.MB003, WX.MB003) AS 最新单价币种,
+    ISNULL(YX.MB011, WX.MB011) AS 最新单价,
+    ISNULL(YX.MB014, WX.MB014) AS 最新单价有效期开始,
+    ISNULL(YX.MB015, WX.MB015) AS 最新单价有效期结束,
+    WX2.MB002 AS [202510单价供应商编号],
+    WX2.MA002 AS [202510单价供应商名称],
+    WX2.MB003 AS [202510单价币种],
+    WX2.MB011 AS [202510单价],
+    WX2.MB014 AS [202510单价有效期开始],
+    WX2.MB015 AS [202510单价有效期结束],
+    ISNULL(YX.MB011, WX.MB011) - WX2.MB011 AS 材料价差
+FROM #BCPXJ_BASE AS A
+JOIN SDRD..INVMB AS B
+    ON A.产品品号 = B.MB001
+JOIN INVMB AS C
+    ON A.元件品号 = C.MB001
+JOIN INVMB AS D
+    ON A.材料品号 = D.MB001
+JOIN BOMMD AS MD
+    ON A.元件品号 = MD.MD001
+   AND MD.MD002 = MD.MD002
+   AND A.材料品号 = MD.MD003
+LEFT JOIN CMSMW AS MW
+    ON MD.MD009 = MW.MW001
+LEFT JOIN #PUR_YX AS YX
+    ON A.材料品号 = YX.MB001
+LEFT JOIN #PUR_WX AS WX
+    ON A.材料品号 = WX.MB001
+LEFT JOIN #PUR_WX2 AS WX2
+    ON A.材料品号 = WX2.MB001
+LEFT JOIN #COP_ACTIVE AS CA
+    ON A.产品品号 = CA.MB002
+LEFT JOIN #COP_INACTIVE AS CI
+    ON A.产品品号 = CI.MB002
+LEFT JOIN #SALES_PRICE AS SP
+    ON A.产品品号 = SP.TD004
+LEFT JOIN #DELIVERY_PRICE AS DP
+    ON A.产品品号 = DP.TH004
+ORDER BY A.产品品号, A.元件品号, A.材料品号;
+
+
+
+
+DECLARE @Today CHAR(8) = CONVERT(CHAR(8), GETDATE(), 112);
+DECLARE @YM    CHAR(6) = '202510';
+
+IF OBJECT_ID('tempdb..#BCPXJ_BASE') IS NOT NULL DROP TABLE #BCPXJ_BASE;
+IF OBJECT_ID('tempdb..#PURMB_SRC') IS NOT NULL DROP TABLE #PURMB_SRC;
+IF OBJECT_ID('tempdb..#PUR_YX') IS NOT NULL DROP TABLE #PUR_YX;
+IF OBJECT_ID('tempdb..#PUR_WX') IS NOT NULL DROP TABLE #PUR_WX;
+IF OBJECT_ID('tempdb..#PUR_WX2') IS NOT NULL DROP TABLE #PUR_WX2;
+IF OBJECT_ID('tempdb..#COPMB_SRC') IS NOT NULL DROP TABLE #COPMB_SRC;
+IF OBJECT_ID('tempdb..#COP_ACTIVE') IS NOT NULL DROP TABLE #COP_ACTIVE;
+IF OBJECT_ID('tempdb..#COP_INACTIVE') IS NOT NULL DROP TABLE #COP_INACTIVE;
+IF OBJECT_ID('tempdb..#SALES_PRICE') IS NOT NULL DROP TABLE #SALES_PRICE;
+IF OBJECT_ID('tempdb..#DELIVERY_PRICE') IS NOT NULL DROP TABLE #DELIVERY_PRICE;
+
+------------------------------------------------------------
+-- 1. 先把主表中要反复 TRIM 的字段清洗一次
+------------------------------------------------------------
+SELECT
+    TRIM(MB01)     AS 产品品号,
+    TRIM(MD01)     AS 元件品号,
+    TRIM(材料品号) AS 材料品号,
+    材料品名,
+    材料规格,
+    物料用量
+INTO #BCPXJ_BASE
+FROM #BCPXJ;
+
+------------------------------------------------------------
+-- 2. PURMB 来源一次性落地（SDRD -> ZJRD -> AHRD -> YNRD）
+------------------------------------------------------------
+SELECT
+    P.MB001,
+    P.MB002,
+    M.MA002,
+    P.MB003,
+    P.MB004,
+    CAST(P.MB011 AS DECIMAL(18,6)) AS MB011,
+    P.MB014,
+    P.MB015,
+    1 AS DBPriority,
+    'SDRD' AS DBName
+INTO #PURMB_SRC
+FROM SDRD.dbo.PURMB AS P
+JOIN SDRD.dbo.PURMA AS M
+    ON M.MA001 = P.MB002
+
+UNION ALL
+
+SELECT
+    P.MB001,
+    P.MB002,
+    M.MA002,
+    P.MB003,
+    P.MB004,
+    CAST(P.MB011 AS DECIMAL(18,6)) AS MB011,
+    P.MB014,
+    P.MB015,
+    2 AS DBPriority,
+    'ZJRD' AS DBName
+FROM ZJRD.dbo.PURMB AS P
+JOIN ZJRD.dbo.PURMA AS M
+    ON M.MA001 = P.MB002
+
+UNION ALL
+
+SELECT
+    P.MB001,
+    P.MB002,
+    M.MA002,
+    P.MB003,
+    P.MB004,
+    CAST(P.MB011 AS DECIMAL(18,6)) AS MB011,
+    P.MB014,
+    P.MB015,
+    3 AS DBPriority,
+    'AHRD' AS DBName
+FROM AHRD.dbo.PURMB AS P
+JOIN AHRD.dbo.PURMA AS M
+    ON M.MA001 = P.MB002
+
+UNION ALL
+
+SELECT
+    P.MB001,
+    P.MB002,
+    M.MA002,
+    P.MB003,
+    P.MB004,
+    CAST(P.MB011 AS DECIMAL(18,6)) AS MB011,
+    P.MB014,
+    P.MB015,
+    4 AS DBPriority,
+    'YNRD' AS DBName
+FROM YNRD.dbo.PURMB AS P
+JOIN YNRD.dbo.PURMA AS M
+    ON M.MA001 = P.MB002;
+
+------------------------------------------------------------
+-- 3. 最新有效采购价
+-- 规则：先按账套优先级回退，再按你原来的价格/日期规则取1条
+------------------------------------------------------------
+SELECT
+    MB001, MB002, MA002, MB003, MB004, MB011, MB014, MB015, DBName
+INTO #PUR_YX
+FROM (
+    SELECT
+        ROW_NUMBER() OVER (
+            PARTITION BY MB001
+            ORDER BY DBPriority, MB011, MB015 DESC, MB014
+        ) AS RN,
+        MB001, MB002, MA002, MB003, MB004, MB011, MB014, MB015, DBName
+    FROM #PURMB_SRC
+    WHERE MB015 = '' OR MB015 >= @Today
+) AS X
+WHERE RN = 1;
+
+------------------------------------------------------------
+-- 4. 最新失效采购价
+-- 规则：先按账套优先级回退，再取该账套内最近失效记录
+------------------------------------------------------------
+SELECT
+    MB001, MB002, MA002, MB003, MB004, MB011, MB014, MB015, DBName
+INTO #PUR_WX
+FROM (
+    SELECT
+        ROW_NUMBER() OVER (
+            PARTITION BY MB001
+            ORDER BY DBPriority, MB015 DESC, MB011, MB014
+        ) AS RN,
+        MB001, MB002, MA002, MB003, MB004, MB011, MB014, MB015, DBName
+    FROM #PURMB_SRC
+    WHERE MB015 <> ''
+      AND MB015 < @Today
+) AS X
+WHERE RN = 1;
+
+------------------------------------------------------------
+-- 5. 202510 对应采购价
+-- 规则：先按账套优先级回退，再按你原来的日期规则取1条
+------------------------------------------------------------
+SELECT
+    MB001, MB002, MA002, MB003, MB004, MB011, MB014, MB015, DBName
+INTO #PUR_WX2
+FROM (
+    SELECT
+        ROW_NUMBER() OVER (
+            PARTITION BY MB001
+            ORDER BY DBPriority, MB015 DESC, MB011, MB014
+        ) AS RN,
+        MB001, MB002, MA002, MB003, MB004, MB011, MB014, MB015, DBName
+    FROM #PURMB_SRC
+    WHERE LEFT(ISNULL(MB015,''), 6) <= @YM
+       OR (
+            LEFT(ISNULL(MB014,''), 6) <= @YM
+        AND LEFT(ISNULL(MB015,''), 6) >= @YM
+       )
+) AS X
+WHERE RN = 1;
+
+------------------------------------------------------------
+-- 6. COPMB 来源一次性落地
+------------------------------------------------------------
+SELECT
+    MB001,
+    MB002,
+    MB003,
+    MB004,
+    CAST(MB008 AS DECIMAL(18,6)) AS MB008,
+    MB017,
+    MB018
+INTO #COPMB_SRC
+FROM COPMB;
+
+------------------------------------------------------------
+-- 7. 最新有效销售底价
+------------------------------------------------------------
+SELECT
+    MB001, MB002, MB003, MB004, MB008, MB017, MB018
+INTO #COP_ACTIVE
+FROM (
+    SELECT
+        ROW_NUMBER() OVER (
+            PARTITION BY MB002
+            ORDER BY MB008, MB018 DESC, MB017
+        ) AS RN,
+        MB001, MB002, MB003, MB004, MB008, MB017, MB018
+    FROM #COPMB_SRC
+    WHERE MB018 = '' OR MB018 >= @Today
+) AS X
+WHERE RN = 1;
+
+------------------------------------------------------------
+-- 8. 最新失效销售底价
+------------------------------------------------------------
+SELECT
+    MB001, MB002, MB003, MB004, MB008, MB017, MB018
+INTO #COP_INACTIVE
+FROM (
+    SELECT
+        ROW_NUMBER() OVER (
+            PARTITION BY MB002
+            ORDER BY MB018 DESC, MB017
+        ) AS RN,
+        MB001, MB002, MB003, MB004, MB008, MB017, MB018
+    FROM #COPMB_SRC
+    WHERE MB018 <> ''
+      AND MB018 < @Today
+) AS X
+WHERE RN = 1;
+
+------------------------------------------------------------
+-- 9. 客户订单最近单价
+------------------------------------------------------------
+SELECT
+    TD004,
+    CAST(TD011 AS DECIMAL(18,6)) AS TD011
+INTO #SALES_PRICE
+FROM (
+    SELECT
+        ROW_NUMBER() OVER (
+            PARTITION BY TD004
+            ORDER BY IIF(MQ002 = N'客户订单',1,2), TC003
+        ) AS RN,
+        COPTD.TD004,
+        COPTD.TD011
+    FROM COPTD
+    JOIN COPTC
+        ON TC001 = TD001
+       AND TC002 = TD002
+    JOIN CMSMQ
+        ON TD001 = MQ001
+    WHERE -- MQ002 = N'客户订单'
+          TC027 = 'Y'
+) AS X
+WHERE RN = 1;
+
+------------------------------------------------------------
+-- 10. 订单出货最近单价
+------------------------------------------------------------
+SELECT
+    TH004,
+    CAST(TH012 AS DECIMAL(18,6)) AS TH012
+INTO #DELIVERY_PRICE
+FROM (
+    SELECT
+        ROW_NUMBER() OVER (
+            PARTITION BY TH004
+            ORDER BY IIF(MQ002 = N'订单出货',1,2), TG003 DESC
+        ) AS RN,
+        COPTH.TH004,
+        COPTH.TH012
+    FROM COPTH
+    JOIN COPTG
+        ON TG001 = TH001
+       AND TG002 = TH002
+    JOIN CMSMQ
+        ON TH001 = MQ001
+    WHERE -- MQ002 = N'订单出货'
+          TG023 = 'Y'
+) AS X
+WHERE RN = 1;
+
+------------------------------------------------------------
+-- 11. 最终查询
+------------------------------------------------------------
+SELECT
+    A.产品品号,
+    B.MB002 AS 产品名称,
+    B.MB003 AS 产品规格,
+    B.MB109 AS 产品关闭,
+    CAST(
+        ISNULL(CA.MB008,
+            ISNULL(CI.MB008,
+                ISNULL(SP.TD011, DP.TH012)
+            )
+        ) AS DECIMAL(15,6)
+    ) AS 销售价格,
+    A.元件品号,
+    C.MB002 AS 元件名称,
+    C.MB003 AS 元件规格,
+    C.MB109 AS 元件关闭,
+    A.材料品号,
+    A.材料品名,
+    A.材料规格,
+    CAST(A.物料用量 AS DECIMAL(38,8)) AS 物料用量,
+    D.MB109 AS 材料关闭,
+    CAST(D.MB433 AS DECIMAL(18,6)) AS 拼板数,
+    MD.MD019 AS 插件位置,
+    MW.MW002 AS 工艺,
+    ISNULL(YX.MB002, WX.MB002) AS 最新单价供应商编号,
+    ISNULL(YX.MA002, WX.MA002) AS 最新单价供应商名称,
+    ISNULL(YX.MB003, WX.MB003) AS 最新单价币种,
+    ISNULL(YX.MB011, WX.MB011) AS 最新单价,
+    ISNULL(YX.MB014, WX.MB014) AS 最新单价有效期开始,
+    ISNULL(YX.MB015, WX.MB015) AS 最新单价有效期结束,
+    WX2.MB002 AS [202510单价供应商编号],
+    WX2.MA002 AS [202510单价供应商名称],
+    WX2.MB003 AS [202510单价币种],
+    WX2.MB011 AS [202510单价],
+    WX2.MB014 AS [202510单价有效期开始],
+    WX2.MB015 AS [202510单价有效期结束],
+    ISNULL(YX.MB011, WX.MB011) - WX2.MB011 AS 材料价差
+FROM #BCPXJ_BASE AS A
+JOIN SDRD..INVMB AS B
+    ON A.产品品号 = B.MB001
+JOIN INVMB AS C
+    ON A.元件品号 = C.MB001
+JOIN INVMB AS D
+    ON A.材料品号 = D.MB001
+JOIN BOMMD AS MD
+    ON A.元件品号 = MD.MD001
+   AND MD.MD002 = MD.MD002
+   AND A.材料品号 = MD.MD003
+LEFT JOIN CMSMW AS MW
+    ON MD.MD009 = MW.MW001
+LEFT JOIN #PUR_YX AS YX
+    ON A.材料品号 = YX.MB001
+LEFT JOIN #PUR_WX AS WX
+    ON A.材料品号 = WX.MB001
+LEFT JOIN #PUR_WX2 AS WX2
+    ON A.材料品号 = WX2.MB001
+LEFT JOIN #COP_ACTIVE AS CA
+    ON A.产品品号 = CA.MB002
+LEFT JOIN #COP_INACTIVE AS CI
+    ON A.产品品号 = CI.MB002
+LEFT JOIN #SALES_PRICE AS SP
+    ON A.产品品号 = SP.TD004
+LEFT JOIN #DELIVERY_PRICE AS DP
+    ON A.产品品号 = DP.TH004
+ORDER BY A.产品品号, A.元件品号, A.材料品号;

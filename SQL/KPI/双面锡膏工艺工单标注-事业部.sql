@@ -96,7 +96,7 @@ left join ( select distinct MF001 from  BOMMF where   MF004  in('P010')
 left join ( select distinct MF001 from  BOMMF where   MF004  in('P022','P020')
 ) RI on  RI.MF001=TA006
 left join ( select distinct MF001 from  BOMMF join CMSMW on MF004=MW001 where   MW002  like'%SMT%') SMT on  SMT.MF001=TA006
-WHERE TA001='5102' AND  TA014 >= '20260130' AND  TA014 <= '20260205'   AND  ((MOCTA.TA011 = 'Y')  OR  (MOCTA.TA011 = 'y')) -- AND left(MOCTB.TB003,1) IN('3','6')
+WHERE TA001='5102' AND  TA014 >= '20260320' AND  TA014 <= '20260326'   AND  ((MOCTA.TA011 = 'Y')  OR  (MOCTA.TA011 = 'y')) -- AND left(MOCTB.TB003,1) IN('3','6')
 
 
 union all
@@ -124,14 +124,15 @@ left join ( select distinct MF001 from  BOMMF where   MF004  in('P010')
 left join ( select distinct MF001 from  BOMMF where   MF004  in('P022','P020')
 ) RI on  RI.MF001=TA006
 left join ( select distinct MF001 from  BOMMF join CMSMW on MF004=MW001 where   MW002  like'%SMT%') SMT on  SMT.MF001=TA006
-WHERE TA001='5102' AND  TA014 >= '20260130' AND  TA014 <= '20260205'  AND  ((MOCTA.TA011 = 'Y')  OR  (MOCTA.TA011 = 'y')) -- AND left(MOCTB.TB003,1) IN('3','6')
+WHERE TA001='5102' AND  TA014 >= '20260320' AND  TA014 <= '20260326'  AND  ((MOCTA.TA011 = 'Y')  OR  (MOCTA.TA011 = 'y')) -- AND left(MOCTB.TB003,1) IN('3','6')
 
 
 union all
 SELECT MOCTA.TA021 AS LS001,CMSMD.MD002 AS LS002,MOCTA.TA001+'-'+MOCTA.TA002   工单号,MOCTA.TA003 AS LS005,
 MOCTA.TA014 AS LS006,MOCTA.TA006 AS LS007,MOCTA.TA034 AS LS008,MOCTA.TA035 AS LS009,
 
-MOCTA.TA015 AS 预计产量,MOCTA.TA017 AS 已生产量 ,case when TA011='Y' then 'Y:已完工' when TA011='y' then 'y:指定结束' end  工单状态 ,left(CMSMC.UDF01,4)
+MOCTA.TA015 AS 预计产量,MOCTA.TA017 AS 已生产量 ,case when TA011='Y' then 'Y:已完工' when TA011='y' then 'y:指定结束' end  工单状态 
+,IIF(SUBSTRING(MD011,0 ,CHARINDEX('-',MD011 , 0)) = '',left(CMSMC.UDF01,4),SUBSTRING(MD011,0 ,CHARINDEX('-',MD011 , 0)) )
  ,case when isnull(gy.MF001,'')='' then '' else '是' end  双面锡膏
   ,case when isnull(AI.MF001,'')='' then '' else '是' end  AI工艺  
   ,case when isnull(RI.MF001,'')='' then '' else '是' end  RI工艺 
@@ -153,7 +154,7 @@ left join ( select distinct MF001 from  BOMMF where   MF004  in('P022','P020')
 ) RI on  RI.MF001=TA006
 left join ( select distinct MF001 from  BOMMF join CMSMW on MF004=MW001 where   MW002  like'%SMT%') SMT on  SMT.MF001=TA006
 
-WHERE TA001='5102' AND   TA014 >= '20260130' AND  TA014 <= '20260205'  AND  ((MOCTA.TA011 = 'Y')  OR  (MOCTA.TA011 = 'y')) -- AND left(MOCTB.TB003,1) IN('3','6')
+WHERE TA001='5102' AND   TA014 >= '20260320' AND  TA014 <= '20260326'  AND  ((MOCTA.TA011 = 'Y')  OR  (MOCTA.TA011 = 'y')) -- AND left(MOCTB.TB003,1) IN('3','6')
 ORDER BY MOCTA.TA014,MOCTA.TA003,MOCTA.TA001+'-'+MOCTA.TA002
 
 

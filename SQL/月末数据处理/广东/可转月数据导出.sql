@@ -4,31 +4,31 @@ drop TABLE #ZYCLZLB
 
 --delete from  web_lnk.RDSJK.dbo.ZYCLZLB
 
-SELECT   '              'Àà±ð,
-	CLZL025 ¹ØÁªµ¥ºÅ ,
+SELECT   '              'ç±»åˆ«,
+	CLZL025 å…³è”å•å· ,
 
-	'                                                                                                                                                                                                               '±¸×¢,
-	CLZL001 Æ·ºÅ ,
-	CLZL002 Æ·Ãû,
-	CLZL003 ¹æ¸ñ,
-	CLZL004 ¹©Ó¦ÉÌ,
-	CLZL005 ¹©Ó¦ÉÌ¼ò³Æ,
-	CLZL012 ±ê×¼µ¥¼Û,
-	CLZL011 ¿â´æ,
-	CLZL013 ½ð¶î ,
-	CLZL014 ½»Ò×ÊýÁ¿,
-	CLZL015 ½»Ò×½ð¶î,
-	CLZL016 ¿â´æÈÕÆÚ,
-	CLZL017 ÈÕÆÚ,
-	CLZL018 [ÕËÁä(Ìì)],
-	MB007 ÉÌÆ·Àà±ð,
-	MA003 Àà±ðÃû³Æ,
-	CLZL019 µ¥¼Û,
-	(SELECT b.MC001+ b.MC002 FROM SDRD..CMSMC b WHERE b.MC001=CLZL020) AS ²Ö±ð,
-	CLZL021 ÎïÁÏ×´Ì¬,
-	ZLDZ04 ËùÊôÊÂÒµ²¿,
-	ZLDZ06 ¿Í»§Ãû³Æ,
-	ZLDZ06 ·ÖÎöÔ­Òò
+	'                                                                                                                                                                                                               'å¤‡æ³¨,
+	CLZL001 å“å· ,
+	CLZL002 å“å,
+	CLZL003 è§„æ ¼,
+	CLZL004 ä¾›åº”å•†,
+	CLZL005 ä¾›åº”å•†ç®€ç§°,
+	CLZL012 æ ‡å‡†å•ä»·,
+	CLZL011 åº“å­˜,
+	CLZL013 é‡‘é¢ ,
+	CLZL014 äº¤æ˜“æ•°é‡,
+	CLZL015 äº¤æ˜“é‡‘é¢,
+	CLZL016 åº“å­˜æ—¥æœŸ,
+	CLZL017 æ—¥æœŸ,
+	CLZL018 [è´¦é¾„(å¤©)],
+	MB007 å•†å“ç±»åˆ«,
+	MA003 ç±»åˆ«åç§°,
+	CLZL019 å•ä»·,
+	(SELECT b.MC001+ b.MC002 FROM SDRD..CMSMC b WHERE b.MC001=CLZL020) AS ä»“åˆ«,
+	CLZL021 ç‰©æ–™çŠ¶æ€,
+	ZLDZ04 æ‰€å±žäº‹ä¸šéƒ¨,
+	ZLDZ06 å®¢æˆ·åç§°,
+	ZLDZ06 åˆ†æžåŽŸå› 
 INTO #ZYCLZLB
 FROM web_lnk.RDSJK.dbo.ZYCLZLB 
 	JOIN  SDRD..INVMB ON MB001=CLZL001 
@@ -39,9 +39,9 @@ WHERE (
 		OR LEFT(CLZL001,1)='5'
 		OR LEFT(CLZL001,1)='6' 
 		OR LEFT(CLZL001,1)='7'
-	) AND (CLZL017 = '2025/11/30')  
-	AND CLZL021='Á¼Æ·'
-	AND CLZL016<='2025/11/30'  
+	) AND (CLZL017 = '2026/02/28')  
+	AND CLZL021='è‰¯å“'
+	AND CLZL016<='2026/02/28'  
 ORDER BY MB007,
 	CLZL001,
 	CLZL021 DESC,
@@ -50,13 +50,13 @@ ORDER BY MB007,
 	CLZL017,
 	CLZL018 DESC
 
- SELECT *FROM  web_lnk.RDSJK.dbo.ZYCLZLB  WHERE (CLZL017 = '2025/11/30') 
+ SELECT *FROM  web_lnk.RDSJK.dbo.ZYCLZLB  WHERE (CLZL017 = '2026/02/28') 
 
- DELETE FROM  web_lnk.RDSJK.dbo.ZYCLZLB  WHERE (CLZL017 = '2025/11/30') 
+ DELETE FROM  web_lnk.RDSJK.dbo.ZYCLZLB  WHERE (CLZL017 = '2026/02/28') 
 
  SELECT *FROM   #ZYCLZLB
- /***²úÏßÍËÁÏ±ê×¢***/
- UPDATE zy SET Àà±ð='²úÏßÍËÁÏ',¹ØÁªµ¥ºÅ= '¹¤µ¥:'+LA024 
+ /***äº§çº¿é€€æ–™æ ‡æ³¨***/
+ UPDATE zy SET ç±»åˆ«='äº§çº¿é€€æ–™',å…³è”å•å·= 'å·¥å•:'+LA024 
  FROM #ZYCLZLB zy 
  JOIN  ( 
 	SELECT LA001,LA024,SUM(LA011*LA006) SL,LEFT(LA004,6)+'01' YF 
@@ -65,45 +65,47 @@ ORDER BY MB007,
 	JOIN SDRD.dbo.INVMB ON MB001=LA001 
 	WHERE CMSMC.MC004='1' 
 	AND CMSMC.MC018='Y' 
-	AND CMSMC.UDF01 LIKE '%-Á¼Æ·' 
-	AND CMSMC.MC002 NOT LIKE '%³µ¼ä²Ö%' 
-	AND CMSMC.MC002 NOT LIKE '%ÍâÐ­²Ö%'
-	AND CMSMC.MC002 NOT LIKE '%·ÇROHS%'
-	AND CMSMC.MC002 NOT LIKE '%¸¨ÁÏ%' 
+	AND CMSMC.UDF01 LIKE '%-è‰¯å“' 
+	AND CMSMC.MC002 NOT LIKE '%è½¦é—´ä»“%' 
+	AND CMSMC.MC002 NOT LIKE '%å¤–åä»“%'
+	AND CMSMC.MC002 NOT LIKE '%éžROHS%'
+	AND CMSMC.MC002 NOT LIKE '%è¾…æ–™%' 
 	AND LA006 LIKE '5%' 
 	AND LEN(LA024)=16 
 	AND LEFT(LA001,1 ) IN('3','5','6','7') 
 	GROUP BY LA001,MB017,LEFT(LA004,6),LA024 
 	HAVING(SUM(LA011*LA006))>0 
-) AS MOC ON  Æ·ºÅ=LA001 AND ¿â´æÈÕÆÚ=YF AND ¹©Ó¦ÉÌ¼ò³Æ='²úÏßÍËÁÏ'
+) AS MOC ON  å“å·=LA001 AND åº“å­˜æ—¥æœŸ=YF AND ä¾›åº”å•†ç®€ç§°='äº§çº¿é€€æ–™'
 
-  /***²úÏßÍËÁÏ±ê×¢***/
+  /***äº§çº¿é€€æ–™æ ‡æ³¨***/
 
 
 
- /***²úÏßÍËÁÏ±ê×¢***/
- UPDATE zy SET Àà±ð='Á¬Ðø×ªÔÂ',±¸×¢= '×î³õÈë¿âÊ±¼ä:'+LEFT(CREATE_DATE ,8)
- --SELECT TG001+'-'+TG002+ '×î³õÈë¿âÊ±¼ä:'+left(CREATE_DATE ,8),*
+ /***äº§çº¿é€€æ–™æ ‡æ³¨***/
+ UPDATE zy SET ç±»åˆ«='è¿žç»­è½¬æœˆ',å¤‡æ³¨= 'æœ€åˆå…¥åº“æ—¶é—´:'+LEFT(CREATE_DATE ,8)
+ --SELECT TG001+'-'+TG002+ 'æœ€åˆå…¥åº“æ—¶é—´:'+left(CREATE_DATE ,8),*
   FROM #ZYCLZLB zy JOIN (SELECT TG001,TG002, TH.CREATE_DATE,TG005,TH014 YF,TH004,TH047 je,TH016,TH018
 FROM SDRD..PURTH TH INNER JOIN SDRD..PURTG ON TH001=TG001 AND TH002=TG002
-WHERE TH030 = 'Y' AND TH016 > 0 AND DATEDIFF(MONTH,CAST(LEFT(TH.CREATE_DATE,6)+'01' AS DATETIME),CAST(LEFT(TH014,6)+'01' AS DATETIME))>1) AS PUR ON  Æ·ºÅ=TH004 AND ¿â´æÈÕÆÚ=YF AND  ¹©Ó¦ÉÌ=TG005
+WHERE TH030 = 'Y' AND TH016 > 0 
+AND DATEDIFF(MONTH,CAST(LEFT(TH.CREATE_DATE,6)+'01' AS DATETIME),CAST(LEFT(TH014,6)+'01' AS DATETIME))>1
+) AS PUR ON  å“å·=TH004 AND åº“å­˜æ—¥æœŸ=YF AND  ä¾›åº”å•†=TG005
 
-  /***²úÏßÍËÁÏ±ê×¢***/
+  /***äº§çº¿é€€æ–™æ ‡æ³¨***/
   --select Datediff(MONTH,cast('20200331' as datetime),cast('20200615' as datetime))>2
 
+  --EXPORT DATE
+ SELECT   RTRIM(ç±»åˆ«) ç±»åˆ«,RTRIM(å…³è”å•å·)å…³è”å•å·,RTRIM(å“å·)å“å· , 
+ å“å,è§„æ ¼,ä¾›åº”å•†,ä¾›åº”å•†ç®€ç§°,æ ‡å‡†å•ä»·,åº“å­˜,é‡‘é¢ ,äº¤æ˜“æ•°é‡, äº¤æ˜“é‡‘é¢,
+ åº“å­˜æ—¥æœŸ,æ—¥æœŸ,[è´¦é¾„(å¤©)],å•†å“ç±»åˆ«,ç±»åˆ«åç§°,å•ä»·,ä»“åˆ«,ç‰©æ–™çŠ¶æ€,
+ ISNULL(æ‰€å±žäº‹ä¸šéƒ¨,'')æ‰€å±žäº‹ä¸šéƒ¨,ISNULL(å®¢æˆ·åç§°,'') å®¢æˆ·åç§°,ISNULL(åˆ†æžåŽŸå› ,'')åˆ†æžåŽŸå› ,RTRIM(å¤‡æ³¨) å¤‡æ³¨ FROM  #ZYCLZLB
 
- SELECT   RTRIM(Àà±ð) Àà±ð,RTRIM(¹ØÁªµ¥ºÅ)¹ØÁªµ¥ºÅ,RTRIM(Æ·ºÅ)Æ·ºÅ , 
- Æ·Ãû,¹æ¸ñ,¹©Ó¦ÉÌ,¹©Ó¦ÉÌ¼ò³Æ,±ê×¼µ¥¼Û,¿â´æ,½ð¶î ,½»Ò×ÊýÁ¿, ½»Ò×½ð¶î,
- ¿â´æÈÕÆÚ,ÈÕÆÚ,[ÕËÁä(Ìì)],ÉÌÆ·Àà±ð,Àà±ðÃû³Æ,µ¥¼Û,²Ö±ð,ÎïÁÏ×´Ì¬,
- ISNULL(ËùÊôÊÂÒµ²¿,'')ËùÊôÊÂÒµ²¿,ISNULL(¿Í»§Ãû³Æ,'') ¿Í»§Ãû³Æ,ISNULL(·ÖÎöÔ­Òò,'')·ÖÎöÔ­Òò,RTRIM(±¸×¢) ±¸×¢ FROM  #ZYCLZLB
 
+ --SELECT   SUM(äº¤æ˜“é‡‘é¢) FROM  #ZYCLZLB
 
- SELECT   SUM(½»Ò×½ð¶î) FROM  #ZYCLZLB
-
-SELECT  RTRIM(Æ·ºÅ)Æ·ºÅ , Æ·Ãû,¹æ¸ñ,SUM(½»Ò×ÊýÁ¿) ¿É×ª¿â´æ, SUM(½»Ò×½ð¶î )¿É×ª½ð¶î,
-SUM(CASE WHEN ±¸×¢ LIKE '%ÍËÁÏ%' THEN ½»Ò×ÊýÁ¿  ELSE 0 END) ÍËÁÏÊýÁ¿,SUM(CASE WHEN ±¸×¢ LIKE '%ÍËÁÏ%' THEN ½»Ò×ÊýÁ¿  ELSE 0 END)*(SUM(½»Ò×½ð¶î )/SUM(½»Ò×ÊýÁ¿)) ÍËÁÏ½ð¶î,
-SUM(CASE WHEN ±¸×¢ LIKE '%×î³õÈë¿âÊ±¼ä%' THEN ½»Ò×ÊýÁ¿  ELSE 0 END) Á¬Ðø×ªÔÂÊý ,SUM(CASE WHEN ±¸×¢ LIKE '%×î³õÈë¿âÊ±¼ä%' THEN ½»Ò×ÊýÁ¿  ELSE 0 END) *(SUM(½»Ò×½ð¶î )/SUM(½»Ò×ÊýÁ¿)) Á¬Ðø×ªÔÂ½ð¶î
- FROM  #ZYCLZLB GROUP BY Æ·ºÅ , Æ·Ãû,¹æ¸ñ  HAVING(SUM(½»Ò×ÊýÁ¿))>0
+SELECT  RTRIM(å“å·)å“å· , å“å,è§„æ ¼,SUM(äº¤æ˜“æ•°é‡) å¯è½¬åº“å­˜, SUM(äº¤æ˜“é‡‘é¢ )å¯è½¬é‡‘é¢,
+SUM(CASE WHEN å¤‡æ³¨ LIKE '%é€€æ–™%' THEN äº¤æ˜“æ•°é‡  ELSE 0 END) é€€æ–™æ•°é‡,SUM(CASE WHEN å¤‡æ³¨ LIKE '%é€€æ–™%' THEN äº¤æ˜“æ•°é‡  ELSE 0 END)*(SUM(äº¤æ˜“é‡‘é¢ )/SUM(äº¤æ˜“æ•°é‡)) é€€æ–™é‡‘é¢,
+SUM(CASE WHEN å¤‡æ³¨ LIKE '%æœ€åˆå…¥åº“æ—¶é—´%' THEN äº¤æ˜“æ•°é‡  ELSE 0 END) è¿žç»­è½¬æœˆæ•° ,SUM(CASE WHEN å¤‡æ³¨ LIKE '%æœ€åˆå…¥åº“æ—¶é—´%' THEN äº¤æ˜“æ•°é‡  ELSE 0 END) *(SUM(äº¤æ˜“é‡‘é¢ )/SUM(äº¤æ˜“æ•°é‡)) è¿žç»­è½¬æœˆé‡‘é¢
+ FROM  #ZYCLZLB GROUP BY å“å· , å“å,è§„æ ¼  HAVING(SUM(äº¤æ˜“æ•°é‡))>0
 
 
 
@@ -114,26 +116,26 @@ WHERE TH030 = 'Y' AND TH016 > 0 AND TH014='20200701' AND LEFT(TH.CREATE_DATE,8)<
 
 SELECT *FROM   RDSJK..TYGYS 
 
- SELECT   RTRIM(Àà±ð) Àà±ð,RTRIM(¹ØÁªµ¥ºÅ)¹ØÁªµ¥ºÅ,RTRIM(±¸×¢) ±¸×¢,RTRIM(Æ·ºÅ)Æ·ºÅ , Æ·Ãû,¹æ¸ñ,¹©Ó¦ÉÌ,¹©Ó¦ÉÌ¼ò³Æ,±ê×¼µ¥¼Û,¿â´æ,½ð¶î ,½»Ò×ÊýÁ¿, ½»Ò×½ð¶î,¿â´æÈÕÆÚ,ÈÕÆÚ,[ÕËÁä(Ìì)],
- ÉÌÆ·Àà±ð,Àà±ðÃû³Æ,µ¥¼Û,²Ö±ð,ÎïÁÏ×´Ì¬,ISNULL(ËùÊôÊÂÒµ²¿,'')ËùÊôÊÂÒµ²¿,ISNULL(¿Í»§Ãû³Æ,'') ¿Í»§Ãû³Æ,ISNULL(·ÖÎöÔ­Òò,'')·ÖÎöÔ­Òò FROM  #ZYCLZLB WHERE  (SELECT COUNT(*) 
- FROM  RDSJK..TYGYS WHERE TY01=¹©Ó¦ÉÌ AND TY06='SDRD')=0
+ SELECT   RTRIM(ç±»åˆ«) ç±»åˆ«,RTRIM(å…³è”å•å·)å…³è”å•å·,RTRIM(å¤‡æ³¨) å¤‡æ³¨,RTRIM(å“å·)å“å· , å“å,è§„æ ¼,ä¾›åº”å•†,ä¾›åº”å•†ç®€ç§°,æ ‡å‡†å•ä»·,åº“å­˜,é‡‘é¢ ,äº¤æ˜“æ•°é‡, äº¤æ˜“é‡‘é¢,åº“å­˜æ—¥æœŸ,æ—¥æœŸ,[è´¦é¾„(å¤©)],
+ å•†å“ç±»åˆ«,ç±»åˆ«åç§°,å•ä»·,ä»“åˆ«,ç‰©æ–™çŠ¶æ€,ISNULL(æ‰€å±žäº‹ä¸šéƒ¨,'')æ‰€å±žäº‹ä¸šéƒ¨,ISNULL(å®¢æˆ·åç§°,'') å®¢æˆ·åç§°,ISNULL(åˆ†æžåŽŸå› ,'')åˆ†æžåŽŸå›  FROM  #ZYCLZLB WHERE  (SELECT COUNT(*) 
+ FROM  RDSJK..TYGYS WHERE TY01=ä¾›åº”å•† AND TY05='SDRD')=0
 
  SELECT *FROM INVLA 
 
 
- SELECT   LEFT(LA004,6)YF ,LEFT(LA006,2) DB,CASE WHEN LA024 LIKE '%ÈðµÂÖÇÄÜ%' THEN 'ÈðµÂÖÇÄÜ' ELSE '±¾µØ²É¹º' END,MB001,MB002,MB003,MB004,-SUM(LA011*LA006) YL  
+ SELECT   LEFT(LA004,6)YF ,LEFT(LA006,2) DB,CASE WHEN LA024 LIKE '%ç‘žå¾·æ™ºèƒ½%' THEN 'ç‘žå¾·æ™ºèƒ½' ELSE 'æœ¬åœ°é‡‡è´­' END,MB001,MB002,MB003,MB004,-SUM(LA011*LA006) YL  
  FROM  INVLA JOIN INVMB ON MB001=LA001 JOIN CMSMC C  ON LA009=MC001 
- WHERE (LA004 >= '20200801'  AND  LA004 <= '20201130' ) AND C.UDF01 LIKE '%-Á¼Æ·%' AND LEFT(LA001,1) NOT IN('A','1','2')  AND LA006 NOT LIKE ('1%')  
+ WHERE (LA004 >= '20200801'  AND  LA004 <= '20201130' ) AND C.UDF01 LIKE '%-è‰¯å“%' AND LEFT(LA001,1) NOT IN('A','1','2')  AND LA006 NOT LIKE ('1%')  
  AND LEFT(LA006,2) NOT IN('35','18' ,'19','34') AND LEFT(LA006,2) NOT IN('1102','1112' )
 
- GROUP BY LEFT(LA004,6),CASE WHEN LA024 LIKE '%ÈðµÂÖÇÄÜ%' THEN 'ÈðµÂÖÇÄÜ' ELSE '±¾µØ²É¹º' END,MB001,MB002,MB003,MB004,LEFT(LA006,2) HAVING(-SUM(LA011*LA006))>0 
- ORDER BY YF,MB001,MB002,CASE WHEN LA024 LIKE '%ÈðµÂÖÇÄÜ%' THEN 'ÈðµÂÖÇÄÜ' ELSE '±¾µØ²É¹º' END
+ GROUP BY LEFT(LA004,6),CASE WHEN LA024 LIKE '%ç‘žå¾·æ™ºèƒ½%' THEN 'ç‘žå¾·æ™ºèƒ½' ELSE 'æœ¬åœ°é‡‡è´­' END,MB001,MB002,MB003,MB004,LEFT(LA006,2) HAVING(-SUM(LA011*LA006))>0 
+ ORDER BY YF,MB001,MB002,CASE WHEN LA024 LIKE '%ç‘žå¾·æ™ºèƒ½%' THEN 'ç‘žå¾·æ™ºèƒ½' ELSE 'æœ¬åœ°é‡‡è´­' END
 
 
 
  
  SELECT   MB001,MB002,MB003,-SUM(LA011*LA006) YL INTO #TEM1  FROM  INVLA JOIN INVMB ON MB001=LA001 JOIN CMSMC C  ON LA009=MC001 
- WHERE (LA004 >= '20200801'  AND  LA004 <= '20201130' ) AND C.UDF01 LIKE '%-Á¼Æ·%' AND LEFT(LA001,1) NOT IN('A','1','2') 
+ WHERE (LA004 >= '20200801'  AND  LA004 <= '20201130' ) AND C.UDF01 LIKE '%-è‰¯å“%' AND LEFT(LA001,1) NOT IN('A','1','2') 
  AND LA006 NOT LIKE ('1%')  AND LEFT(LA006,2) NOT IN('35','18' ,'19','34') AND LEFT(LA006,2) NOT IN('1102','1112' )
 
  GROUP BY MB001,MB002,MB003 HAVING(-SUM(LA011*LA006))>0 ORDER BY MB001,MB002 
@@ -141,8 +143,8 @@ SELECT *FROM   RDSJK..TYGYS
 
 
  
- select  case isnull( YL,0) when 0 then 'ÎÞÊ¹ÓÃ' else 'Î´ÓÃÍê' end  , rtrim(Àà±ð) Àà±ð,rtrim(¹ØÁªµ¥ºÅ)¹ØÁªµ¥ºÅ,rtrim(±¸×¢) ±¸×¢,
- rtrim(Æ·ºÅ)Æ·ºÅ , Æ·Ãû,¹æ¸ñ,¹©Ó¦ÉÌ,¹©Ó¦ÉÌÈ«³Æ,±ê×¼µ¥¼Û,¿â´æ, YL Êµ¼ÊÓÃÁ¿,½ð¶î ,½»Ò×ÊýÁ¿, ½»Ò×½ð¶î,¿â´æÈÕÆÚ,ÈÕÆÚ,[ÕËÁä(Ìì)],ÉÌÆ·Àà±ð,
- Àà±ðÃû³Æ,µ¥¼Û,²Ö±ð,ÎïÁÏ×´Ì¬,isnull(ËùÊôÊÂÒµ²¿,'')ËùÊôÊÂÒµ²¿,isnull(¿Í»§Ãû³Æ,'') ¿Í»§Ãû³Æ,isnull(·ÖÎöÔ­Òò,'')·ÖÎöÔ­Òò 
- from  #ZYCLZLB LEFT JOIN #TEM1 ON rtrim(Æ·ºÅ)=MB001 
- WHERE (select count(*) from  RDSJK..TYGYS where TY01=¹©Ó¦ÉÌ and TY06='SDRD')=0
+ select  case isnull( YL,0) when 0 then 'æ— ä½¿ç”¨' else 'æœªç”¨å®Œ' end  , rtrim(ç±»åˆ«) ç±»åˆ«,rtrim(å…³è”å•å·)å…³è”å•å·,rtrim(å¤‡æ³¨) å¤‡æ³¨,
+ rtrim(å“å·)å“å· , å“å,è§„æ ¼,ä¾›åº”å•†,ä¾›åº”å•†å…¨ç§°,æ ‡å‡†å•ä»·,åº“å­˜, YL å®žé™…ç”¨é‡,é‡‘é¢ ,äº¤æ˜“æ•°é‡, äº¤æ˜“é‡‘é¢,åº“å­˜æ—¥æœŸ,æ—¥æœŸ,[è´¦é¾„(å¤©)],å•†å“ç±»åˆ«,
+ ç±»åˆ«åç§°,å•ä»·,ä»“åˆ«,ç‰©æ–™çŠ¶æ€,isnull(æ‰€å±žäº‹ä¸šéƒ¨,'')æ‰€å±žäº‹ä¸šéƒ¨,isnull(å®¢æˆ·åç§°,'') å®¢æˆ·åç§°,isnull(åˆ†æžåŽŸå› ,'')åˆ†æžåŽŸå›  
+ from  #ZYCLZLB LEFT JOIN #TEM1 ON rtrim(å“å·)=MB001 
+ WHERE (select count(*) from  RDSJK..TYGYS where TY01=ä¾›åº”å•† and TY05='SDRD')=0
