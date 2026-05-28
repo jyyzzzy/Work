@@ -91,7 +91,7 @@ SELECT * FROM LSSJ..MonPrice_Update WHERE 币种<> 'RMB' AND 品号='30503003420
 delete FROM LSSJ..LSCGTH
 
 INSERT LSSJ..LSCGTH (单号,序号,供应商,品号,单价,数量,仓库,币种,汇率)
-SELECT '20260228001','0001',供应商,品号,单价,SUM(数量 )数量,仓库,币种,汇率 FROM  LSSJ..MonPrice_Update INNER JOIN AHRD..PURMA ON 供应商 = PURMA.MA001
+SELECT '20260430001','0001',供应商,品号,单价,SUM(数量 )数量,仓库,币种,汇率 FROM  LSSJ..MonPrice_Update INNER JOIN AHRD..PURMA ON 供应商 = PURMA.MA001
 GROUP BY 供应商,品号,单价,仓库,币种,汇率 
 
 SELECT * FROM LSSJ..LSCGTH 
@@ -100,7 +100,7 @@ ORDER BY 单号,序号
 declare @No int--单号编号
 declare @FormNo varchar(11)--单号前缀
 
-set @FormNo='202602'--本月月份
+set @FormNo='202604'--本月月份
 select @No=right(rtrim(isnull(MAX(TI002),'00000')),5) FROM AHRD..PURTI  where TI001='3573' and left(TI002,6)=@FormNo
 
  update B set 单号=xindan ,序号=xinxu
@@ -117,13 +117,16 @@ SELECT SUM(数量) FROM LSSJ..LSCGTH
 UPDATE LSSJ..LSCGTH SET 序号 = RIGHT(序号,4)
 
 --查看供应商是否存在基础资料中
-SELECT 供应商,MA002 from LSSJ.dbo.LSCGTH INNER JOIN AHRD.dbo.PURMA ON 供应商=MA001
+SELECT 供应商 from LSSJ.dbo.LSCGTH 
+WHERE NOT EXISTS(
+	SELECT 1 FROM AHRD.dbo.PURMA WHERE 供应商=MA001
+)
 
 --查看品号是否存在基础资料中
 SELECT * FROM LSSJ..LSCGTH WHERE 品号 NOT IN (SELECT  MB001 FROM AHRD..INVMB) 
 
 --查看本月最大单号
-select MAX(TI002) FROM AHRD..PURTI  where TI001='3505'  AND TI002 LIKE '202512%'
+select MAX(TI002) FROM AHRD..PURTI  where TI001='3573'  AND TI002 LIKE '2603%'
 
 select * from   LSSJ..LSCGTH WHERE 单号='20240300046'
  
@@ -144,10 +147,10 @@ TI031,TI032,TI033,TI034,TI035,TI036,TI037,TI038,TI039,TI040,
 TI041,TI042,TI043,TI044,TI045,
 UDF01,UDF02,UDF03,UDF04,UDF05,UDF06,UDF51,UDF52,UDF53,UDF54,UDF55,UDF56) 
 SELECT
-'0001','10105978','90001','20260228000000000'--FORMAT(GETDATE(), 'yyyyMMddHHmmssfff')
+'0001','10105978','90001',FORMAT(GETDATE(), 'yyyyMMddHHmmssfff')
 ,'','',1,
-'3573',单号,'20260228',供应商,'000301','RMB',1,'S','1',0,
-SUM(单价*数量)/1.13,'月末批量开退货单','N','20260228',SUM(单价*数量)-SUM(单价*数量)/1.13,PURMA.MA003,PURMA.MA005,'','',''
+'3573',单号,'20260430',供应商,'000301','RMB',1,'S','1',0,
+SUM(单价*数量)/1.13,'月末批量开退货单','N','20260430',SUM(单价*数量)-SUM(单价*数量)/1.13,PURMA.MA003,PURMA.MA005,'','',''
 ,0,SUM(数量),'','N','','',0.13,SUM(单价*数量)/1.13,SUM(单价*数量)-SUM(单价*数量)/1.13,PURMA.MA055
 ,0,'N','',0,'N','N','','','','N'
 ,'N','',0,0,0,'','','','','','',0,0,0,0,0,0
@@ -169,7 +172,7 @@ insert into AHRD..PURTJ
 	TJ051,TJ052,TJ053,TJ054,TJ055,TJ056,
 	UDF01,UDF02,UDF03,UDF04,UDF05,UDF06,UDF51,UDF52,UDF53,UDF54,UDF55,UDF56)
 SELECT 
-'0001','10105978','90001','20260228000000000'--FORMAT(GETDATE(), 'yyyyMMddHHmmssfff')
+'0001','10105978','90001',FORMAT(GETDATE(), 'yyyyMMddHHmmssfff')
 ,'','',1,
 '3573',单号,序号,品号,INVMB.MB002,INVMB.MB003,INVMB.MB004,单价,数量,单价*数量
 ,仓库,'********************','','','','','','','','N'

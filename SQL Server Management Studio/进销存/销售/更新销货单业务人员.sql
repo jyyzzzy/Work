@@ -147,6 +147,7 @@ UPDATE COPTI
 SET TI005 = deptNo
 --,TI006 = salesRepNo
 --,TI022 = salesRepNo
+--SELECT *
 FROM COPTI
 INNER JOIN LSSJ..OrderDeptSalesRep ON LEFT(orderKey,16) = TI001 + '-' + TI002
 WHERE TI005 <> deptNo

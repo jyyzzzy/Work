@@ -33,6 +33,12 @@
           <AssociatedConnUserName />
           <FullPath>SQLQuery2.sql</FullPath>
         </FileNode>
+        <FileNode Name="SQLQuery6.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
+          <FullPath>SQLQuery6.sql</FullPath>
+        </FileNode>
       </Items>
     </LogicalFolder>
     <LogicalFolder Name="杂项" Type="3" Sorted="true">

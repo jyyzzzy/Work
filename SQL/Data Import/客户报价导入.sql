@@ -22,7 +22,7 @@ update LSSJ..TJD    set 失效时间='20241231'
 ="('"&A2&"','"&B2&"',"&C2&",'"&TEXT(D2,"yyyymmdd")&"','"&TEXT(E2,"yyyymmdd")&"'),"
 
 ="insert into LSSJ..TJD(客户简称,内部料号1,含税价格,生效时间,失效时间)values('"&A2&"','"&B2&"',"&C2&",'"&TEXT(D2,"yyyymmdd")&"','')"
-
+--="insert into LSSJ..TJD(客户简称,内部料号1,含税价格,生效时间,失效时间) values('"&A2&"','"&B2&"',"&C2&",'"&TEXT(D2,"yyyymmdd")&"','"&IF(ISBLANK(E2),"",TEXT(E2,"yyyymmdd"))&"')"
 --无生效日期导入
 ="insert into LSSJ..TJD(客户简称,内部料号1,含税价格,生效时间,失效时间)values('"&A2&"','"&B2&"',"&C2&",'"&TEXT(D2,"yyyymmdd")&"','"&TEXT(E2,"yyyymmdd")&"')"
 delete from  LSSJ..TJD
@@ -76,13 +76,17 @@ select dbo.fn_cpc_date_to_char(getdate())
 
   select*from  LSSJ..TJD
   
+
+  delete from  LSSJ..TJD
+
+
   DROP TABLE #COPTA
 
   DECLARE @TA002 AS BIGINT
    select @TA002= CAST( ISNULL(MAX(TA002),LEFT(SDRD.dbo.fn_cpc_date_to_char(getdate()),8)+'000' ) AS bigint)  from COPTA where 
    --TA004 in(select 客户简称 from   LSSJ..TJD) and TA001 in (select min(TA001) from COPTA  )    AND
    TA002 LIKE LEFT(SDRD.dbo.fn_cpc_date_to_char(getdate()),8)+'%'
-   SELECT @TA002
+   --SELECT @TA002
 
 select TA001 TA01,MAX(TA002)YTA02,TA004 TA04,(ROW_NUMBER() over( order by TA004))+ @TA002 XTA02
 INTO #COPTA 
@@ -96,9 +100,11 @@ where TA004 in(
 		when '0006' then '2171' 
 		when '0011' then'21A1' 
 		when '0001' then'2101' 
+		WHEN 'YNRD' THEN '21V1'
+		WHEN '0005' THEN '2101'
 		else '' end  
 	) 
-group by  TA001,TA004
+group by  TA001,TA004;
 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -110,8 +116,8 @@ TA016,TA017,TA018,TA019,TA020,TA021,TA022,TA023,TA025,TA024,
 TA026,TA027,TA028, TA029,TA030,TA031, TA032, TA033,TA034, TA035,
 TA036,TA037,TA038,TA039,TA040,TA041,TA042)
 SELECT  COMPANY,'10105978','90001',SDRD.dbo.fn_cpc_date_to_char(getdate()),MODIFIER,NULL MODI_DATE,1 FLAG,
-   TA001,XTA02,'20260321',TA004,TA005,TA006,TA007,
-TA008,TA009, TA010,TA011,TA012,'20260321',TA014,'',
+   TA001,XTA02,'20260527',TA004,TA005,TA006,TA007,
+TA008,TA009, TA010,TA011,TA012,'20260527',TA014,'',
 TA016,TA017,TA018,'N','','',TA022,TA023,TA025,TA024,
 TA026,TA027,TA028, TA029,TA030,TA031, TA032, TA033,TA034, TA035,
 TA036,TA037,TA038,TA039,TA040,TA041,TA042
@@ -125,26 +131,30 @@ TB011,TB012,TB013,TB014,TB015,TB016,TB017,TB018,TB019,TB020,
 TB021,TB022,TB023,TB024,TB025,TB026,TB027,TB028,TB029,TB030,
 TB031,TB032,TB033,TB034,TB035,TB036,TB037,TB038,TB039
 )
-	 SELECT  B.COMPANY,B.CREATOR,B.USR_GROUP,SDRD.dbo.fn_cpc_date_to_char(getdate()),'' MODIFIER,'' MODI_DATE, 1 FLAG,
+	 SELECT  B.COMPANY,'10105978','90001',SDRD.dbo.fn_cpc_date_to_char(getdate()),'' MODIFIER,'' MODI_DATE, 1 FLAG,
 	TB001,XTA02, RIGHT(10000+ROW_NUMBER() over( PARTITION BY  XTA02  order by 内部料号1),4),MB001,MB002,D.MB003,TB007,MB004,C.含税价格,TB010,
 	'N',C.BZ,TB013,TB014,TB015,C.生效时间,C.失效时间,TB018,TB019,TB020,
 	TB021,TB022,TB023,TB024,TB025,TB026,TB027,TB028,TB029,TB030,
 	TB031,TB032,TB033,TB034,TB035,TB036,TB037,TB038,TB039
 	
 	FROM  COPTB B
-	JOIN  #COPTA ON TA01=TB001 AND YTA02=TB002 AND TB003='0001'
+	JOIN  #COPTA ON TA01=TB001 AND YTA02=TB002 AND TB003 = '0001'--IIF(YTA02 = '20260418001','0001','0002')
 	LEFT  JOIN LSSJ..TJD C ON 1=1 AND   C.客户简称=TA04
 	LEFT JOIN INVMB D ON RTRIM(C.内部料号1) =D.MB001 
 	--LEFT JOIN COPMA E ON C.客户简称=E.MA001
 	WHERE MB001 IS NOT NULL
 
-	select *from  #COPTA
+	select *from  #COPTA LEFT  JOIN LSSJ..TJD C ON 1=1 AND   C.客户简称=TA04 LEFT JOIN INVMB D ON RTRIM(C.内部料号1) =D.MB001 AND MB001 IS NULL
 
 	WHERE TB001='2101' AND TB002='20250222002' AND TB003='0001'
 
-
-
+	SELECT * FROM COPTB ORDER BY CREATE_DATE DESC
+	DELETE FROM COPTA WHERE TA001='2101' AND TA002='20260423001'
 	select * from COPTB WHERE TB001='2101' AND TB002='20241209001'
+
+
+
+SELECT * FROM LSSJ..TJD WHERE NOT EXISTS( SELECT 1 FROM INVMB WHERE MB001 = 内部料号1)
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------313004533100   
 INSERT INTO [dbo].[COPTB](
 [COMPANY],[CREATOR],[USR_GROUP],[CREATE_DATE],[MODIFIER],[MODI_DATE],[FLAG]

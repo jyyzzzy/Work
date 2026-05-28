@@ -2,7 +2,7 @@
 --="INSERT INTO LSSJ..ITEMTMP(ITEMNO) VALUES('"&&"');"
 --SELECT * FROM LSSJ..ITEMTMP;
 --="INSERT INTO LSSJ..Sh11(内部料号) VALUES('"&&"');"
-DELETE FROM LSSJ..Sh11
+--DELETE FROM LSSJ..Sh11
 INSERT INTO LSSJ..ITEMTMP(ITEMNO) SELECT DISTINCT 内部料号 FROM LSSJ..Sh11
 ;WITH U AS(
 	SELECT T.ITEMNO AS COMP, M.MD001 AS P
@@ -836,3 +836,152 @@ WHERE LEFT(B.TA006, 1) IN ('1', 'A')
 ORDER BY
     ITEM.MB001,
     B.TA006;
+
+SELECT R.MATL 材料品号
+    ,MATL.MB002 材料品名
+    ,MATL.MB003 材料规格
+    ,R.CNT 材料用量
+    ,R.PROD 产品品号
+    ,PROD.MB002 产品品名
+    ,PROD.MB003 产品规格
+FROM #RELATION R
+INNER JOIN INVMB MATL ON MATL.MB001 = R.MATL
+INNER JOIN INVMB PROD ON PROD.MB001 = R.PROD
+ORDER BY R.MATL,R.PROD
+
+IF OBJECT_ID('tempdb..#ITEM') IS NOT NULL DROP TABLE #ITEM;
+IF OBJECT_ID('tempdb..#BOM') IS NOT NULL DROP TABLE #BOM;
+IF OBJECT_ID('tempdb..#ANCESTOR') IS NOT NULL DROP TABLE #ANCESTOR;
+IF OBJECT_ID('tempdb..#RELATION') IS NOT NULL DROP TABLE #RELATION;
+IF OBJECT_ID('tempdb..#INVMB') IS NOT NULL DROP TABLE #INVMB;
+
+------------------------------------------------------------
+-- 1. 材料清单
+------------------------------------------------------------
+SELECT DISTINCT
+    LTRIM(RTRIM(ITEMNO)) COLLATE DATABASE_DEFAULT AS ITEMNO
+INTO #ITEM
+FROM LSSJ..ITEMTMP
+WHERE ISNULL(LTRIM(RTRIM(ITEMNO)), '') <> '';
+
+-- 测试单个材料时使用：
+-- SELECT '304090316100' ITEMNO INTO #ITEM;
+
+CREATE UNIQUE CLUSTERED INDEX IX_ITEM_ITEMNO ON #ITEM(ITEMNO);
+
+------------------------------------------------------------
+-- 2. BOM 预清洗
+------------------------------------------------------------
+SELECT
+    LTRIM(RTRIM(MD003)) COLLATE DATABASE_DEFAULT AS CHILD,   -- 元件/材料
+    LTRIM(RTRIM(MD001)) COLLATE DATABASE_DEFAULT AS PARENT,  -- 上阶主件/产品
+    CAST(ISNULL(MD006, 0) AS DECIMAL(18,8)) AS CNT
+INTO #BOM
+FROM SDRD..BOMMD
+WHERE ISNULL(LTRIM(RTRIM(MD003)), '') <> ''
+  AND ISNULL(LTRIM(RTRIM(MD001)), '') <> ''
+  AND ISNULL(MD007, 0) <> 0;
+
+CREATE INDEX IX_BOM_CHILD ON #BOM(CHILD) INCLUDE(PARENT, CNT);
+CREATE INDEX IX_BOM_PARENT ON #BOM(PARENT);
+
+------------------------------------------------------------
+-- 3. 从材料向上递归，找材料对应的所有上阶产品
+------------------------------------------------------------
+;WITH U AS
+(
+    SELECT
+        I.ITEMNO AS MATL,
+        B.PARENT AS PROD,
+        CAST(B.CNT AS DECIMAL(38,12)) AS ACT_QTY,
+        CAST(1 AS INT) AS LVL,
+        CAST('|' + I.ITEMNO + '|' + B.PARENT + '|' AS VARCHAR(4000)) AS PATH
+    FROM #ITEM I
+    INNER JOIN #BOM B
+        ON B.CHILD = I.ITEMNO
+
+    UNION ALL
+
+    SELECT
+        U.MATL,
+        B.PARENT AS PROD,
+        CAST(U.ACT_QTY * B.CNT AS DECIMAL(38,12)) AS ACT_QTY,
+        U.LVL + 1 AS LVL,
+        CAST(U.PATH + B.PARENT + '|' AS VARCHAR(4000)) AS PATH
+    FROM U
+    INNER JOIN #BOM B
+        ON B.CHILD = U.PROD
+    WHERE U.LVL < 50
+      AND CHARINDEX('|' + B.PARENT + '|', U.PATH) = 0
+)
+SELECT
+    MATL,
+    PROD,
+    ACT_QTY
+INTO #ANCESTOR
+FROM U
+OPTION (MAXRECURSION 100);
+
+CREATE INDEX IX_ANCESTOR_MATL ON #ANCESTOR(MATL);
+CREATE INDEX IX_ANCESTOR_PROD ON #ANCESTOR(PROD);
+
+------------------------------------------------------------
+-- 4. 汇总材料-产品实际用量
+------------------------------------------------------------
+SELECT
+    MATL,
+    PROD,
+    SUM(ACT_QTY) AS 实际用量
+INTO #RELATION
+FROM #ANCESTOR
+GROUP BY
+    MATL,
+    PROD;
+
+CREATE INDEX IX_RELATION_MATL ON #RELATION(MATL);
+CREATE INDEX IX_RELATION_PROD ON #RELATION(PROD);
+
+------------------------------------------------------------
+-- 5. 物料资料预清洗
+------------------------------------------------------------
+SELECT
+    LTRIM(RTRIM(MB001)) COLLATE DATABASE_DEFAULT AS ITEMNO,
+    MB002,
+    MB003,
+    MB004
+INTO #INVMB
+FROM SDRD..INVMB
+WHERE EXISTS
+(
+    SELECT 1
+    FROM #RELATION R
+    WHERE R.MATL = LTRIM(RTRIM(MB001)) COLLATE DATABASE_DEFAULT
+       OR R.PROD = LTRIM(RTRIM(MB001)) COLLATE DATABASE_DEFAULT
+);
+
+CREATE UNIQUE CLUSTERED INDEX IX_INVMB_ITEMNO ON #INVMB(ITEMNO);
+
+------------------------------------------------------------
+-- 6. 最终输出
+------------------------------------------------------------
+SELECT
+    R.MATL AS 材料品号,
+    MATL.MB002 AS 材料品名,
+    MATL.MB003 AS 材料规格,
+    MATL.MB004 AS 材料单位,
+
+    R.PROD AS 产品品号,
+    PROD.MB002 AS 产品品名,
+    PROD.MB003 AS 产品规格,
+    PROD.MB004 AS 产品单位,
+
+    R.实际用量
+FROM #RELATION R
+LEFT JOIN #INVMB MATL
+    ON MATL.ITEMNO = R.MATL
+LEFT JOIN #INVMB PROD
+    ON PROD.ITEMNO = R.PROD
+WHERE LEFT(R.PROD,1) IN ('1','A')
+ORDER BY
+    R.MATL,
+    R.PROD;

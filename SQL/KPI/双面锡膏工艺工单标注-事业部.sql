@@ -96,7 +96,7 @@ left join ( select distinct MF001 from  BOMMF where   MF004  in('P010')
 left join ( select distinct MF001 from  BOMMF where   MF004  in('P022','P020')
 ) RI on  RI.MF001=TA006
 left join ( select distinct MF001 from  BOMMF join CMSMW on MF004=MW001 where   MW002  like'%SMT%') SMT on  SMT.MF001=TA006
-WHERE TA001='5102' AND  TA014 >= '20260320' AND  TA014 <= '20260326'   AND  ((MOCTA.TA011 = 'Y')  OR  (MOCTA.TA011 = 'y')) -- AND left(MOCTB.TB003,1) IN('3','6')
+WHERE TA001='5102' AND  TA014 >= '20260515' AND  TA014 <= '20260521'   AND  ((MOCTA.TA011 = 'Y')  OR  (MOCTA.TA011 = 'y')) -- AND left(MOCTB.TB003,1) IN('3','6')
 
 
 union all
@@ -124,7 +124,7 @@ left join ( select distinct MF001 from  BOMMF where   MF004  in('P010')
 left join ( select distinct MF001 from  BOMMF where   MF004  in('P022','P020')
 ) RI on  RI.MF001=TA006
 left join ( select distinct MF001 from  BOMMF join CMSMW on MF004=MW001 where   MW002  like'%SMT%') SMT on  SMT.MF001=TA006
-WHERE TA001='5102' AND  TA014 >= '20260320' AND  TA014 <= '20260326'  AND  ((MOCTA.TA011 = 'Y')  OR  (MOCTA.TA011 = 'y')) -- AND left(MOCTB.TB003,1) IN('3','6')
+WHERE TA001='5102' AND  TA014 >= '20260515' AND  TA014 <= '20260521'  AND  ((MOCTA.TA011 = 'Y')  OR  (MOCTA.TA011 = 'y')) -- AND left(MOCTB.TB003,1) IN('3','6')
 
 
 union all
@@ -154,7 +154,7 @@ left join ( select distinct MF001 from  BOMMF where   MF004  in('P022','P020')
 ) RI on  RI.MF001=TA006
 left join ( select distinct MF001 from  BOMMF join CMSMW on MF004=MW001 where   MW002  like'%SMT%') SMT on  SMT.MF001=TA006
 
-WHERE TA001='5102' AND   TA014 >= '20260320' AND  TA014 <= '20260326'  AND  ((MOCTA.TA011 = 'Y')  OR  (MOCTA.TA011 = 'y')) -- AND left(MOCTB.TB003,1) IN('3','6')
+WHERE TA001='5102' AND   TA014 >= '20260515' AND  TA014 <= '20260521'  AND  ((MOCTA.TA011 = 'Y')  OR  (MOCTA.TA011 = 'y')) -- AND left(MOCTB.TB003,1) IN('3','6')
 ORDER BY MOCTA.TA014,MOCTA.TA003,MOCTA.TA001+'-'+MOCTA.TA002
 
 

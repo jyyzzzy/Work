@@ -1,0 +1,34 @@
+SELECT
+    TRIM(MC.MC001) AS 成品品号,
+    PROD.MB002 AS 成品品名,
+    PROD.MB003 AS 成品规格,
+
+--    MD.MD009 AS 工艺编号,
+--    MW.MW002 AS 工艺名称,
+
+    TRIM(MD.MD003) AS 辅料品号,
+    MATL.MB002 AS 辅料品名,
+    MATL.MB003 AS 辅料规格,
+    MATL.MB004 AS 辅料单位,
+
+    MD.MD006 AS 辅料组成用量,
+    MD.MD007 AS 辅料组成底数,
+
+    CONVERT(decimal(18,8), MD.MD006)
+        / NULLIF(CONVERT(decimal(18,8), MD.MD007), 0) AS 辅料单位用量
+
+FROM BOMMC AS MC
+INNER JOIN BOMMD AS MD
+    ON MD.MD001 = MC.MC001
+INNER JOIN INVMB AS PROD
+    ON PROD.MB001 = MC.MC001
+INNER JOIN INVMB AS MATL
+    ON MATL.MB001 = MD.MD003
+LEFT JOIN CMSMW AS MW
+    ON MW.MW001 = MD.MD009
+WHERE LEFT(MC.MC001, 1) IN ('1', 'A')   -- 成品
+  AND MATL.MB006 IN ('220','218')                -- 辅料\包装
+ORDER BY
+    TRIM(MC.MC001),
+    MD.MD009,
+    TRIM(MD.MD003);

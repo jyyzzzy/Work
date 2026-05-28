@@ -34,7 +34,7 @@ SELECT TOP 10000000 INVMA.MA002 AS MA002,INVMA.MA003 AS MA003,INVMA.MA004 AS MA0
         (ISNULL(LC005,0) ) INVMONEYQ   
 FROM INVMC I   
 LEFT JOIN INVMB AS INVMB ON MB001=I.MC001   
- LEFT JOIN INVLC AS INVLC ON LC001=I.MC001 AND LC002='''+@month+''' AND LC003=I.MC002   --È¡Ç°Èý¸öÔÂÊý¾Ý
+ LEFT JOIN INVLC AS INVLC ON LC001=I.MC001 AND LC002='''+@month+''' AND LC003=I.MC002   --å–å‰ä¸‰ä¸ªæœˆæ•°æ®
  LEFT JOIN INVLA AS INVLA ON LA001=I.MC001 AND LA009=I.MC002 AND (LA004 BETWEEN '''+@month+'01'' AND '''+@month2+''')  
  LEFT JOIN CMSMC C ON C.MC001=I.MC002 LEFT JOIN INVMA AS INVMA ON MA001=''1'' AND MA002=MB005  LEFT JOIN ACTMA A ON A.MA001 =INVMA.MA004   
  LEFT JOIN CMSMF AS CMSMF ON MF001=''RMB''   
@@ -68,7 +68,7 @@ select *from V_KCMX where INVNUMA<0
 select sum(INVMONEY) from V_KCMX
 
 select *from AHRD..INVMB A JOIN INVMB S ON A.MB001=S.MB001
-SELECT *FROM LSSJ..LSKCB  where ¿â´æ½ð¶î<>0
+SELECT *FROM LSSJ..LSKCB  where åº“å­˜é‡‘é¢<>0
 --DELETE FROM LSSJ..LSKCB
 --DELETE FROM LSSJ..LSZCB
 
@@ -77,26 +77,26 @@ insert into  LSSJ..LSKCB
 select rtrim(MB001),MB002,MB003,MB004,rtrim(MC002) ,MC002C,INVNUMA,CASE INVNUMA WHEN 0 THEN INVMONEY ELSE INVMONEY/INVNUMA END ,INVMONEY,NULL,NULL from V_KCMX
 
 CASE WHEN SUBSTRING(MB001,1,1)< '3' THEN MB057*1.13 ELSE INVMB.UDF54 END
-CASE WHEN SUBSTRING(MB001,1,1)< '3' THEN  µ¥¼Û*1.13 ELSE case INVMB.UDF54 when 0 then µ¥¼Û*1.13 else INVMB.UDF54 end END
+CASE WHEN SUBSTRING(MB001,1,1)< '3' THEN  å•ä»·*1.13 ELSE case INVMB.UDF54 when 0 then å•ä»·*1.13 else INVMB.UDF54 end END
 
-SELECT Æ·ºÅ,Æ·Ãû,¹æ¸ñ,µ¥Î»,²Ö¿â±àºÅ,²Ö¿âÃû³Æ,¿â´æÊýÁ¿,
-case INVMB.UDF54 when 0 then µ¥¼Û*1.13 else INVMB.UDF54 end ,¿â´æÊýÁ¿*(case INVMB.UDF54 when 0 then µ¥¼Û*1.13 else INVMB.UDF54 END)
-FROM LSSJ..LSKCB INNER JOIN  INVMB ON MB001 = Æ·ºÅ
-WHERE ¿â´æÊýÁ¿ >0 ORDER BY ²Ö¿â±àºÅ
+SELECT å“å·,å“å,è§„æ ¼,å•ä½,ä»“åº“ç¼–å·,ä»“åº“åç§°,åº“å­˜æ•°é‡,
+case INVMB.UDF54 when 0 then å•ä»·*1.13 else INVMB.UDF54 end ,åº“å­˜æ•°é‡*(case INVMB.UDF54 when 0 then å•ä»·*1.13 else INVMB.UDF54 END)
+FROM LSSJ..LSKCB INNER JOIN  INVMB ON MB001 = å“å·
+WHERE åº“å­˜æ•°é‡ >0 ORDER BY ä»“åº“ç¼–å·
 
-SELECT ¹¤µ¥±àºÅ,²úÆ·Æ·ºÅ,¿ª¹¤ÈÕ,Ô¤¼Æ²úÁ¿,ÒÑÉú²úÁ¿,¹¤×÷ÖÐÐÄ±àºÅ,¹¤×÷ÖÐÐÄÃû³Æ,²ÄÁÏÆ·ºÅ,Æ·Ãû,¹æ¸ñ,µ¥Î»,
-ÒÑ·¢ÁÏÁ¿,ÒÑºÄÓÃÁ¿,ÔÚ²úÆ·ÊýÁ¿,case INVMB.UDF54 when 0 then µ¥¼Û*1.13 else INVMB.UDF54 end,
-ÔÚ²úÆ·ÊýÁ¿*case INVMB.UDF54 when 0 then µ¥¼Û*1.13 else INVMB.UDF54 end
-FROM LSSJ..LSZCB INNER JOIN INVMB ON ²ÄÁÏÆ·ºÅ = MB001
-ORDER BY ¹¤×÷ÖÐÐÄ±àºÅ
+SELECT å·¥å•ç¼–å·,äº§å“å“å·,å¼€å·¥æ—¥,é¢„è®¡äº§é‡,å·²ç”Ÿäº§é‡,å·¥ä½œä¸­å¿ƒç¼–å·,å·¥ä½œä¸­å¿ƒåç§°,ææ–™å“å·,å“å,è§„æ ¼,å•ä½,
+å·²å‘æ–™é‡,å·²è€—ç”¨é‡,åœ¨äº§å“æ•°é‡,case INVMB.UDF54 when 0 then å•ä»·*1.13 else INVMB.UDF54 end,
+åœ¨äº§å“æ•°é‡*case INVMB.UDF54 when 0 then å•ä»·*1.13 else INVMB.UDF54 end
+FROM LSSJ..LSZCB INNER JOIN INVMB ON ææ–™å“å· = MB001
+ORDER BY å·¥ä½œä¸­å¿ƒç¼–å·
 
-SELECT TA021,MD002,LSZCB.* FROM LSSJ..LSZCB INNER JOIN MOCTA ON TA001+'-'+TA002 = ¹¤µ¥±àºÅ
+SELECT TA021,MD002,LSZCB.* FROM LSSJ..LSZCB INNER JOIN MOCTA ON TA001+'-'+TA002 = å·¥å•ç¼–å·
 INNER JOIN CMSMD ON MD001 = TA021
-WHERE ¹¤×÷ÖÐÐÄ±àºÅ IS NULL
+WHERE å·¥ä½œä¸­å¿ƒç¼–å· IS NULL
 
-UPDATE LSSJ..LSZCB SET ¹¤×÷ÖÐÐÄ±àºÅ = TA021,¹¤×÷ÖÐÐÄÃû³Æ = MD002 FROM LSSJ..LSZCB INNER JOIN MOCTA ON TA001+'-'+TA002 = ¹¤µ¥±àºÅ
+UPDATE LSSJ..LSZCB SET å·¥ä½œä¸­å¿ƒç¼–å· = TA021,å·¥ä½œä¸­å¿ƒåç§° = MD002 FROM LSSJ..LSZCB INNER JOIN MOCTA ON TA001+'-'+TA002 = å·¥å•ç¼–å·
 INNER JOIN CMSMD ON MD001 = TA021
-WHERE ¹¤×÷ÖÐÐÄ±àºÅ IS NULL
+WHERE å·¥ä½œä¸­å¿ƒç¼–å· IS NULL
 
 
 
@@ -104,52 +104,52 @@ WHERE ¹¤×÷ÖÐÐÄ±àºÅ IS NULL
 
 
 
--------------------------------------------------Õã½­ÈðµÂ---------------------------------------------------
-SELECT Æ·ºÅ,Æ·Ãû,¹æ¸ñ,µ¥Î»,²Ö¿â±àºÅ,²Ö¿âÃû³Æ,¿â´æÊýÁ¿,
-case INVMB.UDF54 when 0 then µ¥¼Û*1.13 else INVMB.UDF54 end,¿â´æÊýÁ¿*(case INVMB.UDF54 when 0 then µ¥¼Û*1.13 else INVMB.UDF54 end)
-FROM LSSJ..LSKCB INNER JOIN ZJRD..INVMB ON MB001 = Æ·ºÅ
-WHERE ¿â´æÊýÁ¿ >0 ORDER BY ²Ö¿â±àºÅ
+-------------------------------------------------æµ™æ±Ÿç‘žå¾·---------------------------------------------------
+SELECT å“å·,å“å,è§„æ ¼,å•ä½,ä»“åº“ç¼–å·,ä»“åº“åç§°,åº“å­˜æ•°é‡,
+case INVMB.UDF54 when 0 then å•ä»·*1.13 else INVMB.UDF54 end,åº“å­˜æ•°é‡*(case INVMB.UDF54 when 0 then å•ä»·*1.13 else INVMB.UDF54 end)
+FROM LSSJ..LSKCB INNER JOIN ZJRD..INVMB ON MB001 = å“å·
+WHERE åº“å­˜æ•°é‡ >0 ORDER BY ä»“åº“ç¼–å·
 
-SELECT ¹¤µ¥±àºÅ,²úÆ·Æ·ºÅ,¿ª¹¤ÈÕ,Ô¤¼Æ²úÁ¿,ÒÑÉú²úÁ¿,¹¤×÷ÖÐÐÄ±àºÅ,¹¤×÷ÖÐÐÄÃû³Æ,²ÄÁÏÆ·ºÅ,Æ·Ãû,¹æ¸ñ,µ¥Î»,
-ÒÑ·¢ÁÏÁ¿,ÒÑºÄÓÃÁ¿,ÔÚ²úÆ·ÊýÁ¿,case INVMB.UDF54 when 0 then µ¥¼Û*1.13 else INVMB.UDF54 end,
-ÔÚ²úÆ·ÊýÁ¿*case INVMB.UDF54 when 0 then µ¥¼Û*1.13 else INVMB.UDF54 end
-FROM LSSJ..LSZCB INNER JOIN ZJRD..INVMB ON ²ÄÁÏÆ·ºÅ = MB001
-ORDER BY ¹¤×÷ÖÐÐÄ±àºÅ
+SELECT å·¥å•ç¼–å·,äº§å“å“å·,å¼€å·¥æ—¥,é¢„è®¡äº§é‡,å·²ç”Ÿäº§é‡,å·¥ä½œä¸­å¿ƒç¼–å·,å·¥ä½œä¸­å¿ƒåç§°,ææ–™å“å·,å“å,è§„æ ¼,å•ä½,
+å·²å‘æ–™é‡,å·²è€—ç”¨é‡,åœ¨äº§å“æ•°é‡,case INVMB.UDF54 when 0 then å•ä»·*1.13 else INVMB.UDF54 end,
+åœ¨äº§å“æ•°é‡*case INVMB.UDF54 when 0 then å•ä»·*1.13 else INVMB.UDF54 end
+FROM LSSJ..LSZCB INNER JOIN ZJRD..INVMB ON ææ–™å“å· = MB001
+ORDER BY å·¥ä½œä¸­å¿ƒç¼–å·
 
 
-SELECT TA021,MD002,LSZCB.* FROM LSZCB INNER JOIN ZJRD..MOCTA ON TA001+'-'+TA002 = ¹¤µ¥±àºÅ
+SELECT TA021,MD002,LSZCB.* FROM LSZCB INNER JOIN ZJRD..MOCTA ON TA001+'-'+TA002 = å·¥å•ç¼–å·
 INNER JOIN ZJRD..CMSMD ON MD001 = TA021
-WHERE ¹¤×÷ÖÐÐÄ±àºÅ IS NULL
+WHERE å·¥ä½œä¸­å¿ƒç¼–å· IS NULL
 
-UPDATE LSZCB SET ¹¤×÷ÖÐÐÄ±àºÅ = TA021,¹¤×÷ÖÐÐÄÃû³Æ = MD002 FROM LSZCB INNER JOIN ZJRD..MOCTA ON TA001+'-'+TA002 = ¹¤µ¥±àºÅ
+UPDATE LSZCB SET å·¥ä½œä¸­å¿ƒç¼–å· = TA021,å·¥ä½œä¸­å¿ƒåç§° = MD002 FROM LSZCB INNER JOIN ZJRD..MOCTA ON TA001+'-'+TA002 = å·¥å•ç¼–å·
 INNER JOIN ZJRD..CMSMD ON MD001 = TA021
-WHERE ¹¤×÷ÖÐÐÄ±àºÅ IS NULL
+WHERE å·¥ä½œä¸­å¿ƒç¼–å· IS NULL
 
 
 select *from INVLA WHERE LA001='200123530000'
 
--------------------------------------------------Õã½­ÈðµÂ---------------------------------------------------
-SELECT Æ·ºÅ,Æ·Ãû,¹æ¸ñ,µ¥Î»,²Ö¿â±àºÅ,²Ö¿âÃû³Æ,¿â´æÊýÁ¿,
-case INVMB.UDF54 when 0 then µ¥¼Û*1.13 else INVMB.UDF54 end,¿â´æÊýÁ¿*(case INVMB.UDF54 when 0 then µ¥¼Û*1.13 else INVMB.UDF54 end)
-FROM LSSJ..LSKCB INNER JOIN AHRD..INVMB ON MB001 = Æ·ºÅ
-WHERE ¿â´æÊýÁ¿ >0 ORDER BY ²Ö¿â±àºÅ
+-------------------------------------------------å®‰å¾½ç‘žå¾·---------------------------------------------------
+SELECT å“å·,å“å,è§„æ ¼,å•ä½,ä»“åº“ç¼–å·,ä»“åº“åç§°,åº“å­˜æ•°é‡,
+case INVMB.UDF54 when 0 then å•ä»·*1.13 else INVMB.UDF54 end,åº“å­˜æ•°é‡*(case INVMB.UDF54 when 0 then å•ä»·*1.13 else INVMB.UDF54 end)
+FROM LSSJ..LSKCB INNER JOIN AHRD..INVMB ON MB001 = å“å·
+WHERE åº“å­˜æ•°é‡ >0 ORDER BY ä»“åº“ç¼–å·
 
-SELECT ¹¤µ¥±àºÅ,²úÆ·Æ·ºÅ,¿ª¹¤ÈÕ,Ô¤¼Æ²úÁ¿,ÒÑÉú²úÁ¿,¹¤×÷ÖÐÐÄ±àºÅ,¹¤×÷ÖÐÐÄÃû³Æ,²ÄÁÏÆ·ºÅ,Æ·Ãû,¹æ¸ñ,µ¥Î»,
-ÒÑ·¢ÁÏÁ¿,ÒÑºÄÓÃÁ¿,ÔÚ²úÆ·ÊýÁ¿,case INVMB.UDF54 when 0 then µ¥¼Û*1.13 else INVMB.UDF54 end,
-ÔÚ²úÆ·ÊýÁ¿*case INVMB.UDF54 when 0 then µ¥¼Û*1.13 else INVMB.UDF54 end
-FROM LSSJ..LSZCB INNER JOIN AHRD..INVMB ON ²ÄÁÏÆ·ºÅ = MB001
-ORDER BY ¹¤×÷ÖÐÐÄ±àºÅ
+SELECT å·¥å•ç¼–å·,äº§å“å“å·,å¼€å·¥æ—¥,é¢„è®¡äº§é‡,å·²ç”Ÿäº§é‡,å·¥ä½œä¸­å¿ƒç¼–å·,å·¥ä½œä¸­å¿ƒåç§°,ææ–™å“å·,å“å,è§„æ ¼,å•ä½,
+å·²å‘æ–™é‡,å·²è€—ç”¨é‡,åœ¨äº§å“æ•°é‡,case INVMB.UDF54 when 0 then å•ä»·*1.13 else INVMB.UDF54 end,
+åœ¨äº§å“æ•°é‡*case INVMB.UDF54 when 0 then å•ä»·*1.13 else INVMB.UDF54 end
+FROM LSSJ..LSZCB INNER JOIN AHRD..INVMB ON ææ–™å“å· = MB001
+ORDER BY å·¥ä½œä¸­å¿ƒç¼–å·
 
 select UDF54 from  ZJRD..INVMB where MB001='200123530000'
 
 SELECT  * FROM LSZCB
-SELECT TA021,MD002,LSZCB.* FROM LSZCB INNER JOIN AHRD..MOCTA ON TA001+'-'+TA002 = ¹¤µ¥±àºÅ
+SELECT TA021,MD002,LSZCB.* FROM LSZCB INNER JOIN AHRD..MOCTA ON TA001+'-'+TA002 = å·¥å•ç¼–å·
 INNER JOIN AHRD..CMSMD ON MD001 = TA021
-WHERE ¹¤×÷ÖÐÐÄ±àºÅ IS NULL
+WHERE å·¥ä½œä¸­å¿ƒç¼–å· IS NULL
 
-UPDATE LSZCB SET ¹¤×÷ÖÐÐÄ±àºÅ = TA021,¹¤×÷ÖÐÐÄÃû³Æ = MD002 FROM LSZCB INNER JOIN AHRD..MOCTA ON TA001+'-'+TA002 = ¹¤µ¥±àºÅ
+UPDATE LSZCB SET å·¥ä½œä¸­å¿ƒç¼–å· = TA021,å·¥ä½œä¸­å¿ƒåç§° = MD002 FROM LSZCB INNER JOIN AHRD..MOCTA ON TA001+'-'+TA002 = å·¥å•ç¼–å·
 INNER JOIN AHRD..CMSMD ON MD001 = TA021
-WHERE ¹¤×÷ÖÐÐÄ±àºÅ IS NULL
+WHERE å·¥ä½œä¸­å¿ƒç¼–å· IS NULL
 
 
  select *from RDSJK..Material_zlwz
@@ -173,7 +173,7 @@ SELECT MX.* INTO #KC FROM [Fn_GetKCMX]('20250731','') MX
 
 SELECT *FROM  #KC
 
-SELECT SUM(¿â´æ½ð¶î) FROM LSSJ..KCSJHS WHERE LEFT(MB001,1) IN('5','3','6','7')
+SELECT SUM(åº“å­˜é‡‘é¢) FROM LSSJ..KCSJHS WHERE LEFT(MB001,1) IN('5','3','6','7')
 
 SELECT SUM(MC08) FROM #KC WHERE LEFT(MC01,1) IN('5','3','6','7')
 
@@ -182,56 +182,56 @@ select  *  from  LSSJ..KCSJHS
 
 select  *  from  LSSJ..KCSJHS where MB001 
 
-select ËùÊôÊÂÒµ²¿,¿Í»§Ãû³Æ ²Ö¿â±àºÅ,·ÖÎöÔ­Òò ²Ö¿âÃû³Æ,sum(¿â´æ½ð¶î)¿â´æ½ð¶î  from  LSSJ..KCSJHS where ±¸×¢ ='°´²Ö±ð·Ö' group by ËùÊôÊÂÒµ²¿,¿Í»§Ãû³Æ ,·ÖÎöÔ­Òò  
+select æ‰€å±žäº‹ä¸šéƒ¨,å®¢æˆ·åç§° ä»“åº“ç¼–å·,åˆ†æžåŽŸå›  ä»“åº“åç§°,sum(åº“å­˜é‡‘é¢)åº“å­˜é‡‘é¢  from  LSSJ..KCSJHS where å¤‡æ³¨ ='æŒ‰ä»“åˆ«åˆ†' group by æ‰€å±žäº‹ä¸šéƒ¨,å®¢æˆ·åç§° ,åˆ†æžåŽŸå›   
 union all
-select  'ÊÂÒµÒ»²¿','000',±¸×¢,sum(ÊÂÒµÒ»²¿½ð¶î)¿â´æ½ð¶î from  LSSJ..KCSJHS where ±¸×¢ <>'°´²Ö±ð·Ö'  group by  ±¸×¢
+select  'äº‹ä¸šä¸€éƒ¨','000',å¤‡æ³¨,sum(äº‹ä¸šä¸€éƒ¨é‡‘é¢)åº“å­˜é‡‘é¢ from  LSSJ..KCSJHS where å¤‡æ³¨ <>'æŒ‰ä»“åˆ«åˆ†'  group by  å¤‡æ³¨
 union all
-select  'ÊÂÒµ¶þ²¿','000',±¸×¢,sum(ÊÂÒµ¶þ²¿½ð¶î)¿â´æ½ð¶î from  LSSJ..KCSJHS where ±¸×¢ <>'°´²Ö±ð·Ö'  group by  ±¸×¢
+select  'äº‹ä¸šäºŒéƒ¨','000',å¤‡æ³¨,sum(äº‹ä¸šäºŒéƒ¨é‡‘é¢)åº“å­˜é‡‘é¢ from  LSSJ..KCSJHS where å¤‡æ³¨ <>'æŒ‰ä»“åˆ«åˆ†'  group by  å¤‡æ³¨
 union all
-select  'ÊÂÒµÈý²¿','000',±¸×¢,sum(ÊÂÒµÈý²¿½ð¶î)¿â´æ½ð¶î from  LSSJ..KCSJHS where ±¸×¢ <>'°´²Ö±ð·Ö'  group by  ±¸×¢
+select  'äº‹ä¸šä¸‰éƒ¨','000',å¤‡æ³¨,sum(äº‹ä¸šä¸‰éƒ¨é‡‘é¢)åº“å­˜é‡‘é¢ from  LSSJ..KCSJHS where å¤‡æ³¨ <>'æŒ‰ä»“åˆ«åˆ†'  group by  å¤‡æ³¨
 union all
-select  '¹©Ó¦ÖÐÐÄ','000',±¸×¢,sum(¹©Ó¦ÖÐÐÄ½ð¶î)¿â´æ½ð¶î from  LSSJ..KCSJHS where ±¸×¢ <>'°´²Ö±ð·Ö'  group by  ±¸×¢
+select  'ä¾›åº”ä¸­å¿ƒ','000',å¤‡æ³¨,sum(ä¾›åº”ä¸­å¿ƒé‡‘é¢)åº“å­˜é‡‘é¢ from  LSSJ..KCSJHS where å¤‡æ³¨ <>'æŒ‰ä»“åˆ«åˆ†'  group by  å¤‡æ³¨
 union all
-select  'ÐÂÄÜÔ´²¿','000',±¸×¢,sum(ÐÂÄÜÔ´²¿½ð¶î)¿â´æ½ð¶î from  LSSJ..KCSJHS where ±¸×¢ <>'°´²Ö±ð·Ö'  group by  ±¸×¢
+select  'æ–°èƒ½æºéƒ¨','000',å¤‡æ³¨,sum(æ–°èƒ½æºéƒ¨é‡‘é¢)åº“å­˜é‡‘é¢ from  LSSJ..KCSJHS where å¤‡æ³¨ <>'æŒ‰ä»“åˆ«åˆ†'  group by  å¤‡æ³¨
 union all
-select  'Õã½­ÈðµÂ','000',±¸×¢,sum(Õã½­ÈðµÂ½ð¶î)¿â´æ½ð¶î from  LSSJ..KCSJHS where ±¸×¢ <>'°´²Ö±ð·Ö'  group by  ±¸×¢
+select  'æµ™æ±Ÿç‘žå¾·','000',å¤‡æ³¨,sum(æµ™æ±Ÿç‘žå¾·é‡‘é¢)åº“å­˜é‡‘é¢ from  LSSJ..KCSJHS where å¤‡æ³¨ <>'æŒ‰ä»“åˆ«åˆ†'  group by  å¤‡æ³¨
 union all
-select  'ÓªÏúÖÐÐÄ','000',±¸×¢,sum(ÓªÏúÖÐÐÄ½ð¶î)¿â´æ½ð¶î from  LSSJ..KCSJHS where ±¸×¢ <>'°´²Ö±ð·Ö'  group by  ±¸×¢
+select  'è¥é”€ä¸­å¿ƒ','000',å¤‡æ³¨,sum(è¥é”€ä¸­å¿ƒé‡‘é¢)åº“å­˜é‡‘é¢ from  LSSJ..KCSJHS where å¤‡æ³¨ <>'æŒ‰ä»“åˆ«åˆ†'  group by  å¤‡æ³¨
 union ALL
-select  'ÈðµÂÎïÁª','000',±¸×¢,sum(ÈðµÂÎïÁª½ð¶î)¿â´æ½ð¶î from  LSSJ..KCSJHS where ±¸×¢ <>'°´²Ö±ð·Ö'  group by  ±¸×¢
+select  'ç‘žå¾·ç‰©è”','000',å¤‡æ³¨,sum(ç‘žå¾·ç‰©è”é‡‘é¢)åº“å­˜é‡‘é¢ from  LSSJ..KCSJHS where å¤‡æ³¨ <>'æŒ‰ä»“åˆ«åˆ†'  group by  å¤‡æ³¨
 union all
-select  'ï®µç°å¿é','000',±¸×¢,sum(ï®µç°å¿é½ð¶î)¿â´æ½ð¶î from  LSSJ..KCSJHS where ±¸×¢ <>'°´²Ö±ð·Ö'  group by  ±¸×¢
+select  'é”‚ç”µæ¿å—','000',å¤‡æ³¨,sum(é”‚ç”µæ¿å—é‡‘é¢)åº“å­˜é‡‘é¢ from  LSSJ..KCSJHS where å¤‡æ³¨ <>'æŒ‰ä»“åˆ«åˆ†'  group by  å¤‡æ³¨
 union all
-select  '°²»ÕÈðµÂ','000',±¸×¢,sum(°²»ÕÈðµÂ½ð¶î)¿â´æ½ð¶î from  LSSJ..KCSJHS where ±¸×¢ <>'°´²Ö±ð·Ö'  group by  ±¸×¢
+select  'å®‰å¾½ç‘žå¾·','000',å¤‡æ³¨,sum(å®‰å¾½ç‘žå¾·é‡‘é¢)åº“å­˜é‡‘é¢ from  LSSJ..KCSJHS where å¤‡æ³¨ <>'æŒ‰ä»“åˆ«åˆ†'  group by  å¤‡æ³¨
 union all
-select  'Î´Öª¹éÊô','000',±¸×¢,sum(Î´Öª¹éÊô½ð¶î)¿â´æ½ð¶î from  LSSJ..KCSJHS where ±¸×¢ <>'°´²Ö±ð·Ö'  group by  ±¸×¢
+select  'æœªçŸ¥å½’å±ž','000',å¤‡æ³¨,sum(æœªçŸ¥å½’å±žé‡‘é¢)åº“å­˜é‡‘é¢ from  LSSJ..KCSJHS where å¤‡æ³¨ <>'æŒ‰ä»“åˆ«åˆ†'  group by  å¤‡æ³¨
 union all
-select  'Õ½ÂÔÎï×Ê','000',±¸×¢,sum(Õ½ÂÔÎï×Ê½ð¶î)¿â´æ½ð¶î from  LSSJ..KCSJHS where ±¸×¢ <>'°´²Ö±ð·Ö'  group by  ±¸×¢
+select  'æˆ˜ç•¥ç‰©èµ„','000',å¤‡æ³¨,sum(æˆ˜ç•¥ç‰©èµ„é‡‘é¢)åº“å­˜é‡‘é¢ from  LSSJ..KCSJHS where å¤‡æ³¨ <>'æŒ‰ä»“åˆ«åˆ†'  group by  å¤‡æ³¨
 
-order by ËùÊôÊÂÒµ²¿,¿Í»§Ãû³Æ
+order by æ‰€å±žäº‹ä¸šéƒ¨,å®¢æˆ·åç§°
 
 
 
 
 									
 
-/*Õã½­¿â´æ**/
-SELECT MB001 Æ·ºÅ,MB002 Æ·Ãû,MB003 ¹æ¸ñ,MB004 µ¥Î»,
-case WHEN isnull(PH,'')<>'' and CMSMC.UDF01 LIKE '%Á¼Æ·%' THEN 'AAA'  ELSE MC02 end ²Ö¿â±àºÅ,case WHEN isnull(PH,'')<>'' and CMSMC.UDF01 LIKE '%Á¼Æ·%' THEN 'Õ½ÂÔÎï×Ê'  ELSE MC002 end ²Ö¿âÃû³Æ
---MC02 ²Ö¿â±àºÅ,MC002 ²Ö¿âÃû³Æ
+/*æµ™æ±Ÿåº“å­˜**/
+SELECT MB001 å“å·,MB002 å“å,MB003 è§„æ ¼,MB004 å•ä½,
+case WHEN isnull(PH,'')<>'' and CMSMC.UDF01 LIKE '%è‰¯å“%' THEN 'AAA'  ELSE MC02 end ä»“åº“ç¼–å·,case WHEN isnull(PH,'')<>'' and CMSMC.UDF01 LIKE '%è‰¯å“%' THEN 'æˆ˜ç•¥ç‰©èµ„'  ELSE MC002 end ä»“åº“åç§°
+--MC02 ä»“åº“ç¼–å·,MC002 ä»“åº“åç§°
 
-,MC07 ¿â´æÊýÁ¿, CAST(CASE MC07 WHEN 0 THEN 0 ELSE ROUND(MC08/MC07,4) END AS float) µ¥¼Û ,MC08 ¿â´æ½ð¶î,LEFT(MB001,1) ÁÏ±ð   FROM ZJRD.dbo.[Fn_GetKCMX]('20230930','') MX join ZJRD.dbo.CMSMC on MX.MC02=CMSMC.MC001 join ZJRD..INVMB ON MB001=MC01 left join RDSJK..Material_zlwz on MB001=PH where CMSMC.MC004='1'  
-/*Õã½­¿â´æ**/
+,MC07 åº“å­˜æ•°é‡, CAST(CASE MC07 WHEN 0 THEN 0 ELSE ROUND(MC08/MC07,4) END AS float) å•ä»· ,MC08 åº“å­˜é‡‘é¢,LEFT(MB001,1) æ–™åˆ«   FROM ZJRD.dbo.[Fn_GetKCMX]('20230930','') MX join ZJRD.dbo.CMSMC on MX.MC02=CMSMC.MC001 join ZJRD..INVMB ON MB001=MC01 left join RDSJK..Material_zlwz on MB001=PH where CMSMC.MC004='1'  
+/*æµ™æ±Ÿåº“å­˜**/
 
 
 
-/*°²»Õ¿â´æ**/
-SELECT MB001 Æ·ºÅ,MB002 Æ·Ãû,MB003 ¹æ¸ñ,MB004 µ¥Î»,
-case WHEN isnull(PH,'')<>'' and CMSMC.UDF01 LIKE '%Á¼Æ·%' THEN 'AAA'  ELSE MC02 end ²Ö¿â±àºÅ,case WHEN isnull(PH,'')<>'' and CMSMC.UDF01 LIKE '%Á¼Æ·%' THEN 'Õ½ÂÔÎï×Ê'  ELSE MC002 end ²Ö¿âÃû³Æ
---MC02 ²Ö¿â±àºÅ,MC002 ²Ö¿âÃû³Æ
+/*å®‰å¾½åº“å­˜**/
+SELECT MB001 å“å·,MB002 å“å,MB003 è§„æ ¼,MB004 å•ä½,
+case WHEN isnull(PH,'')<>'' and CMSMC.UDF01 LIKE '%è‰¯å“%' THEN 'AAA'  ELSE MC02 end ä»“åº“ç¼–å·,case WHEN isnull(PH,'')<>'' and CMSMC.UDF01 LIKE '%è‰¯å“%' THEN 'æˆ˜ç•¥ç‰©èµ„'  ELSE MC002 end ä»“åº“åç§°
+--MC02 ä»“åº“ç¼–å·,MC002 ä»“åº“åç§°
 
-,MC07 ¿â´æÊýÁ¿, CAST(CASE MC07 WHEN 0 THEN 0 ELSE ROUND(MC08/MC07,4) END AS float) µ¥¼Û ,MC08 ¿â´æ½ð¶î,LEFT(MB001,1) ÁÏ±ð   FROM [AHRD].dbo.[Fn_GetKCMX]('20230930','') MX join [AHRD].dbo.CMSMC on MX.MC02=CMSMC.MC001 join AHRD..INVMB ON MB001=MC01 left join RDSJK..Material_zlwz on MB001=PH where CMSMC.MC004='1'  
-/*°²»Õ¿â´æ**/
+,MC07 åº“å­˜æ•°é‡, CAST(CASE MC07 WHEN 0 THEN 0 ELSE ROUND(MC08/MC07,4) END AS float) å•ä»· ,MC08 åº“å­˜é‡‘é¢,LEFT(MB001,1) æ–™åˆ«   FROM [AHRD].dbo.[Fn_GetKCMX]('20230930','') MX join [AHRD].dbo.CMSMC on MX.MC02=CMSMC.MC001 join AHRD..INVMB ON MB001=MC01 left join RDSJK..Material_zlwz on MB001=PH where CMSMC.MC004='1'  
+/*å®‰å¾½åº“å­˜**/
 
 
 
@@ -241,28 +241,28 @@ select *from    RDSJK..Material_zlwz
 
 drop table #CPKC
 
-SELECT MB001, Æ·Ãû, ¹æ¸ñ, ¿Í»§Ãû³Æ ²Ö¿â±àºÅ , ·ÖÎöÔ­Òò  ²Ö¿âÃû³Æ,  ×Ü¿â´æ,  ¿â´æ½ð¶î  into #CPKC
-FROM LSSJ.dbo.KCSJHS where LEFT(MB001,1) IN ('1','A') and  ÎïÁÏ×´Ì¬='Á¼Æ·'
+SELECT MB001, å“å, è§„æ ¼, å®¢æˆ·åç§° ä»“åº“ç¼–å· , åˆ†æžåŽŸå›   ä»“åº“åç§°,  æ€»åº“å­˜,  åº“å­˜é‡‘é¢  into #CPKC
+FROM LSSJ.dbo.KCSJHS where LEFT(MB001,1) IN ('1','A') and  ç‰©æ–™çŠ¶æ€='è‰¯å“'
 
 
 
-alter table #CPKC add ¿Í»§±àºÅ VARchar(20)
-alter table #CPKC add ¿Í»§È«³Æ VARchar(80)
-alter table #CPKC add ²¿ÃÅ±àºÅ VARchar(10)
-alter table #CPKC add ²¿ÃÅÈ«³Æ VARchar(60)
-alter table #CPKC add ËùÔÚµØ VARchar(60)
-alter table #CPKC add µ¥¼Û  numeric(15,7)
+alter table #CPKC add å®¢æˆ·ç¼–å· VARchar(20)
+alter table #CPKC add å®¢æˆ·å…¨ç§° VARchar(80)
+alter table #CPKC add éƒ¨é—¨ç¼–å· VARchar(10)
+alter table #CPKC add éƒ¨é—¨å…¨ç§° VARchar(60)
+alter table #CPKC add æ‰€åœ¨åœ° VARchar(60)
+alter table #CPKC add å•ä»·  numeric(15,7)
 
 
 insert into #CPKC
-SELECT MC01,MB002,MB003,MC02,MC002,MC07,MC08,'','','','','Õã½­',0 FROM  ZJRD.dbo.[Fn_GetKCMX]('20210131','') MX join  ZJRD.dbo.CMSMC on MX.MC02=CMSMC.MC001
-join ZJRD..INVMB ON MC01=MB001  where CMSMC.MC004='1' and CMSMC.MC018='Y' and CMSMC.UDF01 like '%-Á¼Æ·' and LEFT(MC01,1) IN ('1','A')
+SELECT MC01,MB002,MB003,MC02,MC002,MC07,MC08,'','','','','æµ™æ±Ÿ',0 FROM  ZJRD.dbo.[Fn_GetKCMX]('20210131','') MX join  ZJRD.dbo.CMSMC on MX.MC02=CMSMC.MC001
+join ZJRD..INVMB ON MC01=MB001  where CMSMC.MC004='1' and CMSMC.MC018='Y' and CMSMC.UDF01 like '%-è‰¯å“' and LEFT(MC01,1) IN ('1','A')
 
 insert into #CPKC
-SELECT MC01,MB002,MB003,MC02,MC002,MC07,MC08,'','','','','°²»Õ',0 FROM  AHRD.dbo.[Fn_GetKCMX]('20210131','') MX join  AHRD.dbo.CMSMC on MX.MC02=CMSMC.MC001
-join AHRD..INVMB ON MC01=MB001  where CMSMC.MC004='1' and CMSMC.MC018='Y' and CMSMC.UDF01 like '%-Á¼Æ·' and  LEFT(MC01,1) IN ('1','A')
+SELECT MC01,MB002,MB003,MC02,MC002,MC07,MC08,'','','','','å®‰å¾½',0 FROM  AHRD.dbo.[Fn_GetKCMX]('20210131','') MX join  AHRD.dbo.CMSMC on MX.MC02=CMSMC.MC001
+join AHRD..INVMB ON MC01=MB001  where CMSMC.MC004='1' and CMSMC.MC018='Y' and CMSMC.UDF01 like '%-è‰¯å“' and  LEFT(MC01,1) IN ('1','A')
 --select *from  #CPKC
---SELECT TOP 1 MB001, Æ·Ãû, ¹æ¸ñ, ±¸×¢, ÎïÁÏ×´Ì¬, ËùÊôÊÂÒµ²¿, ¿Í»§Ãû³Æ, ·ÖÎöÔ­Òò, ×Ü¼Æ, ×Ü¿â´æ, µ¥¼Û, ¿â´æ½ð¶î,CPZL004,CPZL006,CPZL007,CPZL008 
+--SELECT TOP 1 MB001, å“å, è§„æ ¼, å¤‡æ³¨, ç‰©æ–™çŠ¶æ€, æ‰€å±žäº‹ä¸šéƒ¨, å®¢æˆ·åç§°, åˆ†æžåŽŸå› , æ€»è®¡, æ€»åº“å­˜, å•ä»·, åº“å­˜é‡‘é¢,CPZL004,CPZL006,CPZL007,CPZL008 
 --FROM LSSJ.dbo.KCSJHS 
 --LEFT  JOIN  (select CPZL001,CPZL004,CPZL005,CPZL006,CPZL007,CPZL008,MAX(CREATE_NUM) NUM from  web_lnk.RDSJK.dbo.CPZLB  group by  CPZL001,CPZL004,CPZL005,CPZL006,CPZL007,CPZL008) AS ZLB
 --ON MB001=CPZL001
@@ -272,7 +272,7 @@ join AHRD..INVMB ON MC01=MB001  where CMSMC.MC004='1' and CMSMC.MC018='Y' and CM
 
 --select * from web_lnk.RDSJK.dbo.CPZLB 
 
---SELECT TOP 1 MB001, Æ·Ãû, ¹æ¸ñ,  ¿Í»§Ãû³Æ ²Ö¿â±àºÅ , ·ÖÎöÔ­Òò  ²Ö¿âÃû³Æ, ×Ü¼Æ, ×Ü¿â´æ, µ¥¼Û, ¿â´æ½ð¶î,ZLB.*
+--SELECT TOP 1 MB001, å“å, è§„æ ¼,  å®¢æˆ·åç§° ä»“åº“ç¼–å· , åˆ†æžåŽŸå›   ä»“åº“åç§°, æ€»è®¡, æ€»åº“å­˜, å•ä»·, åº“å­˜é‡‘é¢,ZLB.*
 --FROM LSSJ.dbo.KCSJHS 
 --LEFT  JOIN  (select CPZL001,CPZL004,CPZL005,CPZL006,CPZL007,CPZL008,MAX(CREATE_NUM) NUM from  web_lnk.RDSJK.dbo.CPZLB  group by  CPZL001,CPZL004,CPZL005,CPZL006,CPZL007,CPZL008) AS ZLB
 --ON MB001=CPZL001
@@ -288,105 +288,105 @@ join AHRD..INVMB ON MC01=MB001  where CMSMC.MC004='1' and CMSMC.MC018='Y' and CM
 
 
 
---alter table #CPKC add ¿Í»§±àºÅ VARchar(20)
---alter table #CPKC add ¿Í»§È«³Æ VARchar(60)
---alter table #CPKC add ²¿ÃÅ±àºÅ VARchar(10)
---alter table #CPKC add ²¿ÃÅÈ«³Æ VARchar(60)
---alter table #CPKC add ËùÔÚµØ VARchar(60)
+--alter table #CPKC add å®¢æˆ·ç¼–å· VARchar(20)
+--alter table #CPKC add å®¢æˆ·å…¨ç§° VARchar(60)
+--alter table #CPKC add éƒ¨é—¨ç¼–å· VARchar(10)
+--alter table #CPKC add éƒ¨é—¨å…¨ç§° VARchar(60)
+--alter table #CPKC add æ‰€åœ¨åœ° VARchar(60)
 
 
 UPDATE  #CPKC SET
-  ¿Í»§±àºÅ=TC004,¿Í»§È«³Æ=MA003 , ²¿ÃÅ±àºÅ=MA015, ²¿ÃÅÈ«³Æ=ME002,ËùÔÚµØ='Ë³µÂ',µ¥¼Û=TD011
+  å®¢æˆ·ç¼–å·=TC004,å®¢æˆ·å…¨ç§°=MA003 , éƒ¨é—¨ç¼–å·=MA015, éƒ¨é—¨å…¨ç§°=ME002,æ‰€åœ¨åœ°='é¡ºå¾·',å•ä»·=TD011
  from  #CPKC join (select TC004,TD004,MAX(RQ) RQ,TD011 from (
 select TC004,TD004,MAX(TC003) RQ,TD011 from  SDRD..COPTC JOIN  SDRD..COPTD ON TC001=TD001 AND TC002=TD002 where LEFT(TD004,1) IN ('1','A')  GROUP BY TC004,TD004,TD011
 union all
 select TG004,TH004,MAX(TG003),TH012 from  SDRD..COPTG JOIN  SDRD..COPTH ON TG001=TH001 AND TG002=TH002 where LEFT(TH004,1) IN ('1','A')  GROUP BY TG004,TG005,TH004 ,TH012
 ) as BMKH GROUP BY TC004,TD004,TD011 ) as KH on MB001=TD004
- LEFT  join SDRD..COPMA ON MA001=TC004 LEFT JOIN SDRD..CMSME ON ME001=MA015 where (²¿ÃÅÈ«³Æ is null or ²¿ÃÅÈ«³Æ='')
+ LEFT  join SDRD..COPMA ON MA001=TC004 LEFT JOIN SDRD..CMSME ON ME001=MA015 where (éƒ¨é—¨å…¨ç§° is null or éƒ¨é—¨å…¨ç§°='')
 
  
 UPDATE  #CPKC SET
-  ¿Í»§±àºÅ=TC004,¿Í»§È«³Æ=MA003 , ²¿ÃÅ±àºÅ=MA015, ²¿ÃÅÈ«³Æ=ME002,ËùÔÚµØ='Õã½­',µ¥¼Û=TD011
+  å®¢æˆ·ç¼–å·=TC004,å®¢æˆ·å…¨ç§°=MA003 , éƒ¨é—¨ç¼–å·=MA015, éƒ¨é—¨å…¨ç§°=ME002,æ‰€åœ¨åœ°='æµ™æ±Ÿ',å•ä»·=TD011
  from  #CPKC join (select TC004,TD004,MAX(RQ) RQ,TD011 from (
 select TC004,TD004,MAX(TC003) RQ,TD011 from  ZJRD..COPTC JOIN  ZJRD..COPTD ON TC001=TD001 AND TC002=TD002 where LEFT(TD004,1) IN ('1','A')  GROUP BY TC004,TD004,TD011
 union all
 select TG004,TH004,MAX(TG003),TH012 from  ZJRD..COPTG JOIN  ZJRD..COPTH ON TG001=TH001 AND TG002=TH002 where LEFT(TH004,1) IN ('1','A')  GROUP BY TG004,TG005,TH004 ,TH012
 ) as BMKH GROUP BY TC004,TD004,TD011 ) as KH on MB001=TD004
- LEFT  join ZJRD..COPMA ON MA001=TC004 LEFT JOIN ZJRD..CMSME ON ME001=MA015 where (²¿ÃÅÈ«³Æ is null or ²¿ÃÅÈ«³Æ='')
+ LEFT  join ZJRD..COPMA ON MA001=TC004 LEFT JOIN ZJRD..CMSME ON ME001=MA015 where (éƒ¨é—¨å…¨ç§° is null or éƒ¨é—¨å…¨ç§°='')
 
  
 UPDATE  #CPKC SET
-  ¿Í»§±àºÅ=TC004,¿Í»§È«³Æ=MA003 , ²¿ÃÅ±àºÅ=MA015, ²¿ÃÅÈ«³Æ=ME002,ËùÔÚµØ='°²»Õ',µ¥¼Û=TD011
+  å®¢æˆ·ç¼–å·=TC004,å®¢æˆ·å…¨ç§°=MA003 , éƒ¨é—¨ç¼–å·=MA015, éƒ¨é—¨å…¨ç§°=ME002,æ‰€åœ¨åœ°='å®‰å¾½',å•ä»·=TD011
  from  #CPKC join (select TC004,TD004,MAX(RQ) RQ,TD011 from (
 select TC004,TD004,MAX(TC003) RQ,TD011 from  AHRD..COPTC JOIN  AHRD..COPTD ON TC001=TD001 AND TC002=TD002 where LEFT(TD004,1) IN ('1','A')  GROUP BY TC004,TD004,TD011
 union all
 select TG004,TH004,MAX(TG003),TH012 from  AHRD..COPTG JOIN  AHRD..COPTH ON TG001=TH001 AND TG002=TH002 where LEFT(TH004,1) IN ('1','A')  GROUP BY TG004,TG005,TH004 ,TH012
 ) as BMKH GROUP BY TC004,TD004,TD011 ) as KH on MB001=TD004
- LEFT  join AHRD..COPMA ON MA001=TC004 LEFT JOIN AHRD..CMSME ON ME001=MA015 where (²¿ÃÅÈ«³Æ is null or ²¿ÃÅÈ«³Æ='')
+ LEFT  join AHRD..COPMA ON MA001=TC004 LEFT JOIN AHRD..CMSME ON ME001=MA015 where (éƒ¨é—¨å…¨ç§° is null or éƒ¨é—¨å…¨ç§°='')
 
 
 
 
- --SELECT *FROM  #CPKC  where (¿Í»§±àºÅ is null or ¿Í»§±àºÅ='')
+ --SELECT *FROM  #CPKC  where (å®¢æˆ·ç¼–å· is null or å®¢æˆ·ç¼–å·='')
 
 
 
 UPDATE  #CPKC SET
-  ¿Í»§±àºÅ=CPZL004,¿Í»§È«³Æ=CPZL006 , ²¿ÃÅ±àºÅ=CPZL007, ²¿ÃÅÈ«³Æ=CPZL008,ËùÔÚµØ='Ë³µÂ' 
+  å®¢æˆ·ç¼–å·=CPZL004,å®¢æˆ·å…¨ç§°=CPZL006 , éƒ¨é—¨ç¼–å·=CPZL007, éƒ¨é—¨å…¨ç§°=CPZL008,æ‰€åœ¨åœ°='é¡ºå¾·' 
 FROM #CPKC
 LEFT  JOIN  (select CPZL001,CPZL004,CPZL005,CPZL006,CPZL007,CPZL008,MAX(CREATE_NUM) NUM from  web_lnk.RDSJK.dbo.CPZLB  group by  CPZL001,CPZL004,CPZL005,CPZL006,CPZL007,CPZL008) AS ZLB
 ON MB001=CPZL001
-where  (¿Í»§±àºÅ is null or ¿Í»§±àºÅ='') and CPZL004 <>''
+where  (å®¢æˆ·ç¼–å· is null or å®¢æˆ·ç¼–å·='') and CPZL004 <>''
 
 
 
 UPDATE  #CPKC SET
-  ¿Í»§±àºÅ=CPZL004,¿Í»§È«³Æ=CPZL006 , ²¿ÃÅ±àºÅ=CPZL007, ²¿ÃÅÈ«³Æ=CPZL008,ËùÔÚµØ='Õã½­' 
+  å®¢æˆ·ç¼–å·=CPZL004,å®¢æˆ·å…¨ç§°=CPZL006 , éƒ¨é—¨ç¼–å·=CPZL007, éƒ¨é—¨å…¨ç§°=CPZL008,æ‰€åœ¨åœ°='æµ™æ±Ÿ' 
 FROM #CPKC
 LEFT  JOIN  (select CPZL001,CPZL004,CPZL005,CPZL006,CPZL007,CPZL008,MAX(CREATE_NUM) NUM from  web_lnk.RDSJK.dbo.ZJCPZLB  group by  CPZL001,CPZL004,CPZL005,CPZL006,CPZL007,CPZL008) AS ZLB
 ON MB001=CPZL001
-where  (¿Í»§±àºÅ is null or ¿Í»§±àºÅ='') and CPZL004 <>''
+where  (å®¢æˆ·ç¼–å· is null or å®¢æˆ·ç¼–å·='') and CPZL004 <>''
 
 
 UPDATE  #CPKC SET
-  ¿Í»§±àºÅ=CPZL004,¿Í»§È«³Æ=CPZL006 , ²¿ÃÅ±àºÅ=CPZL007, ²¿ÃÅÈ«³Æ=CPZL008,ËùÔÚµØ='Õã½­' 
+  å®¢æˆ·ç¼–å·=CPZL004,å®¢æˆ·å…¨ç§°=CPZL006 , éƒ¨é—¨ç¼–å·=CPZL007, éƒ¨é—¨å…¨ç§°=CPZL008,æ‰€åœ¨åœ°='æµ™æ±Ÿ' 
 FROM #CPKC
 LEFT  JOIN  (select CPZL001,CPZL004,CPZL005,CPZL006,CPZL007,CPZL008,MAX(CREATE_NUM) NUM from  web_lnk.RDSJK.dbo.AHCPZLB  group by  CPZL001,CPZL004,CPZL005,CPZL006,CPZL007,CPZL008) AS ZLB
 ON MB001=CPZL001
-where  (¿Í»§±àºÅ is null or ¿Í»§±àºÅ='') and CPZL004 <>''
+where  (å®¢æˆ·ç¼–å· is null or å®¢æˆ·ç¼–å·='') and CPZL004 <>''
 
 
 
 
 
- update #CPKC  set µ¥¼Û = ¿â´æ½ð¶î/×Ü¿â´æ*1.30 where (isnull(µ¥¼Û,0)=0) and ×Ü¿â´æ>0
-update #CPKC  set ¿â´æ½ð¶î = µ¥¼Û*×Ü¿â´æ 
+ update #CPKC  set å•ä»· = åº“å­˜é‡‘é¢/æ€»åº“å­˜*1.30 where (isnull(å•ä»·,0)=0) and æ€»åº“å­˜>0
+update #CPKC  set åº“å­˜é‡‘é¢ = å•ä»·*æ€»åº“å­˜ 
 
-select left(¹æ¸ñ,Charindex('-',¹æ¸ñ,0)),* from #CPKC  where (²¿ÃÅÈ«³Æ is null or ²¿ÃÅÈ«³Æ='')
+select left(è§„æ ¼,Charindex('-',è§„æ ¼,0)),* from #CPKC  where (éƒ¨é—¨å…¨ç§° is null or éƒ¨é—¨å…¨ç§°='')
 
- select left(¹æ¸ñ,Charindex('-',¹æ¸ñ,0)) ,* from #CPKC  where (²¿ÃÅÈ«³Æ <>'')
+ select left(è§„æ ¼,Charindex('-',è§„æ ¼,0)) ,* from #CPKC  where (éƒ¨é—¨å…¨ç§° <>'')
 
 
 
  
-select left(A.¹æ¸ñ,Charindex('-',A.¹æ¸ñ,0)),* from #CPKC A
+select left(A.è§„æ ¼,Charindex('-',A.è§„æ ¼,0)),* from #CPKC A
 join 
-#CPKC B on left(A.¹æ¸ñ,Charindex('-',A.¹æ¸ñ,0))=left(B.¹æ¸ñ,Charindex('-',B.¹æ¸ñ,0))
- where (A.²¿ÃÅÈ«³Æ is null or A.²¿ÃÅÈ«³Æ='') AND  (B.²¿ÃÅÈ«³Æ <>'')
+#CPKC B on left(A.è§„æ ¼,Charindex('-',A.è§„æ ¼,0))=left(B.è§„æ ¼,Charindex('-',B.è§„æ ¼,0))
+ where (A.éƒ¨é—¨å…¨ç§° is null or A.éƒ¨é—¨å…¨ç§°='') AND  (B.éƒ¨é—¨å…¨ç§° <>'')
 
- update  A set ²¿ÃÅÈ«³Æ=B.²¿ÃÅÈ«³Æ  from #CPKC A
+ update  A set éƒ¨é—¨å…¨ç§°=B.éƒ¨é—¨å…¨ç§°  from #CPKC A
 join 
-#CPKC B on left(A.¹æ¸ñ,Charindex('-',A.¹æ¸ñ,0))=left(B.¹æ¸ñ,Charindex('-',B.¹æ¸ñ,0))
- where ( (A.²¿ÃÅÈ«³Æ is null or A.²¿ÃÅÈ«³Æ='') or A.²¿ÃÅÈ«³Æ in('ÊÐ³¡¶þ²¿ÏúÊÛ¶þ²¿','ÊÐ³¡¶þ²¿ÏúÊÛÒ»²¿','ÊÐ³¡Èý²¿ÏúÊÛ¶þ²¿','ÊÐ³¡Èý²¿ÏúÊÛÈý²¿','ÊÂÒµÈý²¿ÊÐ³¡²¿')) AND  (B.²¿ÃÅÈ«³Æ <>''
- and  B.²¿ÃÅÈ«³Æ not in('ÊÐ³¡¶þ²¿ÏúÊÛ¶þ²¿','ÊÐ³¡¶þ²¿ÏúÊÛÒ»²¿','ÊÐ³¡Èý²¿ÏúÊÛ¶þ²¿','ÊÐ³¡Èý²¿ÏúÊÛÈý²¿','ÊÂÒµÈý²¿ÊÐ³¡²¿')
+#CPKC B on left(A.è§„æ ¼,Charindex('-',A.è§„æ ¼,0))=left(B.è§„æ ¼,Charindex('-',B.è§„æ ¼,0))
+ where ( (A.éƒ¨é—¨å…¨ç§° is null or A.éƒ¨é—¨å…¨ç§°='') or A.éƒ¨é—¨å…¨ç§° in('å¸‚åœºäºŒéƒ¨é”€å”®äºŒéƒ¨','å¸‚åœºäºŒéƒ¨é”€å”®ä¸€éƒ¨','å¸‚åœºä¸‰éƒ¨é”€å”®äºŒéƒ¨','å¸‚åœºä¸‰éƒ¨é”€å”®ä¸‰éƒ¨','äº‹ä¸šä¸‰éƒ¨å¸‚åœºéƒ¨')) AND  (B.éƒ¨é—¨å…¨ç§° <>''
+ and  B.éƒ¨é—¨å…¨ç§° not in('å¸‚åœºäºŒéƒ¨é”€å”®äºŒéƒ¨','å¸‚åœºäºŒéƒ¨é”€å”®ä¸€éƒ¨','å¸‚åœºä¸‰éƒ¨é”€å”®äºŒéƒ¨','å¸‚åœºä¸‰éƒ¨é”€å”®ä¸‰éƒ¨','äº‹ä¸šä¸‰éƒ¨å¸‚åœºéƒ¨')
  )
 
 
  
- SELECT *FROM  #CPKC  where (isnull(µ¥¼Û,0)<>0) and ×Ü¿â´æ>0
+ SELECT *FROM  #CPKC  where (isnull(å•ä»·,0)<>0) and æ€»åº“å­˜>0
 
 
 
-SELECT MB001 Æ·ºÅ,MB002 Æ·Ãû,MB003 ¹æ¸ñ,MB004 ¿â´æµ¥Î»,MB017 Ö÷Òª²Ö¿â,MB064 ¿â´æÊýÁ¿
+SELECT MB001 å“å·,MB002 å“å,MB003 è§„æ ¼,MB004 åº“å­˜å•ä½,MB017 ä¸»è¦ä»“åº“,MB064 åº“å­˜æ•°é‡
 FROM INVMB 
 WHERE MB019 = 'Y' ORDER BY MB017 ASC

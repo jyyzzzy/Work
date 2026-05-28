@@ -2,7 +2,7 @@
 use YNRD
 declare @yf varchar(6)
 declare @dt date
-set @yf='202602'
+set @yf='202604'
 set @dt=convert(date,@yf+'01',0);
 
 with ProductOrder as (

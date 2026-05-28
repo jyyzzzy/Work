@@ -88,3 +88,15 @@ WHERE (B.status = 'Y')
         AND A.TA003 >= '20260301'
   )
 ORDER BY TA003
+
+SELECT B.*
+FROM MOCTCFROMWMS AS B
+WHERE (B.status = 'Y')
+  AND EXISTS (
+      SELECT 1
+      FROM MOCTC AS A
+      WHERE A.TC001 = B.TC001
+        AND A.TC002 = B.TC002
+        AND A.TC009 <> 'Y'
+        AND A.TC003 >= '20260301'
+  )

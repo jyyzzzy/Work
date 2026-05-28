@@ -1,11 +1,11 @@
 --SELECT ACTTB.* FROM ACTTB INNER JOIN ACTTA ON TA001 = TB001 AND TA002 = TB002 
 --WHERE TA003 >='20150101' AND TA003 <= '20130631'
 
-SELECT TB016 ÉóºËÂë,TB003 ÐòºÅ, TA003 AS Æ¾Ö¤ÈÕÆÚ,TB001+'-'+TB002 AS Æ¾Ö¤ºÅ,TB005 AS »á¼Æ¿ÆÄ¿,ACTMA.MA026 AS ¿ÆÄ¿Ãû³Æ,TB010 AS ÕªÒª,TB006 AS ²¿ÃÅ±àºÅ,
-ISNULL(ME002,'') AS ²¿ÃÅÃû³Æ,TB008 AS ºËËãÏîÄ¿Ò»±àºÅ,TB017 AS ºËËãÏîÄ¿Ãû³ÆÒ»,TB009 AS ºËËãÏîÄ¿¶þ±àºÅ,TB018 AS ºËËãÏîÄ¿Ãû³Æ¶þ,CASE TB004 WHEN '1' THEN TB007 ELSE 0 END AS ½è·½½ð¶î,
-CASE TB004 WHEN '-1' THEN TB007 ELSE 0 END AS ´û·½½ð¶î,TB031 AS ¿Í»§´úÂë,ISNULL(COPMA.MA003,'') AS ¿Í»§Ãû³Æ,
-TB032 AS ¹©Ó¦ÉÌ´úÂë,ISNULL(PURMA.MA003,'') AS ¹©Ó¦ÉÌÃû³Æ,TB033 AS ÈËÔ±,ISNULL(MV002,'') AS ÈËÔ±Ãû³Æ,
-TB024 AS ½áËãÈÕÆÚ,TB022 AS ½áËã·½Ê½,TB023 AS ½áËãºÅ
+SELECT TB016 å®¡æ ¸ç ,TB003 åºå·, TA003 AS å‡­è¯æ—¥æœŸ,TB001+'-'+TB002 AS å‡­è¯å·,TB005 AS ä¼šè®¡ç§‘ç›®,ACTMA.MA026 AS ç§‘ç›®åç§°,TB010 AS æ‘˜è¦,TB006 AS éƒ¨é—¨ç¼–å·,
+ISNULL(ME002,'') AS éƒ¨é—¨åç§°,TB008 AS æ ¸ç®—é¡¹ç›®ä¸€ç¼–å·,TB017 AS æ ¸ç®—é¡¹ç›®åç§°ä¸€,TB009 AS æ ¸ç®—é¡¹ç›®äºŒç¼–å·,TB018 AS æ ¸ç®—é¡¹ç›®åç§°äºŒ,CASE TB004 WHEN '1' THEN TB007 ELSE 0 END AS å€Ÿæ–¹é‡‘é¢,
+CASE TB004 WHEN '-1' THEN TB007 ELSE 0 END AS è´·æ–¹é‡‘é¢,TB031 AS å®¢æˆ·ä»£ç ,ISNULL(COPMA.MA003,'') AS å®¢æˆ·åç§°,
+TB032 AS ä¾›åº”å•†ä»£ç ,ISNULL(PURMA.MA003,'') AS ä¾›åº”å•†åç§°,TB033 AS äººå‘˜,ISNULL(MV002,'') AS äººå‘˜åç§°,
+TB024 AS ç»“ç®—æ—¥æœŸ,TB022 AS ç»“ç®—æ–¹å¼,TB023 AS ç»“ç®—å·
 
 FROM ACTTB INNER JOIN ACTTA ON TA001 = TB001 AND TA002 = TB002 INNER JOIN ACTMA ON ACTMA.MA001 = TB005
 LEFT JOIN CMSME ON ME001 = TB006

@@ -151,7 +151,7 @@ drop table #BOMXX
 		SELECT MB001,MB002,MA002,MB003,MB004,CAST(MB011 AS FLOAT)*MG002 MB011,MB014,MB015 FROM PURMB W JOIN  dbo.PURMA ON MA001=MB002 join  (select 'RMB' MG001,1 MG002
 	UNION 
 	select 'USD ' MG001,8.14 MG002) MG on MB003=MG001
-		WHERE MB003<>'VND' AND  exists( SELECT MB001+MAX(MB015) FROM PURMB N WHERE MB014<= '20260131'  AND  W.MB001=N.MB001	GROUP BY  MB001  HAVING(MAX(MB015))= W.MB015 ) 
+		WHERE MB003<>'VND' AND  exists( SELECT MB001+MAX(MB015) FROM PURMB N WHERE MB014<= '20260430'  AND  W.MB001=N.MB001	GROUP BY  MB001  HAVING(MAX(MB015))= W.MB015 ) 
 		)MB
 		) PURMB_GYS WHERE RowNum=1
 
@@ -210,9 +210,9 @@ drop table #BOMXX
 
 /***财务数据展阶***/
 
-SELECT *FROM  #BOMXX WHERE LEFT(材料品号,1)NOT IN('2','A','1','4','L','P') and 材料品号  NOT like '%2' and  材料品名  NOT like '%跨线电阻%' ORDER BY 产品品号,元件品号,材料品号   --and 最新单价供应商编号 is null
+SELECT *FROM  #BOMXX WHERE LEFT(材料品号,1)NOT IN('2','A','1','4','L','P') and 材料品号  NOT like '%2' and  材料品名  NOT like '%跨线电阻%' ORDER BY 产品品号,元件品号,材料品号;   --and 最新单价供应商编号 is null
 
-SELECT *FROM  #BOMXX WHERE LEFT(材料品号,1)NOT IN('2','A','1','4','L','P') and 材料品号  NOT like '%2' and  材料品名  NOT like '%跨线电阻%'  --and [202511单价] is null
+--SELECT *FROM  #BOMXX WHERE LEFT(材料品号,1)NOT IN('2','A','1','4','L','P') and 材料品号  NOT like '%2' and  材料品名  NOT like '%跨线电阻%'  --and [202511单价] is null
         
 
 		select 事业部,工作中心编号,工作中心名称,客户名称, 工单号, 开单日期,实际完工,GD.产品品号,GD.产品品名,GD.产品规格,订单数量,未生产量, 工单状态 , 订单单别, 订单单号, 
@@ -223,7 +223,7 @@ SELECT *FROM  #BOMXX WHERE LEFT(材料品号,1)NOT IN('2','A','1','4','L','P') a
 		where 物料用量<>0 and 单价<>0
 		--where  GD.产品品号='100705430000' 
         GROUP BY  事业部,工作中心编号,工作中心名称,客户名称, 工单号, 开单日期,实际完工,GD.产品品号,GD.产品品名,GD.产品规格,订单数量,未生产量, 工单状态 , 订单单别, 订单单号, 单价
-		ORDER BY 工单号
+		ORDER BY 工单号;
 			--select *from #BOMXX --where 
 			--select BOM.*,CAST(未生产量*物料用量 AS FLOAT) 未生产量 from #GDXX GD join  #BOMXX BOM on GD.产品品号=BOM.产品品号
 

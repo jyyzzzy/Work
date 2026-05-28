@@ -1,12 +1,13 @@
 delete from   LSSJ..zjcgrk WHERE cgdh ='订单单别'
 
-
+SELECT * FROM LSSJ..zjcgrk
 
 delete from   LSSJ..zjcgrk
 --insert into  LSSJ..zjcgrk(cgdh,dj) --select'2201-20230608002-0001',15
 --values
 
 --="INSERT INTO LSSJ..zjcgrk(cgdh,dj)values('"&A2&"',"&L2&")"
+--="INSERT INTO LSSJ..zjcgrk(cgdh,dj,币种) VALUES('"&A2&"',"&L2&",'"&&"');"
 delete from   LSSJ..zjcgrk
 INSERT INTO LSSJ..zjcgrk(cgdh,dj)values('2224-20250122014-0001',24.83)
 INSERT INTO LSSJ..zjcgrk(cgdh,dj)values('2224-20250122015-0001',9.1)
@@ -30,7 +31,26 @@ WHERE COPTC.TC001=AA.TD001 AND dbo.COPTC.TC002=TD002  ---越南
 
 
 
+SELECT COPTC.*
+FROM COPTC
+--INNER JOIN LSSJ..zjcgrk ON TC001 + '-' + TC002 = LEFT(cgdh,16)
+WHERE TC008 <> 'VND'
+AND TC003 >='20260401'
 
+UPDATE COPTC SET TC008 = 'VND'
+--SELECT *
+FROM COPTC
+--INNER JOIN LSSJ..zjcgrk ON TC001 + '-' + TC002 = LEFT(cgdh,16)
+WHERE TC008 <> 'VND'
+AND TC003 >='20260401'
+
+UPDATE COPTC
+SET TC009 = 1
+--SELECT *
+FROM COPTC
+--INNER JOIN LSSJ..zjcgrk ON TC001 + '-' + TC002 = LEFT(cgdh,16)
+WHERE TC009 <> 1
+AND TC003 >='20260401'
 
 
 UPDATE COPTD 
@@ -89,6 +109,10 @@ FROM (
 WHERE 
 COPTC.TC001=AA.TD001 
 AND dbo.COPTC.TC002=TD002
+AND (
+	TC029 <> TD029 OR
+	TC030 <> TD030
+)
 
 
 
