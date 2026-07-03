@@ -110,18 +110,18 @@ WHERE TC001 = '5411'
 --FROM MOCTR
 --WHERE TR001 = '5C01'
 --  AND TR002 = '20250800217' --单头
-USE SDRD;
+
 update MOCTR
 set TR004= REPLACE(TR004, '54', 'A-'),
     TR006=REPLACE(TR006, '56', 'A-')
 WHERE TR001 = '5C01'
-  AND TR002 = '20250900329' --改A-
+  AND TR002 = '20260600712' --改A-
 
 update MOCTR
 set TR004= REPLACE(TR004, 'A-', '54'),
     TR006= REPLACE(TR006, 'A-', '56')
 WHERE TR001 = '5C01'
-  AND TR002 = '20250900329' --A-改
+  AND TR002 = '20260600712' --A-改
 
 --    5C01-20250700151
 SELECT * FROM MOCTR WHERE TR004 = '56N1' AND TR005 = '20250900110'
@@ -131,14 +131,14 @@ WHERE EXISTS(SELECT *
              FROM MOCTR
              WHERE (TC001 = TR004 AND TR005 = TC002 OR TR006 = TC001 AND TR007 = TC002)
                AND TR001 = '5C01'
-               AND TR002 = '20250900329')
+               AND TR002 = '20260600712')
 select *
 from MOCTE
 WHERE EXISTS(SELECT *
              FROM MOCTR
              WHERE (TE001 = TR004 AND TR005 = TE002 OR TR006 = TE001 AND TR007 = TE002)
                AND TR001 = '5C01'
-               AND TR002 = '20250900329')
+               AND TR002 = '20260600712')
 SELECT * FROM MOCTC WHERE TC001 = '54N1' AND TC002 = '20250800217'
 SELECT * FROM MOCTR WHERE TR006 = '54N1' AND TR007 = '20250800217'
 
@@ -148,7 +148,7 @@ WHERE EXISTS(SELECT *
              FROM MOCTR
              WHERE (TC001 = TR004 AND TR005 = TC002 OR TR006 = TC001 AND TR007 = TC002)
                AND TR001 = '5C01'
-               AND TR002 = '20250900329')
+               AND TR002 = '20260600712')
   and TC009 = 'N' --删除领/退料单头
 delete
 from MOCTE
@@ -156,16 +156,16 @@ WHERE EXISTS(SELECT *
              FROM MOCTR
              WHERE (TE001 = TR004 AND TR005 = TE002 OR TR006 = TE001 AND TR007 = TE002)
                AND TR001 = '5C01'
-               AND TR002 = '20250900329')
+               AND TR002 = '20260600712')
   and TE019 = 'N' --删除领/退料单身
 
 
 delete
 from MOCTR
-where (MOCTR.TR002 = '20250900329') --删除挪料单头
+where (MOCTR.TR002 = '20260600712') --删除挪料单头
 delete
 from MOCTS
-where (MOCTS.TS002 = '20250900329') --删除挪料单身
+where (MOCTS.TS002 = '20260600712') --删除挪料单身
 
 --select*
 --from MOCTC
@@ -173,7 +173,7 @@ where (MOCTS.TS002 = '20250900329') --删除挪料单身
 --             FROM MOCTR
 --             WHERE (TC001 = TR004 AND TR005 = TC002 OR TR006 = TC001 AND TR007 = TC002)
 --               AND TR001 = '5C01'
---               AND TR002 = '20250900329')
+--               AND TR002 = '20260600712')
 
 /*领/退料单头*/
 
@@ -184,7 +184,7 @@ WHERE EXISTS(SELECT *
              FROM MOCTR
              WHERE (TC001 = TR004 AND TR005 = TC002 OR TR006 = TC001 AND TR007 = TC002)
                AND TR001 = '5C01'
-               AND TR002 = '20250900329')
+               AND TR002 = '20260600712')
 
 
 --SELECT * FROM MOCTC WHERE TC001 = '5402' AND TC002 = '20250703666';
@@ -200,7 +200,7 @@ WHERE EXISTS(select*
                           FROM MOCTR
                           WHERE (TC001 = TR004 AND TR005 = TC002 OR TR006 = TC001 AND TR007 = TC002)
                             AND TR001 = '5C01'
-                            AND TR002 = '20250900329')
+                            AND TR002 = '20260600712')
                AND TC001 = LA006
                AND TC002 = LA007) --修改更新日期
 

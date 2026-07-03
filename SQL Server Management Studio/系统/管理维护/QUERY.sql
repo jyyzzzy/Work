@@ -1,27 +1,27 @@
 SELECT DISTINCT 
-	workcode ¹¤ºÅ,
-	lastname ÐÕÃû,
+	workcode å·¥å·,
+	lastname å§“å,
 	--HrmJobTitles.id,
-	HrmJobTitles.jobtitlename Ö°Î»,
-	DEPT.departmentcode ²¿ÃÅ±àºÅ,
-	DEPT.departmentname ²¿ÃÅÃû³Æ,
-	DEPT.subcompanyname ¹«Ë¾Ãû³Æ,
-	--M.COMPANY È¨ÏÞËùÔÚÏµÍ³,
-	MA002 ÏµÍ³Ãû³Æ,
-	M.MG002 ³ÌÐò±àºÅ,
-	MB002 ³ÌÐòÃû³Æ,
-	--MG004 ¿É·ñÔËÐÐ,
-	SUBSTRING(MG006,7,1) AS µ¥¼Û,
-	SUBSTRING(MG006,8,1) AS ½ð¶î,
-	SUBSTRING(MG006,1,1) AS ²éÑ¯,
-	SUBSTRING(MG006,2,1) AS ¸ü¸Ä,
-	SUBSTRING(MG006,3,1) AS É¾³ý,
-	SUBSTRING(MG006,4,1) AS ÉóºË,
-	SUBSTRING(MG006,5,1) AS ³·ÏúÉóºË,
-	SUBSTRING(MG006,6,1) AS Êä³ö,
-	SUBSTRING(MG006,9,1) AS ÐÂÔö,
-	SUBSTRING(MG006,10,1) AS ËÍÇ©,
-	SUBSTRING(MG006,12,1) AS ×÷·Ï
+	HrmJobTitles.jobtitlename èŒä½,
+	DEPT.departmentcode éƒ¨é—¨ç¼–å·,
+	DEPT.departmentname éƒ¨é—¨åç§°,
+	DEPT.subcompanyname å…¬å¸åç§°,
+	--M.COMPANY æƒé™æ‰€åœ¨ç³»ç»Ÿ,
+	MA002 ç³»ç»Ÿåç§°,
+	M.MG002 ç¨‹åºç¼–å·,
+	MB002 ç¨‹åºåç§°,
+	--MG004 å¯å¦è¿è¡Œ,
+	SUBSTRING(MG006,7,1) AS å•ä»·,
+	SUBSTRING(MG006,8,1) AS é‡‘é¢,
+	SUBSTRING(MG006,1,1) AS æŸ¥è¯¢,
+	SUBSTRING(MG006,2,1) AS æ›´æ”¹,
+	SUBSTRING(MG006,3,1) AS åˆ é™¤,
+	SUBSTRING(MG006,4,1) AS å®¡æ ¸,
+	SUBSTRING(MG006,5,1) AS æ’¤é”€å®¡æ ¸,
+	SUBSTRING(MG006,6,1) AS è¾“å‡º,
+	SUBSTRING(MG006,9,1) AS æ–°å¢ž,
+	SUBSTRING(MG006,10,1) AS é€ç­¾,
+	SUBSTRING(MG006,12,1) AS ä½œåºŸ
 FROM 
 	(
 		SELECT * FROM SDRD..ADMMG
@@ -49,55 +49,55 @@ WHERE
 		--AND seclevel = '30'
 	) 
 	--AND  LEFT(M.MG002,3) IN ('MOC')
-	AND DEPT.departmentname COLLATE Chinese_PRC_BIN LIKE '%ÓªÏúÖÐÐÄ%'
---AND LEFT(M.MG002,3) IN ('INV','PUR')
---AND SUBSTRING(M.MG002,1,5) <> 'PURAB'
---	AND SUBSTRING(M.MG002,1,4) <> 'PURB' 
---	AND SUBSTRING(M.MG002,1,4) <> 'PURQ' 
---	AND M.MG002 NOT IN(
---		'PURI01',
---		'PURI04',
---		'PURI05',
---		'PURI10',
---		'PURI12',
---		'PURI13',
---		'PURR01',
---		'PURR02',
---		'PURR03',
---		'PURR10',
---		'PURR11',
---		'PURR12',
---		'PURR19',
---		'PURR20',
---		'PURR36',
---		'PURR39'
---	)
---	AND LEFT(M.MG002,4) <> 'INVB' 
---	AND  M.MG002 NOT IN(
---		'INVI01',
---		'INVI03',
---		'INVI06',
---		'INVI14',
---		'INVQ02',
---		'INVR01',
---		'INVR02',
---		'INVR11',
---		'INVR12',
---		'INVR13',
---		'INVR14',
---		'INVR15',
---		'INVR16',
---		'INVR21',
---		'INVR27',
---		'INVR33',
---		'INVR34',
---		'INVR38',
---		'INVR45'
---	)
+	AND DEPT.departmentname COLLATE Chinese_PRC_BIN LIKE '%ç ”å‘%'
+AND LEFT(M.MG002,3) IN ('PUR')
+AND SUBSTRING(M.MG002,1,5) <> 'PURAB'
+	AND SUBSTRING(M.MG002,1,4) <> 'PURB' 
+	AND SUBSTRING(M.MG002,1,4) <> 'PURQ' 
+	AND M.MG002 NOT IN(
+		'PURI01',
+		'PURI04',
+		'PURI05',
+		'PURI10',
+		'PURI12',
+		'PURI13',
+		'PURR01',
+		'PURR02',
+		'PURR03',
+		'PURR10',
+		'PURR11',
+		'PURR12',
+		'PURR19',
+		'PURR20',
+		'PURR36',
+		'PURR39'
+	)
+	--AND LEFT(M.MG002,4) <> 'INVB' 
+	--AND  M.MG002 NOT IN(
+	--	'INVI01',
+	--	'INVI03',
+	--	'INVI06',
+	--	'INVI14',
+	--	'INVQ02',
+	--	'INVR01',
+	--	'INVR02',
+	--	'INVR11',
+	--	'INVR12',
+	--	'INVR13',
+	--	'INVR14',
+	--	'INVR15',
+	--	'INVR16',
+	--	'INVR21',
+	--	'INVR27',
+	--	'INVR33',
+	--	'INVR34',
+	--	'INVR38',
+	--	'INVR45'
+	--)
 ----AND MG002 IN ('PURI02','PURR04')
 --	--AND SUBSTRING(MG006,2,1) = 'Y'
 --AND MG004 = 'Y'  AND (SUBSTRING(MG006,7,1)='Y' OR SUBSTRING(MG006,8,1)='Y')
-----AND (departmentname LIKE '%ÑÐ·¢%' 
-----OR lastname IN ('³ÂÔóÁú','ÂÞ¼Ñ','½ðÐñ','³Â½­Æ½','À×öª','Ðì½¡²Ó','ºú×ÓÑï','ÕÔ¿Æ','Í¯»³¿¡','ÀµË¹ÇÉ','ÃÏ¿ü')
+----AND (departmentname LIKE '%ç ”å‘%' 
+----OR lastname IN ('é™ˆæ³½é¾™','ç½—ä½³','é‡‘æ—­','é™ˆæ±Ÿå¹³','é›·éœ†','å¾å¥ç¿','èƒ¡å­æ‰¬','èµµç§‘','ç«¥æ€€ä¿Š','èµ–æ–¯å·§','å­Ÿå¥Ž')
 ----)
 ORDER BY MG002,departmentcode,workcode

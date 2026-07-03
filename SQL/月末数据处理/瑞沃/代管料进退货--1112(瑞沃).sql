@@ -8,7 +8,7 @@ WHERE TA003 >='20251101' AND TA003 <= '20251131' AND TA001 = '1112' AND TB018 = 
 GROUP BY TA005,TB004,MB002,MB003,MB004 having 0-SUM(TB007)<>0 order by rtrim(TA005)
 --="INSERT INTO LSSJ..LSDGL(单号,序号,供应商,品号,数量,单价) VALUES('"&&"','"&&"','"&&"','"&&"',"&&","&&")"
 SELECT *FROM   LSSJ..LSDGL
-UPDATE  LSSJ..LSDGL SET 单号=replace(单号,'202208','202209')
+UPDATE  LSSJ..LSDGL SET 单号=replace(单号,'20260730','20260701')
 
 DELETE FROM LSSJ..LSDGL WHERE 数量 = 0
 
@@ -52,8 +52,8 @@ UDF01 , UDF02 , UDF03 , UDF04 , UDF05 , UDF06 , UDF51 , UDF52 , UDF53 , UDF54 , 
  SELECT 
  '0001','10105978','90001',FORMAT(GETDATE(),'yyyyMMddHHmmssfff')
  ,'','',1,
-'1112',单号,'20260501','160800',供应商,'N',0,'000102','11',0,
-SUM(数量),SUM(数量*单价),'N','20260501','',0,'N','',0,'','1',
+'1112',单号,'20260701','160800',供应商,'N',0,'000102','11',0,
+SUM(数量),SUM(数量*单价),'N','20260701','',0,'N','',0,'','1',
 '','','','','','',0,0,0,0,0,0
 FROM LSSJ..LSDGL
 GROUP BY 单号,供应商
@@ -69,14 +69,14 @@ SELECT
   '0001','10105978','90001',FORMAT(GETDATE(),'yyyyMMddHHmmssfff')
   ,'','',1,
 '1112',单号,序号,品号,MB002,MB003,数量,MB004,0,单价,
-单价*数量,'006','','********************','','','','N','20260501','',
+单价*数量,'006','','********************','','','','N','20260701','',
 '',0,MB090,'',0,0,0,'','##########','','',
 '','','','','','',0,0,0,0,0,0
 FROM LSSJ..LSDGL inner join RWDZ..INVMB ON MB001 = 品号 
 
 
---DELETE FROM RWDZ..INVTA WHERE CREATE_DATE = '20260501000000000' AND TA006 = 'N'
---DELETE FROM RWDZ..INVTB WHERE CREATE_DATE = '20260501160319803' AND TB018 = 'N'
+--DELETE FROM RWDZ..INVTA WHERE CREATE_DATE = '20260701000000000' AND TA006 = 'N'
+--DELETE FROM RWDZ..INVTB WHERE CREATE_DATE = '20260701160319803' AND TB018 = 'N'
 
 
  --select * from  RWDZ..INVTA where CREATE_DATE='20220430113934473'

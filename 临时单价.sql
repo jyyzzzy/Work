@@ -1,0 +1,18 @@
+    SELECT
+        RTRIM(PURMB.MB001) AS 品号,
+        INVMB.MB002 AS 品名,
+        INVMB.MB003 AS 规格,
+        RTRIM(PURMB.MB002) AS 供应商编号,
+        PURMA.MA002 AS 供应商简称,
+        PURMB.MB003 AS 币种,
+        PURMB.MB004 AS 计价单位,
+        CONVERT(decimal(38,10), PURMB.MB011) AS 采购单价,
+        PURMB.MB014 AS 生效日,
+        PURMB.MB015 AS 失效日,
+        PURMB.MB012 AS 备注
+    FROM SDRD..PURMB AS PURMB
+    INNER JOIN SDRD..PURMA AS PURMA
+        ON PURMA.MA001 = PURMB.MB002
+    LEFT JOIN SDRD..INVMB AS INVMB
+        ON INVMB.MB001 = PURMB.MB001
+    WHERE FLOOR(ABS(CONVERT(decimal(38,10), PURMB.MB011)) * 1000000) % 10 = 5

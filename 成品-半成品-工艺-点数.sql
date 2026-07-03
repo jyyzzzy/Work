@@ -54,116 +54,116 @@ SELECT
 INTO #PROD_LA_RAW
 FROM
 (
-    --------------------------------------------------------
-    -- SDRD
-    --------------------------------------------------------
-    SELECT
-        'SDRD' AS 账套,
-        RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT AS 产品品号,
-        LA.LA004 AS 产品最近交易时间,
-        RTRIM(LA.LA006) COLLATE DATABASE_DEFAULT AS LA006,
-        RTRIM(ISNULL(LA.UDF06, '')) COLLATE DATABASE_DEFAULT AS UDF06,
+    ----------------------------------------------------------
+    ---- SDRD
+    ----------------------------------------------------------
+    --SELECT
+    --    'SDRD' AS 账套,
+    --    RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT AS 产品品号,
+    --    LA.LA004 AS 产品最近交易时间,
+    --    RTRIM(LA.LA006) COLLATE DATABASE_DEFAULT AS LA006,
+    --    RTRIM(ISNULL(LA.UDF06, '')) COLLATE DATABASE_DEFAULT AS UDF06,
 
-        WC.工作中心编号,
+    --    WC.工作中心编号,
 
-        RTRIM(
-            LEFT(
-                ISNULL(MD.MD011, '') COLLATE DATABASE_DEFAULT,
-                CHARINDEX('-', ISNULL(MD.MD011, '') COLLATE DATABASE_DEFAULT + '-') - 1
-            )
-        ) AS 解析事业部
-    FROM SDRD.dbo.INVLA LA WITH(NOLOCK)
-    INNER JOIN #PRODUCT P
-        ON RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT = P.产品品号 COLLATE DATABASE_DEFAULT
-    OUTER APPLY
-    (
-        SELECT
-            RTRIM(
-                LEFT(
-                    ISNULL(LA.UDF06, '') COLLATE DATABASE_DEFAULT,
-                    CHARINDEX('|', ISNULL(LA.UDF06, '') COLLATE DATABASE_DEFAULT + '|') - 1
-                )
-            ) AS 工作中心编号
-    ) WC
-    LEFT JOIN SDRD.dbo.CMSMD MD WITH(NOLOCK)
-        ON RTRIM(MD.MD001) COLLATE DATABASE_DEFAULT = WC.工作中心编号 COLLATE DATABASE_DEFAULT
-    WHERE LEFT(RTRIM(LA.LA006), 2) = '58'
+    --    RTRIM(
+    --        LEFT(
+    --            ISNULL(MD.MD011, '') COLLATE DATABASE_DEFAULT,
+    --            CHARINDEX('-', ISNULL(MD.MD011, '') COLLATE DATABASE_DEFAULT + '-') - 1
+    --        )
+    --    ) AS 解析事业部
+    --FROM SDRD.dbo.INVLA LA WITH(NOLOCK)
+    --INNER JOIN #PRODUCT P
+    --    ON RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT = P.产品品号 COLLATE DATABASE_DEFAULT
+    --OUTER APPLY
+    --(
+    --    SELECT
+    --        RTRIM(
+    --            LEFT(
+    --                ISNULL(LA.UDF06, '') COLLATE DATABASE_DEFAULT,
+    --                CHARINDEX('|', ISNULL(LA.UDF06, '') COLLATE DATABASE_DEFAULT + '|') - 1
+    --            )
+    --        ) AS 工作中心编号
+    --) WC
+    --LEFT JOIN SDRD.dbo.CMSMD MD WITH(NOLOCK)
+    --    ON RTRIM(MD.MD001) COLLATE DATABASE_DEFAULT = WC.工作中心编号 COLLATE DATABASE_DEFAULT
+    --WHERE LEFT(RTRIM(LA.LA006), 2) = '58'
 
-    UNION ALL
+    --UNION ALL
 
-    --------------------------------------------------------
-    -- ZJRD
-    --------------------------------------------------------
-    SELECT
-        'ZJRD' AS 账套,
-        RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT AS 产品品号,
-        LA.LA004 AS 产品最近交易时间,
-        RTRIM(LA.LA006) COLLATE DATABASE_DEFAULT AS LA006,
-        RTRIM(ISNULL(LA.UDF06, '')) COLLATE DATABASE_DEFAULT AS UDF06,
+    ----------------------------------------------------------
+    ---- ZJRD
+    ----------------------------------------------------------
+    --SELECT
+    --    'ZJRD' AS 账套,
+    --    RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT AS 产品品号,
+    --    LA.LA004 AS 产品最近交易时间,
+    --    RTRIM(LA.LA006) COLLATE DATABASE_DEFAULT AS LA006,
+    --    RTRIM(ISNULL(LA.UDF06, '')) COLLATE DATABASE_DEFAULT AS UDF06,
 
-        WC.工作中心编号,
+    --    WC.工作中心编号,
 
-        RTRIM(
-            LEFT(
-                ISNULL(MD.MD011, '') COLLATE DATABASE_DEFAULT,
-                CHARINDEX('-', ISNULL(MD.MD011, '') COLLATE DATABASE_DEFAULT + '-') - 1
-            )
-        ) AS 解析事业部
-    FROM ZJRD.dbo.INVLA LA WITH(NOLOCK)
-    INNER JOIN #PRODUCT P
-        ON RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT = P.产品品号 COLLATE DATABASE_DEFAULT
-    OUTER APPLY
-    (
-        SELECT
-            RTRIM(
-                LEFT(
-                    ISNULL(LA.UDF06, '') COLLATE DATABASE_DEFAULT,
-                    CHARINDEX('|', ISNULL(LA.UDF06, '') COLLATE DATABASE_DEFAULT + '|') - 1
-                )
-            ) AS 工作中心编号
-    ) WC
-    LEFT JOIN ZJRD.dbo.CMSMD MD WITH(NOLOCK)
-        ON RTRIM(MD.MD001) COLLATE DATABASE_DEFAULT = WC.工作中心编号 COLLATE DATABASE_DEFAULT
-    WHERE LEFT(RTRIM(LA.LA006), 2) = '58'
+    --    RTRIM(
+    --        LEFT(
+    --            ISNULL(MD.MD011, '') COLLATE DATABASE_DEFAULT,
+    --            CHARINDEX('-', ISNULL(MD.MD011, '') COLLATE DATABASE_DEFAULT + '-') - 1
+    --        )
+    --    ) AS 解析事业部
+    --FROM ZJRD.dbo.INVLA LA WITH(NOLOCK)
+    --INNER JOIN #PRODUCT P
+    --    ON RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT = P.产品品号 COLLATE DATABASE_DEFAULT
+    --OUTER APPLY
+    --(
+    --    SELECT
+    --        RTRIM(
+    --            LEFT(
+    --                ISNULL(LA.UDF06, '') COLLATE DATABASE_DEFAULT,
+    --                CHARINDEX('|', ISNULL(LA.UDF06, '') COLLATE DATABASE_DEFAULT + '|') - 1
+    --            )
+    --        ) AS 工作中心编号
+    --) WC
+    --LEFT JOIN ZJRD.dbo.CMSMD MD WITH(NOLOCK)
+    --    ON RTRIM(MD.MD001) COLLATE DATABASE_DEFAULT = WC.工作中心编号 COLLATE DATABASE_DEFAULT
+    --WHERE LEFT(RTRIM(LA.LA006), 2) = '58'
 
-    UNION ALL
+    --UNION ALL
 
-    --------------------------------------------------------
-    -- AHRD
-    --------------------------------------------------------
-    SELECT
-        'AHRD' AS 账套,
-        RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT AS 产品品号,
-        LA.LA004 AS 产品最近交易时间,
-        RTRIM(LA.LA006) COLLATE DATABASE_DEFAULT AS LA006,
-        RTRIM(ISNULL(LA.UDF06, '')) COLLATE DATABASE_DEFAULT AS UDF06,
+    ----------------------------------------------------------
+    ---- AHRD
+    ----------------------------------------------------------
+    --SELECT
+    --    'AHRD' AS 账套,
+    --    RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT AS 产品品号,
+    --    LA.LA004 AS 产品最近交易时间,
+    --    RTRIM(LA.LA006) COLLATE DATABASE_DEFAULT AS LA006,
+    --    RTRIM(ISNULL(LA.UDF06, '')) COLLATE DATABASE_DEFAULT AS UDF06,
 
-        WC.工作中心编号,
+    --    WC.工作中心编号,
 
-        RTRIM(
-            LEFT(
-                ISNULL(MD.MD011, '') COLLATE DATABASE_DEFAULT,
-                CHARINDEX('-', ISNULL(MD.MD011, '') COLLATE DATABASE_DEFAULT + '-') - 1
-            )
-        ) AS 解析事业部
-    FROM AHRD.dbo.INVLA LA WITH(NOLOCK)
-    INNER JOIN #PRODUCT P
-        ON RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT = P.产品品号 COLLATE DATABASE_DEFAULT
-    OUTER APPLY
-    (
-        SELECT
-            RTRIM(
-                LEFT(
-                    ISNULL(LA.UDF06, '') COLLATE DATABASE_DEFAULT,
-                    CHARINDEX('|', ISNULL(LA.UDF06, '') COLLATE DATABASE_DEFAULT + '|') - 1
-                )
-            ) AS 工作中心编号
-    ) WC
-    LEFT JOIN AHRD.dbo.CMSMD MD WITH(NOLOCK)
-        ON RTRIM(MD.MD001) COLLATE DATABASE_DEFAULT = WC.工作中心编号 COLLATE DATABASE_DEFAULT
-    WHERE LEFT(RTRIM(LA.LA006), 2) = '58'
+    --    RTRIM(
+    --        LEFT(
+    --            ISNULL(MD.MD011, '') COLLATE DATABASE_DEFAULT,
+    --            CHARINDEX('-', ISNULL(MD.MD011, '') COLLATE DATABASE_DEFAULT + '-') - 1
+    --        )
+    --    ) AS 解析事业部
+    --FROM AHRD.dbo.INVLA LA WITH(NOLOCK)
+    --INNER JOIN #PRODUCT P
+    --    ON RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT = P.产品品号 COLLATE DATABASE_DEFAULT
+    --OUTER APPLY
+    --(
+    --    SELECT
+    --        RTRIM(
+    --            LEFT(
+    --                ISNULL(LA.UDF06, '') COLLATE DATABASE_DEFAULT,
+    --                CHARINDEX('|', ISNULL(LA.UDF06, '') COLLATE DATABASE_DEFAULT + '|') - 1
+    --            )
+    --        ) AS 工作中心编号
+    --) WC
+    --LEFT JOIN AHRD.dbo.CMSMD MD WITH(NOLOCK)
+    --    ON RTRIM(MD.MD001) COLLATE DATABASE_DEFAULT = WC.工作中心编号 COLLATE DATABASE_DEFAULT
+    --WHERE LEFT(RTRIM(LA.LA006), 2) = '58'
 
-    UNION ALL
+    --UNION ALL
 
     --------------------------------------------------------
     -- YNRD
@@ -428,7 +428,7 @@ SELECT
 FROM #BOM_TREE T
 INNER JOIN #PRODUCT P
     ON P.产品品号 = T.产品品号
-LEFT JOIN #PROD_LA LA
+INNER JOIN #PROD_LA LA
     ON LA.产品品号 = T.产品品号
 LEFT JOIN SDRD.dbo.INVMB S WITH(NOLOCK)
     ON RTRIM(S.MB001) = T.下阶品号

@@ -1,18 +1,18 @@
-/******–ﬁ∏ƒøÕªßª˘±æ–≈œ¢******/--Modify customer basic info
+/******‰øÆÊîπÂÆ¢Êà∑Âü∫Êú¨‰ø°ÊÅØ******/--Modify customer basic info
 --CREATE AT 20251129 BY ZIYANG ZHANG
 SELECT * FROM COPMA
 CREATE TABLE LSSJ..CustomerBasic (
-    custNo        CHAR(10),   -- øÕªß±‡∫≈-- Customer Number (CUST_NO)
-    custShortName CHAR(20),   -- øÕªßºÚ≥∆ Customer Short Name (CUST_SHORT_NAME)
-    custFullName  CHAR(72),   -- øÕªß»´≥∆ Customer Full Name (CUST_FULL_NAME)
-    salesRepNo        CHAR(10),   -- “µŒÒ»À‘±±‡∫≈ Sales Representative Number (SALES_REP_NO)
-    salesRepName      CHAR(10)    -- “µŒÒ»À‘±√˚≥∆ Sales Representative Name (SALES_REP_NAME)
+    custNo        CHAR(10),   -- ÂÆ¢Êà∑ÁºñÂè∑-- Customer Number (CUST_NO)
+    custShortName CHAR(20),   -- ÂÆ¢Êà∑ÁÆÄÁß∞ Customer Short Name (CUST_SHORT_NAME)
+    custFullName  CHAR(72),   -- ÂÆ¢Êà∑ÂÖ®Áß∞ Customer Full Name (CUST_FULL_NAME)
+    salesRepNo        CHAR(10),   -- ‰∏öÂä°‰∫∫ÂëòÁºñÂè∑ Sales Representative Number (SALES_REP_NO)
+    salesRepName      CHAR(10)    -- ‰∏öÂä°‰∫∫ÂëòÂêçÁß∞ Sales Representative Name (SALES_REP_NAME)
 );
 
 ALTER TABLE LSSJ..CustomerBasic
 ADD
-    deptNo   CHAR(10) NULL,  -- ≤ø√≈±‡∫≈ Department Number (DEPT_NO)
-    deptName CHAR(10) NULL;  -- ≤ø√≈√˚≥∆ Department Name (DEPT_NAME)
+    deptNo   CHAR(10) NULL,  -- ÈÉ®Èó®ÁºñÂè∑ Department Number (DEPT_NO)
+    deptName CHAR(10) NULL;  -- ÈÉ®Èó®ÂêçÁß∞ Department Name (DEPT_NAME)
 
 DELETE FROM LSSJ..CustomerBasic
 SELECT * FROM LSSJ..CustomerBasic 
@@ -21,6 +21,8 @@ WHERE salesRepNo IS NULL
 ORDER BY custNo
 --="INSERT INTO LSSJ..CustomerBasic(custNo,custShortName,salesRepName) VALUES('"&&"','"&&"','"&&"');"
 --="INSERT INTO LSSJ..CustomerBasic(custNo,salesRepNo,deptNo) VALUES('"&&"','"&&"','"&&"');"
+--="INSERT INTO LSSJ..CustomerBasic(custNo,salesRepNo) VALUES('"&&"','"&&"');"
+--="INSERT INTO LSSJ..CustomerBasic(custNo,deptNo) VALUES('"&&"','"&&"');"
 --UPDATE CB
 --SET CB.custNo = MA001
 --FROM LSSJ..CustomerBasic AS CB
@@ -44,11 +46,11 @@ UPDATE COPMA
 SET 
 --SELECT
 --MA001,
-MA015 = CB.deptNo,
+--MA015 = CB.deptNo,
 MA016 = CB.salesRepNo,
 MA085 = CB.salesRepNo
 FROM COPMA 
 INNER JOIN LSSJ..CustomerBasic AS CB ON CB.custNo = MA001
-WHERE MA015 <> CB.deptNo
-OR MA016 <> CB.salesRepNo
-OR MA085 <> CB.salesRepNo
+WHERE --MA015 <> CB.deptNo OR 
+MA016 <> CB.salesRepNo OR 
+MA085 <> CB.salesRepNo

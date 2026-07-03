@@ -1,0 +1,40 @@
+use master;
+select RTRIM(MB001) 品号,
+    RTRIM(MB001A) 品名,
+    RTRIM(MB001B) 规格,
+    RTRIM(MB002) 供应商编号,
+    RTRIM(MB002A) 供应商名称,
+    RTRIM(MB003) 币种,
+    RTRIM(MB004) 计价单位,
+    MB008 核价日,
+    MB014 生效日,
+    MB015 失效日,
+    MB013 含税,
+    MB011 采购单价,
+    MB009 上次进货,
+    MB005 初次交易
+from (
+    select PURMB.MB001, 
+    A.MB002 AS MB001A, 
+    A.MB003 AS MB001B, 
+    PURMB.MB002,
+    B.MA002 AS MB002A, 
+    PURMB.MB003, 
+    PURMB.MB004, 
+    PURMB.MB007, 
+    PURMB.MB008, 
+    PURMB.MB014,
+    PURMB.MB015, 
+    PURMB.MB010, 
+    PURMB.MB013, 
+    PURMB.MB011, 
+    PURMB.MB009, 
+    PURMB.MB005, 
+    PURMB.MB012, 
+    PURMB.MB016, 
+    A.MB066 AS CANMODI
+    FROM AHRD..PURMB AS PURMB 
+    LEFT JOIN AHRD..INVMB AS A ON PURMB.MB001=A.MB001 
+    LEFT JOIN AHRD..PURMA AS B ON PURMB.MB002=B.MA001
+)AA 
+    order by MB001,MB002,MB003,MB004,MB014 

@@ -20,26 +20,7 @@
       </Items>
     </LogicalFolder>
     <LogicalFolder Name="查询" Type="0" Sorted="true">
-      <Items>
-        <FileNode Name="SQLQuery1.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:192.168.8.5:False:sa</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>192.168.8.5</AssociatedConnSrvName>
-          <AssociatedConnUserName>sa</AssociatedConnUserName>
-          <FullPath>SQLQuery1.sql</FullPath>
-        </FileNode>
-        <FileNode Name="SQLQuery2.sql">
-          <AssociatedConnectionMoniker />
-          <AssociatedConnSrvName />
-          <AssociatedConnUserName />
-          <FullPath>SQLQuery2.sql</FullPath>
-        </FileNode>
-        <FileNode Name="SQLQuery6.sql">
-          <AssociatedConnectionMoniker />
-          <AssociatedConnSrvName />
-          <AssociatedConnUserName />
-          <FullPath>SQLQuery6.sql</FullPath>
-        </FileNode>
-      </Items>
+      <Items />
     </LogicalFolder>
     <LogicalFolder Name="杂项" Type="3" Sorted="true">
       <Items />

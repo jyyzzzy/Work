@@ -77,21 +77,21 @@ update LSSJ..MonPrice_Update  set 仓库=MB017
 from LSSJ..MonPrice_Update  join  AHRD..INVMB on 品号=MB001 
 
 
-SELECT * FROM  LSSJ..MonPrice_Update WHERE 品号='309000002700'
+SELECT * FROM  LSSJ..MonPrice_Update-- WHERE 品号='309000002700'
 
 --客供无单价，删除数据
 select*from   LSSJ..MonPrice_Update where isnull(单价,0)=0 AND 规格 LIKE '%客供%'
 --DELETE from   LSSJ..MonPrice_Update where isnull(单价,0)=0 AND 规格 LIKE '%客供%'
 
 --查看币种不为RMB的数据
-SELECT * FROM LSSJ..MonPrice_Update WHERE 供应商='20533537'
-SELECT * FROM LSSJ..MonPrice_Update WHERE 币种<> 'RMB' AND 品号='305030034200'
+--SELECT * FROM LSSJ..MonPrice_Update WHERE 供应商='20533537'
+SELECT * FROM LSSJ..MonPrice_Update WHERE 币种<> 'RMB' --AND 品号='305030034200'
 --DELETE FROM LSSJ..MonPrice_Update WHERE 币种='USD'
 --插入转月临时表
 delete FROM LSSJ..LSCGTH
 
 INSERT LSSJ..LSCGTH (单号,序号,供应商,品号,单价,数量,仓库,币种,汇率)
-SELECT '20260430001','0001',供应商,品号,单价,SUM(数量 )数量,仓库,币种,汇率 FROM  LSSJ..MonPrice_Update INNER JOIN AHRD..PURMA ON 供应商 = PURMA.MA001
+SELECT '20260630001','0001',供应商,品号,单价,SUM(数量 )数量,仓库,币种,汇率 FROM  LSSJ..MonPrice_Update INNER JOIN AHRD..PURMA ON 供应商 = PURMA.MA001
 GROUP BY 供应商,品号,单价,仓库,币种,汇率 
 
 SELECT * FROM LSSJ..LSCGTH 
@@ -100,7 +100,7 @@ ORDER BY 单号,序号
 declare @No int--单号编号
 declare @FormNo varchar(11)--单号前缀
 
-set @FormNo='202604'--本月月份
+set @FormNo='202606'--本月月份
 select @No=right(rtrim(isnull(MAX(TI002),'00000')),5) FROM AHRD..PURTI  where TI001='3573' and left(TI002,6)=@FormNo
 
  update B set 单号=xindan ,序号=xinxu
@@ -126,7 +126,7 @@ WHERE NOT EXISTS(
 SELECT * FROM LSSJ..LSCGTH WHERE 品号 NOT IN (SELECT  MB001 FROM AHRD..INVMB) 
 
 --查看本月最大单号
-select MAX(TI002) FROM AHRD..PURTI  where TI001='3573'  AND TI002 LIKE '2603%'
+select MAX(TI002) FROM AHRD..PURTI  where TI001='3573'  AND TI002 LIKE '2606%'
 
 select * from   LSSJ..LSCGTH WHERE 单号='20240300046'
  
@@ -149,8 +149,8 @@ UDF01,UDF02,UDF03,UDF04,UDF05,UDF06,UDF51,UDF52,UDF53,UDF54,UDF55,UDF56)
 SELECT
 '0001','10105978','90001',FORMAT(GETDATE(), 'yyyyMMddHHmmssfff')
 ,'','',1,
-'3573',单号,'20260430',供应商,'000301','RMB',1,'S','1',0,
-SUM(单价*数量)/1.13,'月末批量开退货单','N','20260430',SUM(单价*数量)-SUM(单价*数量)/1.13,PURMA.MA003,PURMA.MA005,'','',''
+'3573',单号,'20260630',供应商,'000301','RMB',1,'S','1',0,
+SUM(单价*数量)/1.13,'月末批量开退货单','N','20260630',SUM(单价*数量)-SUM(单价*数量)/1.13,PURMA.MA003,PURMA.MA005,'','',''
 ,0,SUM(数量),'','N','','',0.13,SUM(单价*数量)/1.13,SUM(单价*数量)-SUM(单价*数量)/1.13,PURMA.MA055
 ,0,'N','',0,'N','N','','','','N'
 ,'N','',0,0,0,'','','','','','',0,0,0,0,0,0
