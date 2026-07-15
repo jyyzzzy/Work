@@ -1,27 +1,10 @@
-SELECT MB001 AS 品号,
-	MB002 AS 品名,
-	MB003 AS 规格,
-	INVMB.UDF52 AS 采购参考周期
-FROM INVMB 
-WHERE MB008 IN ('414','416') 
-ORDER BY INVMB.MB001 ASC
-
 USE SDRD;
 SET NOCOUNT ON;
 
-------------------------------------------------------------
--- 日期规则
--- 1. 领用量：过去12个完整月份
---    当前7月时：过去第1月=6月，过去第12月=去年7月
--- 2. 样板订单：订单日期从当前月往前2个月的月初到今天
---    当前7月时：订单日期 >= 5月1日 且 <= 今天
-------------------------------------------------------------
-DECLARE @ThisMonthStart DATE = DATEFROMPARTS(YEAR(GETDATE()), MONTH(GETDATE()), 1);
-
-DECLARE @BeginDate CHAR(8) = CONVERT(CHAR(8), DATEADD(MONTH, -12, @ThisMonthStart), 112);
-DECLARE @ThisMonthStartChar CHAR(8) = CONVERT(CHAR(8), @ThisMonthStart, 112);
-
-DECLARE @OrderBeginDate CHAR(8) = CONVERT(CHAR(8), DATEADD(MONTH, -2, @ThisMonthStart), 112);
+DECLARE @M0 DATE = DATEFROMPARTS(YEAR(GETDATE()), MONTH(GETDATE()), 1);
+DECLARE @BeginDate CHAR(8) = CONVERT(CHAR(8), DATEADD(MONTH, -12, @M0), 112);
+DECLARE @M0Char CHAR(8) = CONVERT(CHAR(8), @M0, 112);
+DECLARE @OrderBeginDate CHAR(8) = CONVERT(CHAR(8), DATEADD(MONTH, -2, @M0), 112);
 DECLARE @TodayChar CHAR(8) = CONVERT(CHAR(8), GETDATE(), 112);
 
 IF OBJECT_ID('tempdb..#ITEM') IS NOT NULL DROP TABLE #ITEM;
@@ -31,475 +14,729 @@ IF OBJECT_ID('tempdb..#ALLOC') IS NOT NULL DROP TABLE #ALLOC;
 IF OBJECT_ID('tempdb..#ISSUE_DETAIL') IS NOT NULL DROP TABLE #ISSUE_DETAIL;
 IF OBJECT_ID('tempdb..#ISSUE') IS NOT NULL DROP TABLE #ISSUE;
 IF OBJECT_ID('tempdb..#SALE_INFO') IS NOT NULL DROP TABLE #SALE_INFO;
-IF OBJECT_ID('tempdb..#PRODUCT') IS NOT NULL DROP TABLE #PRODUCT;
+IF OBJECT_ID('tempdb..#PRODUCT_INFO') IS NOT NULL DROP TABLE #PRODUCT_INFO;
+IF OBJECT_ID('tempdb..#SAMPLE_SPEC') IS NOT NULL DROP TABLE #SAMPLE_SPEC;
 
 ------------------------------------------------------------
--- 1. 基础物料：414 / 416
+-- 1. 物料
 ------------------------------------------------------------
-SELECT
-    MB001 AS 品号,
-    MB002 AS 品名,
-    MB003 AS 规格,
-    MB004 AS 单位,
-    INVMB.UDF52 AS 采购参考周期
+SELECT *
 INTO #ITEM
-FROM INVMB WITH(NOLOCK)
-WHERE MB008 IN ('414', '416');
+FROM (
+    SELECT N'顺德瑞德' 账套,RTRIM(MB001) 品号,RTRIM(MB002) 品名,RTRIM(MB003) 规格,RTRIM(MB004) 单位,CONVERT(NVARCHAR(100),UDF52) 采购参考周期,RTRIM(MB109) 核准状况
+    FROM SDRD..INVMB WITH(NOLOCK)
+    WHERE LEFT(MB001,1) IN ('3','5','6','7')
+      AND EXISTS (
+          SELECT 1
+          FROM (VALUES
+              (N'集成电路'),(N'光耦'),(N'可变流半导体'),(N'场效应管'),(N'集成模块'),
+              (N'可控硅'),(N'WIFI模块'),(N'温湿度传感器'),(N'整流桥'),(N'整流二极管'),
+              (N'阻容模块'),(N'快恢复二极管'),(N'三极管'),(N'红外接收头'),
+              (N'人体感应接收头'),(N'霍尔器件'),(N'红外发射二极管')
+          ) K(关键词)
+          WHERE RTRIM(MB002) COLLATE Chinese_PRC_CI_AS LIKE N'%' + K.关键词 + N'%' COLLATE Chinese_PRC_CI_AS
+      )
+    UNION ALL
+    SELECT N'浙江瑞德',RTRIM(MB001),RTRIM(MB002),RTRIM(MB003),RTRIM(MB004),CONVERT(NVARCHAR(100),UDF52),RTRIM(MB109)
+    FROM ZJRD..INVMB WITH(NOLOCK)
+    WHERE LEFT(MB001,1) IN ('3','5','6','7')
+      AND EXISTS (
+          SELECT 1
+          FROM (VALUES
+              (N'集成电路'),(N'光耦'),(N'可变流半导体'),(N'场效应管'),(N'集成模块'),
+              (N'可控硅'),(N'WIFI模块'),(N'温湿度传感器'),(N'整流桥'),(N'整流二极管'),
+              (N'阻容模块'),(N'快恢复二极管'),(N'三极管'),(N'红外接收头'),
+              (N'人体感应接收头'),(N'霍尔器件'),(N'红外发射二极管')
+          ) K(关键词)
+          WHERE RTRIM(MB002) COLLATE Chinese_PRC_CI_AS LIKE N'%' + K.关键词 + N'%' COLLATE Chinese_PRC_CI_AS
+      )
+    UNION ALL
+    SELECT N'安徽瑞德',RTRIM(MB001),RTRIM(MB002),RTRIM(MB003),RTRIM(MB004),CONVERT(NVARCHAR(100),UDF52),RTRIM(MB109)
+    FROM AHRD..INVMB WITH(NOLOCK)
+    WHERE LEFT(MB001,1) IN ('3','5','6','7')
+      AND EXISTS (
+          SELECT 1
+          FROM (VALUES
+              (N'集成电路'),(N'光耦'),(N'可变流半导体'),(N'场效应管'),(N'集成模块'),
+              (N'可控硅'),(N'WIFI模块'),(N'温湿度传感器'),(N'整流桥'),(N'整流二极管'),
+              (N'阻容模块'),(N'快恢复二极管'),(N'三极管'),(N'红外接收头'),
+              (N'人体感应接收头'),(N'霍尔器件'),(N'红外发射二极管')
+          ) K(关键词)
+          WHERE RTRIM(MB002) COLLATE Chinese_PRC_CI_AS LIKE N'%' + K.关键词 + N'%' COLLATE Chinese_PRC_CI_AS
+      )
+    UNION ALL
+    SELECT N'越南瑞德',RTRIM(MB001),RTRIM(MB002),RTRIM(MB003),RTRIM(MB004),CONVERT(NVARCHAR(100),UDF52),RTRIM(MB109)
+    FROM YNRD..INVMB WITH(NOLOCK)
+    WHERE LEFT(MB001,1) IN ('3','5','6','7')
+      AND EXISTS (
+          SELECT 1
+          FROM (VALUES
+              (N'集成电路'),(N'光耦'),(N'可变流半导体'),(N'场效应管'),(N'集成模块'),
+              (N'可控硅'),(N'WIFI模块'),(N'温湿度传感器'),(N'整流桥'),(N'整流二极管'),
+              (N'阻容模块'),(N'快恢复二极管'),(N'三极管'),(N'红外接收头'),
+              (N'人体感应接收头'),(N'霍尔器件'),(N'红外发射二极管')
+          ) K(关键词)
+          WHERE RTRIM(MB002) COLLATE Chinese_PRC_CI_AS LIKE N'%' + K.关键词 + N'%' COLLATE Chinese_PRC_CI_AS
+      )
+) X;
 
-CREATE UNIQUE CLUSTERED INDEX IX_ITEM_品号 ON #ITEM(品号);
+CREATE UNIQUE CLUSTERED INDEX IX_ITEM ON #ITEM(账套,品号);
 
 ------------------------------------------------------------
--- 2. 库存：纳入库存仓库汇总
+-- 2. 库存
 ------------------------------------------------------------
-SELECT
-    INVMC.MC001 AS 品号,
-    SUM(ISNULL(INVMC.MC007, 0)) AS 库存数量
+SELECT *
 INTO #STOCK
-FROM INVMC WITH(NOLOCK)
-INNER JOIN CMSMC WITH(NOLOCK)
-    ON CMSMC.MC001 = INVMC.MC002
-INNER JOIN #ITEM I
-    ON I.品号 = INVMC.MC001
-WHERE CMSMC.MC005 = 'Y'
-GROUP BY INVMC.MC001;
+FROM (
+    SELECT N'顺德瑞德' 账套,RTRIM(MC.MC001) 品号,SUM(ISNULL(MC.MC007,0)) 库存数量 FROM SDRD..INVMC MC WITH(NOLOCK) JOIN SDRD..CMSMC WH WITH(NOLOCK) ON WH.MC001=MC.MC002 JOIN #ITEM I ON I.账套=N'顺德瑞德' AND I.品号=RTRIM(MC.MC001) WHERE WH.MC005='Y' GROUP BY RTRIM(MC.MC001)
+    UNION ALL
+    SELECT N'浙江瑞德',RTRIM(MC.MC001),SUM(ISNULL(MC.MC007,0)) FROM ZJRD..INVMC MC WITH(NOLOCK) JOIN ZJRD..CMSMC WH WITH(NOLOCK) ON WH.MC001=MC.MC002 JOIN #ITEM I ON I.账套=N'浙江瑞德' AND I.品号=RTRIM(MC.MC001) WHERE WH.MC005='Y' GROUP BY RTRIM(MC.MC001)
+    UNION ALL
+    SELECT N'安徽瑞德',RTRIM(MC.MC001),SUM(ISNULL(MC.MC007,0)) FROM AHRD..INVMC MC WITH(NOLOCK) JOIN AHRD..CMSMC WH WITH(NOLOCK) ON WH.MC001=MC.MC002 JOIN #ITEM I ON I.账套=N'安徽瑞德' AND I.品号=RTRIM(MC.MC001) WHERE WH.MC005='Y' GROUP BY RTRIM(MC.MC001)
+    UNION ALL
+    SELECT N'越南瑞德',RTRIM(MC.MC001),SUM(ISNULL(MC.MC007,0)) FROM YNRD..INVMC MC WITH(NOLOCK) JOIN YNRD..CMSMC WH WITH(NOLOCK) ON WH.MC001=MC.MC002 JOIN #ITEM I ON I.账套=N'越南瑞德' AND I.品号=RTRIM(MC.MC001) WHERE WH.MC005='Y' GROUP BY RTRIM(MC.MC001)
+) X;
 
-CREATE UNIQUE CLUSTERED INDEX IX_STOCK_品号 ON #STOCK(品号);
+CREATE INDEX IX_STOCK ON #STOCK(账套,品号);
 
 ------------------------------------------------------------
--- 3. 在途：采购单未结束且已审核
+-- 3. 在途
 ------------------------------------------------------------
-SELECT
-    TD004 AS 品号,
-    SUM(ISNULL(TD008, 0) - ISNULL(TD015, 0)) AS 在途数量
+SELECT *
 INTO #ONWAY
-FROM PURTD WITH(NOLOCK)
-INNER JOIN #ITEM I
-    ON I.品号 = TD004
-WHERE TD016 = 'N'
-  AND TD018 = 'Y'
-  AND ISNULL(TD008, 0) - ISNULL(TD015, 0) > 0
-GROUP BY TD004;
+FROM (
+    SELECT N'顺德瑞德' 账套,RTRIM(TD004) 品号,SUM(ISNULL(TD008,0)-ISNULL(TD015,0)) 在途数量 FROM SDRD..PURTD WITH(NOLOCK) JOIN #ITEM I ON I.账套=N'顺德瑞德' AND I.品号=RTRIM(TD004) WHERE TD016='N' AND TD018='Y' GROUP BY RTRIM(TD004)
+    UNION ALL
+    SELECT N'浙江瑞德',RTRIM(TD004),SUM(ISNULL(TD008,0)-ISNULL(TD015,0)) FROM ZJRD..PURTD WITH(NOLOCK) JOIN #ITEM I ON I.账套=N'浙江瑞德' AND I.品号=RTRIM(TD004) WHERE TD016='N' AND TD018='Y' GROUP BY RTRIM(TD004)
+    UNION ALL
+    SELECT N'安徽瑞德',RTRIM(TD004),SUM(ISNULL(TD008,0)-ISNULL(TD015,0)) FROM AHRD..PURTD WITH(NOLOCK) JOIN #ITEM I ON I.账套=N'安徽瑞德' AND I.品号=RTRIM(TD004) WHERE TD016='N' AND TD018='Y' GROUP BY RTRIM(TD004)
+    UNION ALL
+    SELECT N'越南瑞德',RTRIM(TD004),SUM(ISNULL(TD008,0)-ISNULL(TD015,0)) FROM YNRD..PURTD WITH(NOLOCK) JOIN #ITEM I ON I.账套=N'越南瑞德' AND I.品号=RTRIM(TD004) WHERE TD016='N' AND TD018='Y' GROUP BY RTRIM(TD004)
+) X
+WHERE 在途数量 > 0;
 
-CREATE UNIQUE CLUSTERED INDEX IX_ONWAY_品号 ON #ONWAY(品号);
+CREATE INDEX IX_ONWAY ON #ONWAY(账套,品号);
 
 ------------------------------------------------------------
--- 4. 分配：已审核、未完工工单材料未领数量
+-- 4. 分配
 ------------------------------------------------------------
-SELECT
-    TB003 AS 品号,
-    SUM(
-        CASE 
-            WHEN ISNULL(TB004, 0) - ISNULL(TB005, 0) <= 0 THEN 0
-            ELSE ISNULL(TB004, 0) - ISNULL(TB005, 0)
-        END
-    ) AS 分配数量
+SELECT *
 INTO #ALLOC
-FROM MOCTB WITH(NOLOCK)
-INNER JOIN MOCTA WITH(NOLOCK)
-    ON TA001 = TB001
-   AND TA002 = TB002
-INNER JOIN #ITEM I
-    ON I.品号 = TB003
-WHERE TA013 = 'Y'
-  AND TA011 IN ('1', '2', '3')
-GROUP BY TB003;
+FROM (
+    SELECT N'顺德瑞德' 账套,RTRIM(TB003) 品号,SUM(CASE WHEN ISNULL(TB004,0)-ISNULL(TB005,0)>0 THEN ISNULL(TB004,0)-ISNULL(TB005,0) ELSE 0 END) 分配数量 FROM SDRD..MOCTB TB WITH(NOLOCK) JOIN SDRD..MOCTA TA WITH(NOLOCK) ON TA001=TB001 AND TA002=TB002 JOIN #ITEM I ON I.账套=N'顺德瑞德' AND I.品号=RTRIM(TB003) WHERE TA013='Y' AND TA011 IN ('1','2','3') GROUP BY RTRIM(TB003)
+    UNION ALL
+    SELECT N'浙江瑞德',RTRIM(TB003),SUM(CASE WHEN ISNULL(TB004,0)-ISNULL(TB005,0)>0 THEN ISNULL(TB004,0)-ISNULL(TB005,0) ELSE 0 END) FROM ZJRD..MOCTB TB WITH(NOLOCK) JOIN ZJRD..MOCTA TA WITH(NOLOCK) ON TA001=TB001 AND TA002=TB002 JOIN #ITEM I ON I.账套=N'浙江瑞德' AND I.品号=RTRIM(TB003) WHERE TA013='Y' AND TA011 IN ('1','2','3') GROUP BY RTRIM(TB003)
+    UNION ALL
+    SELECT N'安徽瑞德',RTRIM(TB003),SUM(CASE WHEN ISNULL(TB004,0)-ISNULL(TB005,0)>0 THEN ISNULL(TB004,0)-ISNULL(TB005,0) ELSE 0 END) FROM AHRD..MOCTB TB WITH(NOLOCK) JOIN AHRD..MOCTA TA WITH(NOLOCK) ON TA001=TB001 AND TA002=TB002 JOIN #ITEM I ON I.账套=N'安徽瑞德' AND I.品号=RTRIM(TB003) WHERE TA013='Y' AND TA011 IN ('1','2','3') GROUP BY RTRIM(TB003)
+    UNION ALL
+    SELECT N'越南瑞德',RTRIM(TB003),SUM(CASE WHEN ISNULL(TB004,0)-ISNULL(TB005,0)>0 THEN ISNULL(TB004,0)-ISNULL(TB005,0) ELSE 0 END) FROM YNRD..MOCTB TB WITH(NOLOCK) JOIN YNRD..MOCTA TA WITH(NOLOCK) ON TA001=TB001 AND TA002=TB002 JOIN #ITEM I ON I.账套=N'越南瑞德' AND I.品号=RTRIM(TB003) WHERE TA013='Y' AND TA011 IN ('1','2','3') GROUP BY RTRIM(TB003)
+) X;
 
-CREATE UNIQUE CLUSTERED INDEX IX_ALLOC_品号 ON #ALLOC(品号);
-
-------------------------------------------------------------
--- 5. 显式创建领用明细表
---    避免 SELECT INTO 旧结构缓存导致无效列名
-------------------------------------------------------------
-CREATE TABLE #ISSUE_DETAIL
-(
-    品号 NVARCHAR(40) NOT NULL,
-
-    客户编号 NVARCHAR(40) NOT NULL,
-    客户简称 NVARCHAR(200) NOT NULL,
-    客户全称 NVARCHAR(300) NOT NULL,
-
-    销售部门 NVARCHAR(200) NOT NULL,
-    业务员 NVARCHAR(200) NOT NULL,
-
-    成品品号 NVARCHAR(40) NOT NULL,
-    成品品名 NVARCHAR(300) NOT NULL,
-    成品规格 NVARCHAR(500) NOT NULL,
-
-    领用日期 CHAR(8) NOT NULL,
-    使用量 DECIMAL(38, 10) NOT NULL
-);
+CREATE INDEX IX_ALLOC ON #ALLOC(账套,品号);
 
 ------------------------------------------------------------
--- 6. 插入过去12个月领用明细
---    只取样板订单：
---    COPTC.TC001 = CMSMQ.MQ001
---    CMSMQ.MQ002 = '样板订单'
---    COPTC.TC003 between @OrderBeginDate and @TodayChar
+-- 5. 领用明细：过去12个月领退料
+--    只按 INVLA 领用日期限定月份，不再使用销售订单日期过滤。
+--    无销售订单、订单早于过去12个月的领退料仍保留，避免月使用量缺失。
+--    OUTER APPLY TOP (1) 防止异常的一对多关联放大同一笔 INVLA 交易。
+--    本段不使用 NOLOCK，避免并发读取时重复读、漏读和脏读。
+--    使用部门 = 工单工作中心 TA021 -> CMSMD.MD001 -> CMSMD.MD011 截取 '-' 前
+--    销售部门 = 销售订单 TC005 -> CMSME.ME001 -> CMSME.ME002
+--    业务员 = 客户信息 COPMA.MA016 -> CMSMV.MV001 -> CMSMV.MV002
 ------------------------------------------------------------
-INSERT INTO #ISSUE_DETAIL
-(
-    品号,
-    客户编号,
-    客户简称,
-    客户全称,
-    销售部门,
-    业务员,
-    成品品号,
-    成品品名,
-    成品规格,
-    领用日期,
-    使用量
-)
+SELECT *
+INTO #ISSUE_DETAIL
+FROM (
+    SELECT N'顺德瑞德' 账套,
+           RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT 品号,
+           ISNULL(RTRIM(TC.TC004),'') COLLATE DATABASE_DEFAULT 客户编号,
+           ISNULL(RTRIM(CUS.MA002),ISNULL(RTRIM(TC.TC004),'')) COLLATE DATABASE_DEFAULT 客户简称,
+           ISNULL(RTRIM(CUS.MA003),'') COLLATE DATABASE_DEFAULT 客户全称,
+           CASE
+                WHEN CHARINDEX('-', ISNULL(RTRIM(WC.MD011), '')) > 0
+                    THEN LEFT(RTRIM(WC.MD011), CHARINDEX('-', RTRIM(WC.MD011)) - 1)
+                ELSE ISNULL(RTRIM(WC.MD011), '')
+           END COLLATE DATABASE_DEFAULT 使用部门,
+           ISNULL(RTRIM(DEPT.ME002),ISNULL(RTRIM(TC.TC005),'')) COLLATE DATABASE_DEFAULT 销售部门,
+           ISNULL(RTRIM(EMP.MV002),ISNULL(RTRIM(CUS.MA016),'')) COLLATE DATABASE_DEFAULT 业务员,
+           RTRIM(ISNULL(NULLIF(RTRIM(TD.TD004),''),ISNULL(RTRIM(TA.TA006),''))) COLLATE DATABASE_DEFAULT 成品品号,
+           ISNULL(RTRIM(PROD.MB002),'') COLLATE DATABASE_DEFAULT 成品品名,
+           ISNULL(RTRIM(PROD.MB003),'') COLLATE DATABASE_DEFAULT 成品规格,
+           TC.TC003 订单日期,
+           ISNULL(RTRIM(MQ.MQ002),'') COLLATE DATABASE_DEFAULT 订单单别名称,
+           LA.LA004 领用日期,
+           CONVERT(DECIMAL(38,10),-1*ISNULL(LA.LA011,0)*ISNULL(LA.LA005,0)) 使用量
+    FROM SDRD..INVLA LA
+    JOIN #ITEM I
+      ON I.账套=N'顺德瑞德'
+     AND I.品号=RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT
+    OUTER APPLY
+    (
+        SELECT TOP (1)
+            E.TE011,
+            E.TE012
+        FROM SDRD..MOCTE E
+        WHERE E.TE001=LA.LA006
+          AND E.TE002=LA.LA007
+          AND E.TE003=LA.LA008
+        ORDER BY E.TE011,E.TE012
+    ) TE
+    OUTER APPLY
+    (
+        SELECT TOP (1)
+            A.TA006,
+            A.TA021,
+            A.TA026,
+            A.TA027,
+            A.TA028
+        FROM SDRD..MOCTA A
+        WHERE A.TA001=TE.TE011
+          AND A.TA002=TE.TE012
+        ORDER BY A.TA001,A.TA002
+    ) TA
+    OUTER APPLY
+    (
+        SELECT TOP (1)
+            D.TD001,
+            D.TD002,
+            D.TD003,
+            D.TD004
+        FROM SDRD..COPTD D
+        WHERE D.TD001=TA.TA026
+          AND D.TD002=TA.TA027
+          AND D.TD003=TA.TA028
+        ORDER BY D.TD001,D.TD002,D.TD003
+    ) TD
+    OUTER APPLY
+    (
+        SELECT TOP (1)
+            C.TC001,
+            C.TC002,
+            C.TC003,
+            C.TC004,
+            C.TC005
+        FROM SDRD..COPTC C
+        WHERE C.TC001=TD.TD001
+          AND C.TC002=TD.TD002
+        ORDER BY C.TC001,C.TC002
+    ) TC
+    LEFT JOIN SDRD..CMSMQ MQ ON MQ.MQ001=TC.TC001
+    LEFT JOIN SDRD..COPMA CUS ON CUS.MA001=TC.TC004
+    LEFT JOIN SDRD..CMSMD WC ON WC.MD001=TA.TA021
+    LEFT JOIN SDRD..CMSME DEPT ON DEPT.ME001=TC.TC005
+    LEFT JOIN SDRD..CMSMV EMP ON EMP.MV001=CUS.MA016
+    LEFT JOIN SDRD..INVMB PROD
+      ON RTRIM(PROD.MB001)=RTRIM(ISNULL(NULLIF(RTRIM(TD.TD004),''),ISNULL(RTRIM(TA.TA006),'')))
+    WHERE LA.LA004>=@BeginDate
+      AND LA.LA004<@M0Char
+      AND LEFT(LA.LA006,2) IN ('54','56')
+
+    UNION ALL
+    SELECT N'浙江瑞德' 账套,
+           RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT 品号,
+           ISNULL(RTRIM(TC.TC004),'') COLLATE DATABASE_DEFAULT 客户编号,
+           ISNULL(RTRIM(CUS.MA002),ISNULL(RTRIM(TC.TC004),'')) COLLATE DATABASE_DEFAULT 客户简称,
+           ISNULL(RTRIM(CUS.MA003),'') COLLATE DATABASE_DEFAULT 客户全称,
+           CASE
+                WHEN CHARINDEX('-', ISNULL(RTRIM(WC.MD011), '')) > 0
+                    THEN LEFT(RTRIM(WC.MD011), CHARINDEX('-', RTRIM(WC.MD011)) - 1)
+                ELSE ISNULL(RTRIM(WC.MD011), '')
+           END COLLATE DATABASE_DEFAULT 使用部门,
+           ISNULL(RTRIM(DEPT.ME002),ISNULL(RTRIM(TC.TC005),'')) COLLATE DATABASE_DEFAULT 销售部门,
+           ISNULL(RTRIM(EMP.MV002),ISNULL(RTRIM(CUS.MA016),'')) COLLATE DATABASE_DEFAULT 业务员,
+           RTRIM(ISNULL(NULLIF(RTRIM(TD.TD004),''),ISNULL(RTRIM(TA.TA006),''))) COLLATE DATABASE_DEFAULT 成品品号,
+           ISNULL(RTRIM(PROD.MB002),'') COLLATE DATABASE_DEFAULT 成品品名,
+           ISNULL(RTRIM(PROD.MB003),'') COLLATE DATABASE_DEFAULT 成品规格,
+           TC.TC003 订单日期,
+           ISNULL(RTRIM(MQ.MQ002),'') COLLATE DATABASE_DEFAULT 订单单别名称,
+           LA.LA004 领用日期,
+           CONVERT(DECIMAL(38,10),-1*ISNULL(LA.LA011,0)*ISNULL(LA.LA005,0)) 使用量
+    FROM ZJRD..INVLA LA
+    JOIN #ITEM I
+      ON I.账套=N'浙江瑞德'
+     AND I.品号=RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT
+    OUTER APPLY
+    (
+        SELECT TOP (1)
+            E.TE011,
+            E.TE012
+        FROM ZJRD..MOCTE E
+        WHERE E.TE001=LA.LA006
+          AND E.TE002=LA.LA007
+          AND E.TE003=LA.LA008
+        ORDER BY E.TE011,E.TE012
+    ) TE
+    OUTER APPLY
+    (
+        SELECT TOP (1)
+            A.TA006,
+            A.TA021,
+            A.TA026,
+            A.TA027,
+            A.TA028
+        FROM ZJRD..MOCTA A
+        WHERE A.TA001=TE.TE011
+          AND A.TA002=TE.TE012
+        ORDER BY A.TA001,A.TA002
+    ) TA
+    OUTER APPLY
+    (
+        SELECT TOP (1)
+            D.TD001,
+            D.TD002,
+            D.TD003,
+            D.TD004
+        FROM ZJRD..COPTD D
+        WHERE D.TD001=TA.TA026
+          AND D.TD002=TA.TA027
+          AND D.TD003=TA.TA028
+        ORDER BY D.TD001,D.TD002,D.TD003
+    ) TD
+    OUTER APPLY
+    (
+        SELECT TOP (1)
+            C.TC001,
+            C.TC002,
+            C.TC003,
+            C.TC004,
+            C.TC005
+        FROM ZJRD..COPTC C
+        WHERE C.TC001=TD.TD001
+          AND C.TC002=TD.TD002
+        ORDER BY C.TC001,C.TC002
+    ) TC
+    LEFT JOIN ZJRD..CMSMQ MQ ON MQ.MQ001=TC.TC001
+    LEFT JOIN ZJRD..COPMA CUS ON CUS.MA001=TC.TC004
+    LEFT JOIN ZJRD..CMSMD WC ON WC.MD001=TA.TA021
+    LEFT JOIN ZJRD..CMSME DEPT ON DEPT.ME001=TC.TC005
+    LEFT JOIN ZJRD..CMSMV EMP ON EMP.MV001=CUS.MA016
+    LEFT JOIN ZJRD..INVMB PROD
+      ON RTRIM(PROD.MB001)=RTRIM(ISNULL(NULLIF(RTRIM(TD.TD004),''),ISNULL(RTRIM(TA.TA006),'')))
+    WHERE LA.LA004>=@BeginDate
+      AND LA.LA004<@M0Char
+      AND LEFT(LA.LA006,2) IN ('54','56')
+
+    UNION ALL
+    SELECT N'安徽瑞德' 账套,
+           RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT 品号,
+           ISNULL(RTRIM(TC.TC004),'') COLLATE DATABASE_DEFAULT 客户编号,
+           ISNULL(RTRIM(CUS.MA002),ISNULL(RTRIM(TC.TC004),'')) COLLATE DATABASE_DEFAULT 客户简称,
+           ISNULL(RTRIM(CUS.MA003),'') COLLATE DATABASE_DEFAULT 客户全称,
+           CASE
+                WHEN CHARINDEX('-', ISNULL(RTRIM(WC.MD011), '')) > 0
+                    THEN LEFT(RTRIM(WC.MD011), CHARINDEX('-', RTRIM(WC.MD011)) - 1)
+                ELSE ISNULL(RTRIM(WC.MD011), '')
+           END COLLATE DATABASE_DEFAULT 使用部门,
+           ISNULL(RTRIM(DEPT.ME002),ISNULL(RTRIM(TC.TC005),'')) COLLATE DATABASE_DEFAULT 销售部门,
+           ISNULL(RTRIM(EMP.MV002),ISNULL(RTRIM(CUS.MA016),'')) COLLATE DATABASE_DEFAULT 业务员,
+           RTRIM(ISNULL(NULLIF(RTRIM(TD.TD004),''),ISNULL(RTRIM(TA.TA006),''))) COLLATE DATABASE_DEFAULT 成品品号,
+           ISNULL(RTRIM(PROD.MB002),'') COLLATE DATABASE_DEFAULT 成品品名,
+           ISNULL(RTRIM(PROD.MB003),'') COLLATE DATABASE_DEFAULT 成品规格,
+           TC.TC003 订单日期,
+           ISNULL(RTRIM(MQ.MQ002),'') COLLATE DATABASE_DEFAULT 订单单别名称,
+           LA.LA004 领用日期,
+           CONVERT(DECIMAL(38,10),-1*ISNULL(LA.LA011,0)*ISNULL(LA.LA005,0)) 使用量
+    FROM AHRD..INVLA LA
+    JOIN #ITEM I
+      ON I.账套=N'安徽瑞德'
+     AND I.品号=RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT
+    OUTER APPLY
+    (
+        SELECT TOP (1)
+            E.TE011,
+            E.TE012
+        FROM AHRD..MOCTE E
+        WHERE E.TE001=LA.LA006
+          AND E.TE002=LA.LA007
+          AND E.TE003=LA.LA008
+        ORDER BY E.TE011,E.TE012
+    ) TE
+    OUTER APPLY
+    (
+        SELECT TOP (1)
+            A.TA006,
+            A.TA021,
+            A.TA026,
+            A.TA027,
+            A.TA028
+        FROM AHRD..MOCTA A
+        WHERE A.TA001=TE.TE011
+          AND A.TA002=TE.TE012
+        ORDER BY A.TA001,A.TA002
+    ) TA
+    OUTER APPLY
+    (
+        SELECT TOP (1)
+            D.TD001,
+            D.TD002,
+            D.TD003,
+            D.TD004
+        FROM AHRD..COPTD D
+        WHERE D.TD001=TA.TA026
+          AND D.TD002=TA.TA027
+          AND D.TD003=TA.TA028
+        ORDER BY D.TD001,D.TD002,D.TD003
+    ) TD
+    OUTER APPLY
+    (
+        SELECT TOP (1)
+            C.TC001,
+            C.TC002,
+            C.TC003,
+            C.TC004,
+            C.TC005
+        FROM AHRD..COPTC C
+        WHERE C.TC001=TD.TD001
+          AND C.TC002=TD.TD002
+        ORDER BY C.TC001,C.TC002
+    ) TC
+    LEFT JOIN AHRD..CMSMQ MQ ON MQ.MQ001=TC.TC001
+    LEFT JOIN AHRD..COPMA CUS ON CUS.MA001=TC.TC004
+    LEFT JOIN AHRD..CMSMD WC ON WC.MD001=TA.TA021
+    LEFT JOIN AHRD..CMSME DEPT ON DEPT.ME001=TC.TC005
+    LEFT JOIN AHRD..CMSMV EMP ON EMP.MV001=CUS.MA016
+    LEFT JOIN AHRD..INVMB PROD
+      ON RTRIM(PROD.MB001)=RTRIM(ISNULL(NULLIF(RTRIM(TD.TD004),''),ISNULL(RTRIM(TA.TA006),'')))
+    WHERE LA.LA004>=@BeginDate
+      AND LA.LA004<@M0Char
+      AND LEFT(LA.LA006,2) IN ('54','56')
+
+    UNION ALL
+    SELECT N'越南瑞德' 账套,
+           RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT 品号,
+           ISNULL(RTRIM(TC.TC004),'') COLLATE DATABASE_DEFAULT 客户编号,
+           ISNULL(RTRIM(CUS.MA002),ISNULL(RTRIM(TC.TC004),'')) COLLATE DATABASE_DEFAULT 客户简称,
+           ISNULL(RTRIM(CUS.MA003),'') COLLATE DATABASE_DEFAULT 客户全称,
+           CASE
+                WHEN CHARINDEX('-', ISNULL(RTRIM(WC.MD011), '')) > 0
+                    THEN LEFT(RTRIM(WC.MD011), CHARINDEX('-', RTRIM(WC.MD011)) - 1)
+                ELSE ISNULL(RTRIM(WC.MD011), '')
+           END COLLATE DATABASE_DEFAULT 使用部门,
+           ISNULL(RTRIM(DEPT.ME002),ISNULL(RTRIM(TC.TC005),'')) COLLATE DATABASE_DEFAULT 销售部门,
+           ISNULL(RTRIM(EMP.MV002),ISNULL(RTRIM(CUS.MA016),'')) COLLATE DATABASE_DEFAULT 业务员,
+           RTRIM(ISNULL(NULLIF(RTRIM(TD.TD004),''),ISNULL(RTRIM(TA.TA006),''))) COLLATE DATABASE_DEFAULT 成品品号,
+           ISNULL(RTRIM(PROD.MB002),'') COLLATE DATABASE_DEFAULT 成品品名,
+           ISNULL(RTRIM(PROD.MB003),'') COLLATE DATABASE_DEFAULT 成品规格,
+           TC.TC003 订单日期,
+           ISNULL(RTRIM(MQ.MQ002),'') COLLATE DATABASE_DEFAULT 订单单别名称,
+           LA.LA004 领用日期,
+           CONVERT(DECIMAL(38,10),-1*ISNULL(LA.LA011,0)*ISNULL(LA.LA005,0)) 使用量
+    FROM YNRD..INVLA LA
+    JOIN #ITEM I
+      ON I.账套=N'越南瑞德'
+     AND I.品号=RTRIM(LA.LA001) COLLATE DATABASE_DEFAULT
+    OUTER APPLY
+    (
+        SELECT TOP (1)
+            E.TE011,
+            E.TE012
+        FROM YNRD..MOCTE E
+        WHERE E.TE001=LA.LA006
+          AND E.TE002=LA.LA007
+          AND E.TE003=LA.LA008
+        ORDER BY E.TE011,E.TE012
+    ) TE
+    OUTER APPLY
+    (
+        SELECT TOP (1)
+            A.TA006,
+            A.TA021,
+            A.TA026,
+            A.TA027,
+            A.TA028
+        FROM YNRD..MOCTA A
+        WHERE A.TA001=TE.TE011
+          AND A.TA002=TE.TE012
+        ORDER BY A.TA001,A.TA002
+    ) TA
+    OUTER APPLY
+    (
+        SELECT TOP (1)
+            D.TD001,
+            D.TD002,
+            D.TD003,
+            D.TD004
+        FROM YNRD..COPTD D
+        WHERE D.TD001=TA.TA026
+          AND D.TD002=TA.TA027
+          AND D.TD003=TA.TA028
+        ORDER BY D.TD001,D.TD002,D.TD003
+    ) TD
+    OUTER APPLY
+    (
+        SELECT TOP (1)
+            C.TC001,
+            C.TC002,
+            C.TC003,
+            C.TC004,
+            C.TC005
+        FROM YNRD..COPTC C
+        WHERE C.TC001=TD.TD001
+          AND C.TC002=TD.TD002
+        ORDER BY C.TC001,C.TC002
+    ) TC
+    LEFT JOIN YNRD..CMSMQ MQ ON MQ.MQ001=TC.TC001
+    LEFT JOIN YNRD..COPMA CUS ON CUS.MA001=TC.TC004
+    LEFT JOIN YNRD..CMSMD WC ON WC.MD001=TA.TA021
+    LEFT JOIN YNRD..CMSME DEPT ON DEPT.ME001=TC.TC005
+    LEFT JOIN YNRD..CMSMV EMP ON EMP.MV001=CUS.MA016
+    LEFT JOIN YNRD..INVMB PROD
+      ON RTRIM(PROD.MB001)=RTRIM(ISNULL(NULLIF(RTRIM(TD.TD004),''),ISNULL(RTRIM(TA.TA006),'')))
+    WHERE LA.LA004>=@BeginDate
+      AND LA.LA004<@M0Char
+      AND LEFT(LA.LA006,2) IN ('54','56')
+) X;
+
+
+------------------------------------------------------------
+-- 5.1 使用部门标准化
+--     其他 / 装配车间 / 自动化车间 统一归入浙江瑞德，然后参与后续汇总合并
+------------------------------------------------------------
+UPDATE #ISSUE_DETAIL
+SET 使用部门 = N'浙江瑞德'
+WHERE RTRIM(ISNULL(使用部门, N'')) IN (N'其他', N'装配车间', N'自动化车间');
+
+CREATE INDEX IX_ISSUE_DETAIL ON #ISSUE_DETAIL(账套,品号,客户编号,使用部门,成品品号);
+
+------------------------------------------------------------
+-- 6. 使用量汇总：一个客户一行；不同使用部门合并到同一行
+------------------------------------------------------------
 SELECT
-    LA.LA001 AS 品号,
-
-    ISNULL(NULLIF(TC.TC004, ''), '') AS 客户编号,
-    ISNULL(NULLIF(COPMA.MA002, ''), ISNULL(TC.TC004, '')) AS 客户简称,
-    ISNULL(NULLIF(COPMA.MA003, ''), '') AS 客户全称,
-
-    ISNULL(NULLIF(CMSME.ME002, ''), ISNULL(TC.TC005, '')) AS 销售部门,
-    ISNULL(NULLIF(CMSMV.MV002, ''), ISNULL(TC.TC006, '')) AS 业务员,
-
-    ISNULL(NULLIF(TD.TD004, ''), ISNULL(TA.TA006, '')) AS 成品品号,
-    ISNULL(PROD.MB002, '') AS 成品品名,
-    ISNULL(PROD.MB003, '') AS 成品规格,
-
-    LA.LA004 AS 领用日期,
-    CONVERT(DECIMAL(38, 10), -1 * ISNULL(LA.LA011, 0) * ISNULL(LA.LA005, 0)) AS 使用量
-FROM INVLA LA WITH(NOLOCK)
-INNER JOIN #ITEM I
-    ON I.品号 = LA.LA001
-
-LEFT JOIN MOCTE TE WITH(NOLOCK)
-    ON TE.TE001 = LA.LA006
-   AND TE.TE002 = LA.LA007
-   AND TE.TE003 = LA.LA008
-
-LEFT JOIN MOCTA TA WITH(NOLOCK)
-    ON TA.TA001 = TE.TE011
-   AND TA.TA002 = TE.TE012
-
-LEFT JOIN COPTD TD WITH(NOLOCK)
-    ON TD.TD001 = TA.TA026
-   AND TD.TD002 = TA.TA027
-   AND TD.TD003 = TA.TA028
-
-LEFT JOIN COPTC TC WITH(NOLOCK)
-    ON TC.TC001 = TD.TD001
-   AND TC.TC002 = TD.TD002
-
-INNER JOIN CMSMQ WITH(NOLOCK)
-    ON CMSMQ.MQ001 = TC.TC001
-   AND CMSMQ.MQ002 = '样板订单'
-
-LEFT JOIN COPMA WITH(NOLOCK)
-    ON COPMA.MA001 = TC.TC004
-
-LEFT JOIN CMSME WITH(NOLOCK)
-    ON CMSME.ME001 = TC.TC005
-
-LEFT JOIN CMSMV WITH(NOLOCK)
-    ON CMSMV.MV001 = TC.TC006
-
-LEFT JOIN INVMB PROD WITH(NOLOCK)
-    ON PROD.MB001 = ISNULL(NULLIF(TD.TD004, ''), TA.TA006)
-
-WHERE LA.LA004 >= @BeginDate
-  AND LA.LA004 <  @ThisMonthStartChar
-  AND LEFT(LA.LA006, 2) IN ('54', '56')
-  AND TC.TC003 >= @OrderBeginDate
-  AND TC.TC003 <= @TodayChar;
-
-CREATE NONCLUSTERED INDEX IX_ISSUE_DETAIL_KEY 
-ON #ISSUE_DETAIL(品号, 客户编号, 客户简称, 客户全称, 成品品号);
-
-------------------------------------------------------------
--- 7. 按 物料 + 客户 汇总过去12个月使用量
---    一个客户一行
-------------------------------------------------------------
-SELECT
-    品号,
-    客户编号,
-    客户简称,
-    客户全称,
-
-    SUM(CASE 
-        WHEN 领用日期 >= CONVERT(CHAR(8), DATEADD(MONTH, -1, @ThisMonthStart), 112)
-         AND 领用日期 <  CONVERT(CHAR(8), DATEADD(MONTH,  0, @ThisMonthStart), 112)
-        THEN 使用量 ELSE 0 END
-    ) AS 过去第1月使用量,
-
-    SUM(CASE 
-        WHEN 领用日期 >= CONVERT(CHAR(8), DATEADD(MONTH, -2, @ThisMonthStart), 112)
-         AND 领用日期 <  CONVERT(CHAR(8), DATEADD(MONTH, -1, @ThisMonthStart), 112)
-        THEN 使用量 ELSE 0 END
-    ) AS 过去第2月使用量,
-
-    SUM(CASE 
-        WHEN 领用日期 >= CONVERT(CHAR(8), DATEADD(MONTH, -3, @ThisMonthStart), 112)
-         AND 领用日期 <  CONVERT(CHAR(8), DATEADD(MONTH, -2, @ThisMonthStart), 112)
-        THEN 使用量 ELSE 0 END
-    ) AS 过去第3月使用量,
-
-    SUM(CASE 
-        WHEN 领用日期 >= CONVERT(CHAR(8), DATEADD(MONTH, -4, @ThisMonthStart), 112)
-         AND 领用日期 <  CONVERT(CHAR(8), DATEADD(MONTH, -3, @ThisMonthStart), 112)
-        THEN 使用量 ELSE 0 END
-    ) AS 过去第4月使用量,
-
-    SUM(CASE 
-        WHEN 领用日期 >= CONVERT(CHAR(8), DATEADD(MONTH, -5, @ThisMonthStart), 112)
-         AND 领用日期 <  CONVERT(CHAR(8), DATEADD(MONTH, -4, @ThisMonthStart), 112)
-        THEN 使用量 ELSE 0 END
-    ) AS 过去第5月使用量,
-
-    SUM(CASE 
-        WHEN 领用日期 >= CONVERT(CHAR(8), DATEADD(MONTH, -6, @ThisMonthStart), 112)
-         AND 领用日期 <  CONVERT(CHAR(8), DATEADD(MONTH, -5, @ThisMonthStart), 112)
-        THEN 使用量 ELSE 0 END
-    ) AS 过去第6月使用量,
-
-    SUM(CASE 
-        WHEN 领用日期 >= CONVERT(CHAR(8), DATEADD(MONTH, -7, @ThisMonthStart), 112)
-         AND 领用日期 <  CONVERT(CHAR(8), DATEADD(MONTH, -6, @ThisMonthStart), 112)
-        THEN 使用量 ELSE 0 END
-    ) AS 过去第7月使用量,
-
-    SUM(CASE 
-        WHEN 领用日期 >= CONVERT(CHAR(8), DATEADD(MONTH, -8, @ThisMonthStart), 112)
-         AND 领用日期 <  CONVERT(CHAR(8), DATEADD(MONTH, -7, @ThisMonthStart), 112)
-        THEN 使用量 ELSE 0 END
-    ) AS 过去第8月使用量,
-
-    SUM(CASE 
-        WHEN 领用日期 >= CONVERT(CHAR(8), DATEADD(MONTH, -9, @ThisMonthStart), 112)
-         AND 领用日期 <  CONVERT(CHAR(8), DATEADD(MONTH, -8, @ThisMonthStart), 112)
-        THEN 使用量 ELSE 0 END
-    ) AS 过去第9月使用量,
-
-    SUM(CASE 
-        WHEN 领用日期 >= CONVERT(CHAR(8), DATEADD(MONTH, -10, @ThisMonthStart), 112)
-         AND 领用日期 <  CONVERT(CHAR(8), DATEADD(MONTH, -9, @ThisMonthStart), 112)
-        THEN 使用量 ELSE 0 END
-    ) AS 过去第10月使用量,
-
-    SUM(CASE 
-        WHEN 领用日期 >= CONVERT(CHAR(8), DATEADD(MONTH, -11, @ThisMonthStart), 112)
-         AND 领用日期 <  CONVERT(CHAR(8), DATEADD(MONTH, -10, @ThisMonthStart), 112)
-        THEN 使用量 ELSE 0 END
-    ) AS 过去第11月使用量,
-
-    SUM(CASE 
-        WHEN 领用日期 >= CONVERT(CHAR(8), DATEADD(MONTH, -12, @ThisMonthStart), 112)
-         AND 领用日期 <  CONVERT(CHAR(8), DATEADD(MONTH, -11, @ThisMonthStart), 112)
-        THEN 使用量 ELSE 0 END
-    ) AS 过去第12月使用量
-
-INTO #ISSUE
-FROM #ISSUE_DETAIL
-GROUP BY
-    品号,
-    客户编号,
-    客户简称,
-    客户全称;
-
-CREATE UNIQUE CLUSTERED INDEX IX_ISSUE_KEY 
-ON #ISSUE(品号, 客户编号, 客户简称, 客户全称);
-
-------------------------------------------------------------
--- 8. 销售部门、业务员合并
-------------------------------------------------------------
-SELECT
+    C.账套,
     C.品号,
     C.客户编号,
-    C.客户简称,
-    C.客户全称,
 
     STUFF((
-        SELECT DISTINCT '、' + D.销售部门
-        FROM #ISSUE_DETAIL D
-        WHERE D.品号 = C.品号
-          AND D.客户编号 = C.客户编号
-          AND D.客户简称 = C.客户简称
-          AND D.客户全称 = C.客户全称
-          AND ISNULL(D.销售部门, '') <> ''
+        SELECT N'、' + X.使用部门
+        FROM (
+            SELECT DISTINCT D.使用部门
+            FROM #ISSUE_DETAIL D
+            WHERE D.账套 = C.账套
+              AND D.品号 = C.品号
+              AND D.客户编号 = C.客户编号
+              AND ISNULL(RTRIM(D.使用部门), '') <> ''
+        ) X
+        ORDER BY X.使用部门
         FOR XML PATH(''), TYPE
-    ).value('.', 'NVARCHAR(MAX)'), 1, 1, '') AS 销售部门,
+    ).value('.','NVARCHAR(MAX)'), 1, 1, '') AS 使用部门,
+
+    MAX(C.客户简称) 客户简称,
+    MAX(C.客户全称) 客户全称,
+
+    SUM(CASE WHEN C.领用日期>=CONVERT(CHAR(8),DATEADD(MONTH,-1,@M0),112)  AND C.领用日期<CONVERT(CHAR(8),DATEADD(MONTH,0,@M0),112)   THEN C.使用量 ELSE 0 END) 过去第1月使用量,
+    SUM(CASE WHEN C.领用日期>=CONVERT(CHAR(8),DATEADD(MONTH,-2,@M0),112)  AND C.领用日期<CONVERT(CHAR(8),DATEADD(MONTH,-1,@M0),112)  THEN C.使用量 ELSE 0 END) 过去第2月使用量,
+    SUM(CASE WHEN C.领用日期>=CONVERT(CHAR(8),DATEADD(MONTH,-3,@M0),112)  AND C.领用日期<CONVERT(CHAR(8),DATEADD(MONTH,-2,@M0),112)  THEN C.使用量 ELSE 0 END) 过去第3月使用量,
+    SUM(CASE WHEN C.领用日期>=CONVERT(CHAR(8),DATEADD(MONTH,-4,@M0),112)  AND C.领用日期<CONVERT(CHAR(8),DATEADD(MONTH,-3,@M0),112)  THEN C.使用量 ELSE 0 END) 过去第4月使用量,
+    SUM(CASE WHEN C.领用日期>=CONVERT(CHAR(8),DATEADD(MONTH,-5,@M0),112)  AND C.领用日期<CONVERT(CHAR(8),DATEADD(MONTH,-4,@M0),112)  THEN C.使用量 ELSE 0 END) 过去第5月使用量,
+    SUM(CASE WHEN C.领用日期>=CONVERT(CHAR(8),DATEADD(MONTH,-6,@M0),112)  AND C.领用日期<CONVERT(CHAR(8),DATEADD(MONTH,-5,@M0),112)  THEN C.使用量 ELSE 0 END) 过去第6月使用量,
+    SUM(CASE WHEN C.领用日期>=CONVERT(CHAR(8),DATEADD(MONTH,-7,@M0),112)  AND C.领用日期<CONVERT(CHAR(8),DATEADD(MONTH,-6,@M0),112)  THEN C.使用量 ELSE 0 END) 过去第7月使用量,
+    SUM(CASE WHEN C.领用日期>=CONVERT(CHAR(8),DATEADD(MONTH,-8,@M0),112)  AND C.领用日期<CONVERT(CHAR(8),DATEADD(MONTH,-7,@M0),112)  THEN C.使用量 ELSE 0 END) 过去第8月使用量,
+    SUM(CASE WHEN C.领用日期>=CONVERT(CHAR(8),DATEADD(MONTH,-9,@M0),112)  AND C.领用日期<CONVERT(CHAR(8),DATEADD(MONTH,-8,@M0),112)  THEN C.使用量 ELSE 0 END) 过去第9月使用量,
+    SUM(CASE WHEN C.领用日期>=CONVERT(CHAR(8),DATEADD(MONTH,-10,@M0),112) AND C.领用日期<CONVERT(CHAR(8),DATEADD(MONTH,-9,@M0),112)  THEN C.使用量 ELSE 0 END) 过去第10月使用量,
+    SUM(CASE WHEN C.领用日期>=CONVERT(CHAR(8),DATEADD(MONTH,-11,@M0),112) AND C.领用日期<CONVERT(CHAR(8),DATEADD(MONTH,-10,@M0),112) THEN C.使用量 ELSE 0 END) 过去第11月使用量,
+    SUM(CASE WHEN C.领用日期>=CONVERT(CHAR(8),DATEADD(MONTH,-12,@M0),112) AND C.领用日期<CONVERT(CHAR(8),DATEADD(MONTH,-11,@M0),112) THEN C.使用量 ELSE 0 END) 过去第12月使用量
+
+INTO #ISSUE
+FROM #ISSUE_DETAIL C
+GROUP BY
+    C.账套,
+    C.品号,
+    C.客户编号;
+
+CREATE INDEX IX_ISSUE ON #ISSUE(账套,品号,客户编号);
+
+------------------------------------------------------------
+-- 7. 销售部门、业务员合并：一个客户一行；不同使用部门不再分行
+------------------------------------------------------------
+SELECT
+    C.账套,
+    C.品号,
+    C.客户编号,
 
     STUFF((
-        SELECT DISTINCT '、' + D.业务员
-        FROM #ISSUE_DETAIL D
-        WHERE D.品号 = C.品号
-          AND D.客户编号 = C.客户编号
-          AND D.客户简称 = C.客户简称
-          AND D.客户全称 = C.客户全称
-          AND ISNULL(D.业务员, '') <> ''
+        SELECT N'、' + X.销售部门
+        FROM (
+            SELECT DISTINCT D.销售部门
+            FROM #ISSUE_DETAIL D
+            WHERE D.账套 = C.账套
+              AND D.品号 = C.品号
+              AND D.客户编号 = C.客户编号
+              AND ISNULL(D.销售部门,'') <> ''
+        ) X
+        ORDER BY X.销售部门
         FOR XML PATH(''), TYPE
-    ).value('.', 'NVARCHAR(MAX)'), 1, 1, '') AS 业务员
+    ).value('.','NVARCHAR(MAX)'),1,1,'') 销售部门,
+
+    STUFF((
+        SELECT N'、' + X.业务员
+        FROM (
+            SELECT DISTINCT D.业务员
+            FROM #ISSUE_DETAIL D
+            WHERE D.账套 = C.账套
+              AND D.品号 = C.品号
+              AND D.客户编号 = C.客户编号
+              AND ISNULL(D.业务员,'') <> ''
+        ) X
+        ORDER BY X.业务员
+        FOR XML PATH(''), TYPE
+    ).value('.','NVARCHAR(MAX)'),1,1,'') 业务员
 
 INTO #SALE_INFO
 FROM (
     SELECT DISTINCT
+        账套,
         品号,
-        客户编号,
-        客户简称,
-        客户全称
+        客户编号
     FROM #ISSUE_DETAIL
 ) C;
 
-CREATE UNIQUE CLUSTERED INDEX IX_SALE_INFO_KEY 
-ON #SALE_INFO(品号, 客户编号, 客户简称, 客户全称);
+CREATE INDEX IX_SALE_INFO ON #SALE_INFO(账套,品号,客户编号);
 
 ------------------------------------------------------------
--- 9. 成品去重并编号
+-- 8. 成品品名、规格合并：一个客户一行；重复值合并
+--    品名、规格仅取订单日期在过去12个月内的订单；月使用量不受订单日期限制
 ------------------------------------------------------------
 SELECT
-    品号,
-    客户编号,
-    客户简称,
-    客户全称,
-    成品品号,
-    成品品名,
-    成品规格,
-    ROW_NUMBER() OVER (
-        PARTITION BY 品号, 客户编号, 客户简称, 客户全称
-        ORDER BY 成品品号
-    ) AS rn
-INTO #PRODUCT
-FROM (
-    SELECT DISTINCT
-        品号,
-        客户编号,
-        客户简称,
-        客户全称,
-        成品品号,
-        成品品名,
-        成品规格
-    FROM #ISSUE_DETAIL
-    WHERE ISNULL(成品品号, '') <> ''
-) X;
+    C.账套,
+    C.品号,
+    C.客户编号,
 
-CREATE NONCLUSTERED INDEX IX_PRODUCT_KEY 
-ON #PRODUCT(品号, 客户编号, 客户简称, 客户全称, rn);
+    STUFF((
+        SELECT N'、' + X.成品品名
+        FROM (
+            SELECT DISTINCT D.成品品名
+            FROM #ISSUE_DETAIL D
+            WHERE D.账套 = C.账套
+              AND D.品号 = C.品号
+              AND D.客户编号 = C.客户编号
+              AND D.订单日期 >= @BeginDate
+              AND D.订单日期 <= @TodayChar
+              AND ISNULL(RTRIM(D.成品品名), '') <> ''
+        ) X
+        ORDER BY X.成品品名
+        FOR XML PATH(''), TYPE
+    ).value('.','NVARCHAR(MAX)'), 1, 1, '') AS 成品品名,
 
-------------------------------------------------------------
--- 10. 用 FOR XML PATH 动态生成成品列
-------------------------------------------------------------
-DECLARE @ProductCols NVARCHAR(MAX) = N'';
-DECLARE @SQL NVARCHAR(MAX);
+    STUFF((
+        SELECT N'、' + X.成品规格
+        FROM (
+            SELECT DISTINCT D.成品规格
+            FROM #ISSUE_DETAIL D
+            WHERE D.账套 = C.账套
+              AND D.品号 = C.品号
+              AND D.客户编号 = C.客户编号
+              AND D.订单日期 >= @BeginDate
+              AND D.订单日期 <= @TodayChar
+              AND ISNULL(RTRIM(D.成品规格), '') <> ''
+        ) X
+        ORDER BY X.成品规格
+        FOR XML PATH(''), TYPE
+    ).value('.','NVARCHAR(MAX)'), 1, 1, '') AS 成品规格
 
-SELECT @ProductCols =
-(
-    SELECT
-        CHAR(13) + CHAR(10) +
-        ', ISNULL(MAX(CASE WHEN P.rn = ' + CAST(R.rn AS VARCHAR(10)) + ' THEN P.成品品号 END), '''') AS ' + QUOTENAME('成品品号' + CAST(R.rn AS VARCHAR(10))) +
-        ', ISNULL(MAX(CASE WHEN P.rn = ' + CAST(R.rn AS VARCHAR(10)) + ' THEN P.成品品名 END), '''') AS ' + QUOTENAME('成品品名' + CAST(R.rn AS VARCHAR(10))) +
-        ', ISNULL(MAX(CASE WHEN P.rn = ' + CAST(R.rn AS VARCHAR(10)) + ' THEN P.成品规格 END), '''') AS ' + QUOTENAME('成品规格' + CAST(R.rn AS VARCHAR(10)))
-    FROM (
-        SELECT DISTINCT rn
-        FROM #PRODUCT
-    ) R
-    ORDER BY R.rn
-    FOR XML PATH(''), TYPE
-).value('.', 'NVARCHAR(MAX)');
+INTO #PRODUCT_INFO
+FROM (SELECT DISTINCT 账套,品号,客户编号 FROM #ISSUE_DETAIL) C;
 
-SET @ProductCols = ISNULL(@ProductCols, N'');
+CREATE INDEX IX_PRODUCT_INFO ON #PRODUCT_INFO(账套,品号,客户编号);
 
 ------------------------------------------------------------
--- 11. 最终结果
+-- 8.1 过去2个月样板规格合并
+--     样板型号列改为样板规格；同规格合并
 ------------------------------------------------------------
-SET @SQL = N'
 SELECT
-    I.品号,
+    C.账套,
+    C.品号,
+    C.客户编号,
+
+    STUFF((
+        SELECT N'、' + X.成品规格
+        FROM (
+            SELECT DISTINCT D.成品规格
+            FROM #ISSUE_DETAIL D
+            WHERE D.账套 = C.账套
+              AND D.品号 = C.品号
+              AND D.客户编号 = C.客户编号
+              AND D.订单日期 >= @OrderBeginDate
+              AND D.订单日期 <= @TodayChar
+              AND D.订单单别名称 = N'样板订单'
+              AND ISNULL(RTRIM(D.成品规格), '') <> ''
+        ) X
+        ORDER BY X.成品规格
+        FOR XML PATH(''), TYPE
+    ).value('.','NVARCHAR(MAX)'), 1, 1, '') AS 样板规格
+
+INTO #SAMPLE_SPEC
+FROM (SELECT DISTINCT 账套,品号,客户编号 FROM #ISSUE_DETAIL) C;
+
+CREATE INDEX IX_SAMPLE_SPEC ON #SAMPLE_SPEC(账套,品号,客户编号);
+
+------------------------------------------------------------
+-- 9. 最终输出：按模板；一个客户一行，使用部门合并显示
+------------------------------------------------------------
+SELECT
+    --ROW_NUMBER() OVER (ORDER BY I.品号,ISNULL(U.客户简称,'')) AS 序号,
+    --'' AS 供应商,
+        I.账套 AS 所属基地,
+    I.品号 AS 料号,
     I.品名,
     I.规格,
-    I.单位,
-    I.采购参考周期,
-    ISNULL(S.库存数量, 0) AS 库存数量,
-    ISNULL(O.在途数量, 0) AS 在途数量,
-    ISNULL(A.分配数量, 0) AS 分配数量,
-    ISNULL(U.过去第1月使用量, 0) AS 过去第1月使用量,
-    ISNULL(U.过去第2月使用量, 0) AS 过去第2月使用量,
-    ISNULL(U.过去第3月使用量, 0) AS 过去第3月使用量,
-    ISNULL(U.过去第4月使用量, 0) AS 过去第4月使用量,
-    ISNULL(U.过去第5月使用量, 0) AS 过去第5月使用量,
-    ISNULL(U.过去第6月使用量, 0) AS 过去第6月使用量,
-    ISNULL(U.过去第7月使用量, 0) AS 过去第7月使用量,
-    ISNULL(U.过去第8月使用量, 0) AS 过去第8月使用量,
-    ISNULL(U.过去第9月使用量, 0) AS 过去第9月使用量,
-    ISNULL(U.过去第10月使用量, 0) AS 过去第10月使用量,
-    ISNULL(U.过去第11月使用量, 0) AS 过去第11月使用量,
-    ISNULL(U.过去第12月使用量, 0) AS 过去第12月使用量,
-    ISNULL(U.客户编号, '''') AS 客户编号,
-    ISNULL(U.客户简称, '''') AS 客户简称,
-    ISNULL(U.客户全称, '''') AS 客户全称,
-    ISNULL(SI.销售部门, '''') AS 销售部门,
-    ISNULL(SI.业务员, '''') AS 业务员
-    ' + @ProductCols + N'
+    I.采购参考周期 AS 周期,
 
+    '' AS 未来第1月计划,
+    '' AS 未来第2月计划,
+    '' AS 未来第3月计划,
+    '' AS 未来第4月计划,
+    '' AS 未来第5月计划,
+    '' AS 未来第6月计划,
 
+    '' AS 过去1个计划量,
+    '' AS 过去2个计划量,
+    '' AS 过去3个计划量,
+    '' AS 过去4个计划量,
 
+    CASE WHEN ISNULL(U.过去第1月使用量,0) < 0 THEN 0 ELSE ISNULL(U.过去第1月使用量,0) END AS 过去第1月使用量,
+    CASE WHEN ISNULL(U.过去第2月使用量,0) < 0 THEN 0 ELSE ISNULL(U.过去第2月使用量,0) END AS 过去第2月使用量,
+    CASE WHEN ISNULL(U.过去第3月使用量,0) < 0 THEN 0 ELSE ISNULL(U.过去第3月使用量,0) END AS 过去第3月使用量,
+    CASE WHEN ISNULL(U.过去第4月使用量,0) < 0 THEN 0 ELSE ISNULL(U.过去第4月使用量,0) END AS 过去第4月使用量,
+    CASE WHEN ISNULL(U.过去第5月使用量,0) < 0 THEN 0 ELSE ISNULL(U.过去第5月使用量,0) END AS 过去第5月使用量,
+    CASE WHEN ISNULL(U.过去第6月使用量,0) < 0 THEN 0 ELSE ISNULL(U.过去第6月使用量,0) END AS 过去第6月使用量,
+    CASE WHEN ISNULL(U.过去第7月使用量,0) < 0 THEN 0 ELSE ISNULL(U.过去第7月使用量,0) END AS 过去第7月使用量,
+    CASE WHEN ISNULL(U.过去第8月使用量,0) < 0 THEN 0 ELSE ISNULL(U.过去第8月使用量,0) END AS 过去第8月使用量,
+    CASE WHEN ISNULL(U.过去第9月使用量,0) < 0 THEN 0 ELSE ISNULL(U.过去第9月使用量,0) END AS 过去第9月使用量,
+    CASE WHEN ISNULL(U.过去第10月使用量,0) < 0 THEN 0 ELSE ISNULL(U.过去第10月使用量,0) END AS 过去第10月使用量,
+    CASE WHEN ISNULL(U.过去第11月使用量,0) < 0 THEN 0 ELSE ISNULL(U.过去第11月使用量,0) END AS 过去第11月使用量,
+    CASE WHEN ISNULL(U.过去第12月使用量,0) < 0 THEN 0 ELSE ISNULL(U.过去第12月使用量,0) END AS 过去第12月使用量,
 
+    ISNULL(S.库存数量,0) AS 现库存,
+    ISNULL(O.在途数量,0) AS 在途,
+    ISNULL(A.分配数量,0) AS 分配,
 
+    ISNULL(SS.样板规格,'') AS 过去2个月样板型号,
+    ISNULL(U.使用部门,'') AS 使用部门,
+    ISNULL(U.客户简称,'') AS [客户],
+    ISNULL(PI.成品品名,'') AS 品名,
+    ISNULL(PI.成品规格,'') AS [所使用产品],
+    ISNULL(SI.销售部门,'') AS 销售部门,
+    ISNULL(SI.业务员,'') AS 业务员,
+    '' AS 备注,
+    ISNULL(I.核准状况,'') AS 可否交易
 FROM #ITEM I
-
-LEFT JOIN #ISSUE U
-    ON U.品号 = I.品号
-
-LEFT JOIN #SALE_INFO SI
-    ON SI.品号 = U.品号
+LEFT JOIN #ISSUE U ON U.账套=I.账套 AND U.品号=I.品号
+LEFT JOIN #SALE_INFO SI 
+    ON SI.账套 = U.账套 
+   AND SI.品号 = U.品号 
    AND SI.客户编号 = U.客户编号
-   AND SI.客户简称 = U.客户简称
-   AND SI.客户全称 = U.客户全称
 
-LEFT JOIN #PRODUCT P
-    ON P.品号 = U.品号
-   AND P.客户编号 = U.客户编号
-   AND P.客户简称 = U.客户简称
-   AND P.客户全称 = U.客户全称
-
-LEFT JOIN #STOCK S
-    ON S.品号 = I.品号
-
-LEFT JOIN #ONWAY O
-    ON O.品号 = I.品号
-
-LEFT JOIN #ALLOC A
-    ON A.品号 = I.品号
-
-GROUP BY
-    I.品号,
-    I.品名,
-    I.规格,
-    I.单位,
-    I.采购参考周期,
-
-    ISNULL(U.客户编号, ''''),
-    ISNULL(U.客户简称, ''''),
-    ISNULL(U.客户全称, ''''),
-    ISNULL(SI.销售部门, ''''),
-    ISNULL(SI.业务员, ''''),
-
-    ISNULL(S.库存数量, 0),
-    ISNULL(O.在途数量, 0),
-    ISNULL(A.分配数量, 0),
-
-    ISNULL(U.过去第1月使用量, 0),
-    ISNULL(U.过去第2月使用量, 0),
-    ISNULL(U.过去第3月使用量, 0),
-    ISNULL(U.过去第4月使用量, 0),
-    ISNULL(U.过去第5月使用量, 0),
-    ISNULL(U.过去第6月使用量, 0),
-    ISNULL(U.过去第7月使用量, 0),
-    ISNULL(U.过去第8月使用量, 0),
-    ISNULL(U.过去第9月使用量, 0),
-    ISNULL(U.过去第10月使用量, 0),
-    ISNULL(U.过去第11月使用量, 0),
-    ISNULL(U.过去第12月使用量, 0)
-
+LEFT JOIN #PRODUCT_INFO PI 
+    ON PI.账套 = U.账套 
+   AND PI.品号 = U.品号 
+   AND PI.客户编号 = U.客户编号
+LEFT JOIN #SAMPLE_SPEC SS
+    ON SS.账套 = U.账套
+   AND SS.品号 = U.品号
+   AND SS.客户编号 = U.客户编号
+LEFT JOIN #STOCK S ON S.账套=I.账套 AND S.品号=I.品号
+LEFT JOIN #ONWAY O ON O.账套=I.账套 AND O.品号=I.品号
+LEFT JOIN #ALLOC A ON A.账套=I.账套 AND A.品号=I.品号
 ORDER BY
-    I.品号 ASC,
-    ISNULL(U.客户简称, '''');
-';
-
-EXEC sp_executesql @SQL;
+    I.品号,
+    ISNULL(U.客户简称,'');
