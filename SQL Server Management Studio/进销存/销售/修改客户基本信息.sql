@@ -42,6 +42,8 @@ ORDER BY custNo
 --WHERE CB.salesRepNo IS NULL
 
 
+DELETE FROM LSSJ..CustomerBasic
+
 UPDATE COPMA 
 SET 
 --SELECT

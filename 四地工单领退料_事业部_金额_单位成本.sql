@@ -1,0 +1,399 @@
+﻿USE SDRD;
+SET NOCOUNT ON;
+
+DECLARE @StartDate CHAR(8) = '20260101';
+DECLARE @EndDate   CHAR(8) = '20260630';
+
+IF OBJECT_ID('tempdb..#GDLL') IS NOT NULL DROP TABLE #GDLL;
+IF OBJECT_ID('tempdb..#INVLA') IS NOT NULL DROP TABLE #INVLA;
+
+------------------------------------------------------------
+-- 1. 四地工单领退料明细
+--    事业部：MOCTA.TA021（工作中心）
+--          -> CMSMD.MD001
+--          -> CMSMD.MD011 中“-”前面的内容
+------------------------------------------------------------
+SELECT
+    'SDRD' AS 账套,
+    B.TB001 COLLATE DATABASE_DEFAULT AS 工单单别,
+    B.TB002 COLLATE DATABASE_DEFAULT AS 工单单号,
+    B.TB003 COLLATE DATABASE_DEFAULT AS 材料品号,
+    B.TB014 COLLATE DATABASE_DEFAULT AS 上阶主件品号,
+    B.TB006 COLLATE DATABASE_DEFAULT AS 工艺,
+    A.TA006 COLLATE DATABASE_DEFAULT AS 产品品号,
+    A.TA034 COLLATE DATABASE_DEFAULT AS 产品品名,
+    A.TA035 COLLATE DATABASE_DEFAULT AS 产品规格,
+    CASE
+        WHEN CHARINDEX('-', ISNULL(D.MD011, '')) > 0
+            THEN LTRIM(RTRIM(
+                LEFT(D.MD011, CHARINDEX('-', D.MD011) - 1)
+            ))
+        WHEN ISNULL(LTRIM(RTRIM(D.MD011)), '') <> ''
+            THEN LTRIM(RTRIM(D.MD011))
+        ELSE '其他'
+    END COLLATE DATABASE_DEFAULT AS 事业部,
+    E.TE001 COLLATE DATABASE_DEFAULT AS 单据单别,
+    E.TE002 COLLATE DATABASE_DEFAULT AS 单据单号,
+    E.TE003 COLLATE DATABASE_DEFAULT AS 单据序号,
+    CAST(
+        CASE
+            WHEN LEFT(E.TE001, 2) = '54' THEN E.TE005
+            WHEN LEFT(E.TE001, 2) = '56' THEN -E.TE005
+            ELSE 0
+        END
+        AS DECIMAL(38, 8)
+    ) AS 领退料数量
+INTO #GDLL
+FROM SDRD..MOCTA AS A WITH (NOLOCK)
+INNER JOIN SDRD..MOCTB AS B WITH (NOLOCK)
+    ON A.TA001 = B.TB001
+   AND A.TA002 = B.TB002
+   AND B.TB011 <> '4'
+INNER JOIN SDRD..MOCTE AS E WITH (NOLOCK)
+    ON E.TE011 = B.TB001
+   AND E.TE012 = B.TB002
+   AND E.TE004 = B.TB003
+   AND E.TE009 = B.TB006
+INNER JOIN SDRD..MOCTC AS C WITH (NOLOCK)
+    ON C.TC001 = E.TE001
+   AND C.TC002 = E.TE002
+LEFT JOIN SDRD..CMSMD AS D WITH (NOLOCK)
+    ON D.MD001 = A.TA021
+WHERE C.TC003 BETWEEN @StartDate AND @EndDate
+  AND E.TE019 = 'Y'
+  AND LEFT(E.TE001, 2) IN ('54', '56')
+
+UNION ALL
+
+SELECT
+    'AHRD',
+    B.TB001 COLLATE DATABASE_DEFAULT,
+    B.TB002 COLLATE DATABASE_DEFAULT,
+    B.TB003 COLLATE DATABASE_DEFAULT,
+    B.TB014 COLLATE DATABASE_DEFAULT,
+    B.TB006 COLLATE DATABASE_DEFAULT,
+    A.TA006 COLLATE DATABASE_DEFAULT,
+    A.TA034 COLLATE DATABASE_DEFAULT,
+    A.TA035 COLLATE DATABASE_DEFAULT,
+    CASE
+        WHEN CHARINDEX('-', ISNULL(D.MD011, '')) > 0
+            THEN LTRIM(RTRIM(
+                LEFT(D.MD011, CHARINDEX('-', D.MD011) - 1)
+            ))
+        WHEN ISNULL(LTRIM(RTRIM(D.MD011)), '') <> ''
+            THEN LTRIM(RTRIM(D.MD011))
+        ELSE '其他'
+    END COLLATE DATABASE_DEFAULT,
+    E.TE001 COLLATE DATABASE_DEFAULT,
+    E.TE002 COLLATE DATABASE_DEFAULT,
+    E.TE003 COLLATE DATABASE_DEFAULT,
+    CAST(
+        CASE
+            WHEN LEFT(E.TE001, 2) = '54' THEN E.TE005
+            WHEN LEFT(E.TE001, 2) = '56' THEN -E.TE005
+            ELSE 0
+        END
+        AS DECIMAL(38, 8)
+    )
+FROM AHRD..MOCTA AS A WITH (NOLOCK)
+INNER JOIN AHRD..MOCTB AS B WITH (NOLOCK)
+    ON A.TA001 = B.TB001
+   AND A.TA002 = B.TB002
+   AND B.TB011 <> '4'
+INNER JOIN AHRD..MOCTE AS E WITH (NOLOCK)
+    ON E.TE011 = B.TB001
+   AND E.TE012 = B.TB002
+   AND E.TE004 = B.TB003
+   AND E.TE009 = B.TB006
+INNER JOIN AHRD..MOCTC AS C WITH (NOLOCK)
+    ON C.TC001 = E.TE001
+   AND C.TC002 = E.TE002
+LEFT JOIN AHRD..CMSMD AS D WITH (NOLOCK)
+    ON D.MD001 = A.TA021
+WHERE C.TC003 BETWEEN @StartDate AND @EndDate
+  AND E.TE019 = 'Y'
+  AND LEFT(E.TE001, 2) IN ('54', '56')
+
+UNION ALL
+
+SELECT
+    'ZJRD',
+    B.TB001 COLLATE DATABASE_DEFAULT,
+    B.TB002 COLLATE DATABASE_DEFAULT,
+    B.TB003 COLLATE DATABASE_DEFAULT,
+    B.TB014 COLLATE DATABASE_DEFAULT,
+    B.TB006 COLLATE DATABASE_DEFAULT,
+    A.TA006 COLLATE DATABASE_DEFAULT,
+    A.TA034 COLLATE DATABASE_DEFAULT,
+    A.TA035 COLLATE DATABASE_DEFAULT,
+    CASE
+        WHEN CHARINDEX('-', ISNULL(D.MD011, '')) > 0
+            THEN LTRIM(RTRIM(
+                LEFT(D.MD011, CHARINDEX('-', D.MD011) - 1)
+            ))
+        WHEN ISNULL(LTRIM(RTRIM(D.MD011)), '') <> ''
+            THEN LTRIM(RTRIM(D.MD011))
+        ELSE '其他'
+    END COLLATE DATABASE_DEFAULT,
+    E.TE001 COLLATE DATABASE_DEFAULT,
+    E.TE002 COLLATE DATABASE_DEFAULT,
+    E.TE003 COLLATE DATABASE_DEFAULT,
+    CAST(
+        CASE
+            WHEN LEFT(E.TE001, 2) = '54' THEN E.TE005
+            WHEN LEFT(E.TE001, 2) = '56' THEN -E.TE005
+            ELSE 0
+        END
+        AS DECIMAL(38, 8)
+    )
+FROM ZJRD..MOCTA AS A WITH (NOLOCK)
+INNER JOIN ZJRD..MOCTB AS B WITH (NOLOCK)
+    ON A.TA001 = B.TB001
+   AND A.TA002 = B.TB002
+   AND B.TB011 <> '4'
+INNER JOIN ZJRD..MOCTE AS E WITH (NOLOCK)
+    ON E.TE011 = B.TB001
+   AND E.TE012 = B.TB002
+   AND E.TE004 = B.TB003
+   AND E.TE009 = B.TB006
+INNER JOIN ZJRD..MOCTC AS C WITH (NOLOCK)
+    ON C.TC001 = E.TE001
+   AND C.TC002 = E.TE002
+LEFT JOIN ZJRD..CMSMD AS D WITH (NOLOCK)
+    ON D.MD001 = A.TA021
+WHERE C.TC003 BETWEEN @StartDate AND @EndDate
+  AND E.TE019 = 'Y'
+  AND LEFT(E.TE001, 2) IN ('54', '56')
+
+UNION ALL
+
+SELECT
+    'YNRD',
+    B.TB001 COLLATE DATABASE_DEFAULT,
+    B.TB002 COLLATE DATABASE_DEFAULT,
+    B.TB003 COLLATE DATABASE_DEFAULT,
+    B.TB014 COLLATE DATABASE_DEFAULT,
+    B.TB006 COLLATE DATABASE_DEFAULT,
+    A.TA006 COLLATE DATABASE_DEFAULT,
+    A.TA034 COLLATE DATABASE_DEFAULT,
+    A.TA035 COLLATE DATABASE_DEFAULT,
+    CASE
+        WHEN CHARINDEX('-', ISNULL(D.MD011, '')) > 0
+            THEN LTRIM(RTRIM(
+                LEFT(D.MD011, CHARINDEX('-', D.MD011) - 1)
+            ))
+        WHEN ISNULL(LTRIM(RTRIM(D.MD011)), '') <> ''
+            THEN LTRIM(RTRIM(D.MD011))
+        ELSE '其他'
+    END COLLATE DATABASE_DEFAULT,
+    E.TE001 COLLATE DATABASE_DEFAULT,
+    E.TE002 COLLATE DATABASE_DEFAULT,
+    E.TE003 COLLATE DATABASE_DEFAULT,
+    CAST(
+        CASE
+            WHEN LEFT(E.TE001, 2) = '54' THEN E.TE005
+            WHEN LEFT(E.TE001, 2) = '56' THEN -E.TE005
+            ELSE 0
+        END
+        AS DECIMAL(38, 8)
+    )
+FROM YNRD..MOCTA AS A WITH (NOLOCK)
+INNER JOIN YNRD..MOCTB AS B WITH (NOLOCK)
+    ON A.TA001 = B.TB001
+   AND A.TA002 = B.TB002
+   AND B.TB011 <> '4'
+INNER JOIN YNRD..MOCTE AS E WITH (NOLOCK)
+    ON E.TE011 = B.TB001
+   AND E.TE012 = B.TB002
+   AND E.TE004 = B.TB003
+   AND E.TE009 = B.TB006
+INNER JOIN YNRD..MOCTC AS C WITH (NOLOCK)
+    ON C.TC001 = E.TE001
+   AND C.TC002 = E.TE002
+LEFT JOIN YNRD..CMSMD AS D WITH (NOLOCK)
+    ON D.MD001 = A.TA021
+WHERE C.TC003 BETWEEN @StartDate AND @EndDate
+  AND E.TE019 = 'Y'
+  AND LEFT(E.TE001, 2) IN ('54', '56');
+
+
+------------------------------------------------------------
+-- 2. 四地库存交易金额
+--
+-- 关联关系：
+-- INVLA.LA001 = MOCTE.TE004（材料品号）
+-- INVLA.LA006 = MOCTE.TE001（单别）
+-- INVLA.LA007 = MOCTE.TE002（单号）
+-- INVLA.LA008 = MOCTE.TE003（序号）
+--
+-- 金额口径：
+-- -LA005 * LA013
+-- 领料为正金额，退料为负金额
+------------------------------------------------------------
+SELECT
+    X.账套,
+    X.LA001,
+    X.LA006,
+    X.LA007,
+    X.LA008,
+    SUM(
+        CAST(
+            -1 * X.LA005 * X.LA013
+            AS DECIMAL(38, 8)
+        )
+    ) AS 领退料金额
+INTO #INVLA
+FROM
+(
+    SELECT
+        'SDRD' AS 账套,
+        LA001 COLLATE DATABASE_DEFAULT AS LA001,
+        LA005,
+        LA006 COLLATE DATABASE_DEFAULT AS LA006,
+        LA007 COLLATE DATABASE_DEFAULT AS LA007,
+        LA008 COLLATE DATABASE_DEFAULT AS LA008,
+        LA013
+    FROM SDRD..INVLA WITH (NOLOCK)
+    WHERE LA004 BETWEEN @StartDate AND @EndDate
+      AND LEFT(LA006, 2) IN ('54', '56')
+
+    UNION ALL
+
+    SELECT
+        'AHRD',
+        LA001 COLLATE DATABASE_DEFAULT,
+        LA005,
+        LA006 COLLATE DATABASE_DEFAULT,
+        LA007 COLLATE DATABASE_DEFAULT,
+        LA008 COLLATE DATABASE_DEFAULT,
+        LA013
+    FROM AHRD..INVLA WITH (NOLOCK)
+    WHERE LA004 BETWEEN @StartDate AND @EndDate
+      AND LEFT(LA006, 2) IN ('54', '56')
+
+    UNION ALL
+
+    SELECT
+        'ZJRD',
+        LA001 COLLATE DATABASE_DEFAULT,
+        LA005,
+        LA006 COLLATE DATABASE_DEFAULT,
+        LA007 COLLATE DATABASE_DEFAULT,
+        LA008 COLLATE DATABASE_DEFAULT,
+        LA013
+    FROM ZJRD..INVLA WITH (NOLOCK)
+    WHERE LA004 BETWEEN @StartDate AND @EndDate
+      AND LEFT(LA006, 2) IN ('54', '56')
+
+    UNION ALL
+
+    SELECT
+        'YNRD',
+        LA001 COLLATE DATABASE_DEFAULT,
+        LA005,
+        LA006 COLLATE DATABASE_DEFAULT,
+        LA007 COLLATE DATABASE_DEFAULT,
+        LA008 COLLATE DATABASE_DEFAULT,
+        LA013
+    FROM YNRD..INVLA WITH (NOLOCK)
+    WHERE LA004 BETWEEN @StartDate AND @EndDate
+      AND LEFT(LA006, 2) IN ('54', '56')
+) AS X
+GROUP BY
+    X.账套,
+    X.LA001,
+    X.LA006,
+    X.LA007,
+    X.LA008;
+
+
+------------------------------------------------------------
+-- 3. 最终汇总
+--    单位成本 = 净金额 / 净领退料数量
+--    当净数量为 0 时，单位成本返回 0
+------------------------------------------------------------
+SELECT
+    RTRIM(G.材料品号) AS 材料品号,
+    MATL.MB002 AS 材料品名,
+    MATL.MB003 AS 材料规格,
+    RTRIM(G.上阶主件品号) AS 上阶主件品号,
+    RTRIM(G.产品品号) AS 产品品号,
+    G.产品品名,
+    G.产品规格,
+    G.事业部,
+
+    SUM(G.领退料数量) AS 领退料数量,
+
+    CAST(
+        SUM(ISNULL(L.领退料金额, 0))
+        AS DECIMAL(38, 2)
+    ) AS 金额,
+
+    CAST(
+        CASE
+            WHEN SUM(G.领退料数量) = 0 THEN 0
+            ELSE
+                CAST(
+                    SUM(ISNULL(L.领退料金额, 0))
+                    AS DECIMAL(28, 8)
+                )
+                /
+                NULLIF(
+                    CAST(
+                        SUM(G.领退料数量)
+                        AS DECIMAL(28, 8)
+                    ),
+                    0
+                )
+        END
+        AS DECIMAL(28, 8)
+    ) AS 单位成本,
+
+    CASE
+        WHEN ISNULL(RTRIM(PROD.MB110), '') = ''
+            THEN RTRIM(PROD.MB001)
+        WHEN LEFT(RTRIM(PROD.MB110), 1) = 'K'
+            THEN SUBSTRING(RTRIM(PROD.MB110), 2, 13)
+        ELSE SUBSTRING(RTRIM(PROD.MB110), 1, 12)
+    END AS PLM产品品号,
+
+    G.账套
+FROM #GDLL AS G
+LEFT JOIN #INVLA AS L
+    ON L.账套 = G.账套
+   AND L.LA001 = G.材料品号
+   AND L.LA006 = G.单据单别
+   AND L.LA007 = G.单据单号
+   AND L.LA008 = G.单据序号
+INNER JOIN SDRD..INVMB AS PROD WITH (NOLOCK)
+    ON PROD.MB001 = G.产品品号
+INNER JOIN SDRD..INVMB AS MATL WITH (NOLOCK)
+    ON MATL.MB001 = G.材料品号
+-- WHERE MATL.MB002 LIKE '%继电器%'
+GROUP BY
+    G.材料品号,
+    MATL.MB002,
+    MATL.MB003,
+    G.上阶主件品号,
+    G.产品品号,
+    G.产品品名,
+    G.产品规格,
+    G.事业部,
+    CASE
+        WHEN ISNULL(RTRIM(PROD.MB110), '') = ''
+            THEN RTRIM(PROD.MB001)
+        WHEN LEFT(RTRIM(PROD.MB110), 1) = 'K'
+            THEN SUBSTRING(RTRIM(PROD.MB110), 2, 13)
+        ELSE SUBSTRING(RTRIM(PROD.MB110), 1, 12)
+    END,
+    G.账套
+ORDER BY
+    G.事业部,
+    G.材料品号,
+    G.产品品号,
+    G.上阶主件品号,
+    G.账套;
+
+
+DROP TABLE #INVLA;
+DROP TABLE #GDLL;

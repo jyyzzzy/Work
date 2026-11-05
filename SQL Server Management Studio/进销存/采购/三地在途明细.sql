@@ -1,4 +1,4 @@
-/******鏈氦閲囪喘璁㈠崟鏄庣粏******/
+/******未交采购订单明细******/
 --CREATE AT 2025/10/17
 --MODIFY AT 2026/1/30
 /* note:
@@ -7,41 +7,41 @@
 */
 SELECT 
 'SDRD' AS COMPANY,
-TC003 AS 瀹℃牳鏃ユ湡,
-TD001 AS 閲囪喘鍗曞埆,
-TD002 AS 閲囪喘鍗曞彿,
-TD003 AS 閲囪喘搴忓彿,
-TC009 AS 璁㈠崟缂栧彿,
-TD012 AS 璁㈠崟棰勮鍒拌揣鏃ユ湡,
-PURTD.UDF05 AS 渚涘簲鍟嗗洖澶嶄氦鏈?
-MA002 AS 渚涘簲鍟嗗悕绉?
-TD004 AS 鐗╂枡缂栧彿,
-TD005 AS 鐗╂枡鍚嶇О,
-TD006 AS 瑙勬牸鍨嬪彿,
-TD008 AS 閲囪喘鏁伴噺,
-TD010 AS 鍚◣鍗曚环,
-ISNULL(QTY.QTH007,0) AS 閫佽揣鏁伴噺,
-TD008 - ISNULL(QTY.QTH007,0) AS 鍙埗鍗曞墿浣欐暟閲?
-ISNULL(QTH015, 0) AS 鍚堟牸鍏ュ簱鏁伴噺,
-TD014 AS 澶囨敞,
+TC003 AS 审核日期,
+TD001 AS 采购单别,
+TD002 AS 采购单号,
+TD003 AS 采购序号,
+TC009 AS 订单编号,
+TD012 AS 订单预计到货日期,
+PURTD.UDF05 AS 供应商回复交期,
+MA002 AS 供应商名称,
+TD004 AS 物料编号,
+TD005 AS 物料名称,
+TD006 AS 规格型号,
+TD008 AS 采购数量,
+TD010 AS 含税单价,
+ISNULL(QTY.QTH007,0) AS 送货数量,
+TD008 - ISNULL(QTY.QTH007,0) AS 可制单剩余数量,
+ISNULL(QTH015, 0) AS 合格入库数量,
+TD014 AS 备注,
 CASE TD016
 	WHEN 'N'
-	THEN '鏈粨鏉?
+	THEN '未结束'
 	WHEN 'Y'
-	THEN '鑷姩缁撴潫'
+	THEN '自动结束'
 	WHEN 'y'
-	THEN '鎸囧畾缁撴潫'
+	THEN '指定结束'
 	ELSE TD016
 END
-AS 纭鐘舵€?
-TC004 AS 渚涘簲鍟嗙紪鍙?
-TD009 AS 鍗曚綅,
-TD010/(1+TD033) AS 涓嶅惈绋庡崟浠?
-TD011 AS 閲戦,
-TD033 AS 绋庣巼,
-TD035 AS 绋庨,
-TD034 AS 涓嶅惈绋庨噾棰?
-TD007 AS 榛樿浠撳簱鍚嶇О
+AS 确认状态,
+TC004 AS 供应商编号,
+TD009 AS 单位,
+TD010/(1+TD033) AS 不含税单价,
+TD011 AS 金额,
+TD033 AS 税率,
+TD035 AS 税额,
+TD034 AS 不含税金额,
+TD007 AS 默认仓库名称
 FROM 
 	SDRD..PURTD
 	INNER JOIN SDRD..PURTC ON TC001 = TD001 AND TC002 = TD002 
@@ -53,7 +53,7 @@ FROM
 		GROUP BY TH011,TH012,TH013
 	) AS QTY ON QTY.QTH011 = TD001 AND QTY.QTH012 = TD002 AND QTY.QTH013 = TD003
 WHERE 1=1
---AND MA002 LIKE '%浼氳豹%'
+--AND MA002 LIKE '%会豪%'
 AND TC014 = 'Y'
 AND TD018 = 'Y'
 AND TD016 = 'N'
@@ -61,41 +61,41 @@ AND TD016 = 'N'
 UNION ALL
 SELECT 
 'ZJRD' AS COMPANY,
-TC003 AS 瀹℃牳鏃ユ湡,
-TD001 AS 閲囪喘鍗曞埆,
-TD002 AS 閲囪喘鍗曞彿,
-TD003 AS 閲囪喘搴忓彿,
-TC009 AS 璁㈠崟缂栧彿,
-TD012 AS 璁㈠崟棰勮鍒拌揣鏃ユ湡,
-PURTD.UDF05 AS 渚涘簲鍟嗗洖澶嶄氦鏈?
-MA002 AS 渚涘簲鍟嗗悕绉?
-TD004 AS 鐗╂枡缂栧彿,
-TD005 AS 鐗╂枡鍚嶇О,
-TD006 AS 瑙勬牸鍨嬪彿,
-TD008 AS 閲囪喘鏁伴噺,
-TD010 AS 鍚◣鍗曚环,
-ISNULL(QTY.QTH007,0) AS 閫佽揣鏁伴噺,
-TD008 - ISNULL(QTY.QTH007,0) AS 鍙埗鍗曞墿浣欐暟閲?
-ISNULL(QTH015, 0) AS 鍚堟牸鍏ュ簱鏁伴噺,
-TD014 AS 澶囨敞,
+TC003 AS 审核日期,
+TD001 AS 采购单别,
+TD002 AS 采购单号,
+TD003 AS 采购序号,
+TC009 AS 订单编号,
+TD012 AS 订单预计到货日期,
+PURTD.UDF05 AS 供应商回复交期,
+MA002 AS 供应商名称,
+TD004 AS 物料编号,
+TD005 AS 物料名称,
+TD006 AS 规格型号,
+TD008 AS 采购数量,
+TD010 AS 含税单价,
+ISNULL(QTY.QTH007,0) AS 送货数量,
+TD008 - ISNULL(QTY.QTH007,0) AS 可制单剩余数量,
+ISNULL(QTH015, 0) AS 合格入库数量,
+TD014 AS 备注,
 CASE TD016
 	WHEN 'N'
-	THEN '鏈粨鏉?
+	THEN '未结束'
 	WHEN 'Y'
-	THEN '鑷姩缁撴潫'
+	THEN '自动结束'
 	WHEN 'y'
-	THEN '鎸囧畾缁撴潫'
+	THEN '指定结束'
 	ELSE TD016
 END
-AS 纭鐘舵€?
-TC004 AS 渚涘簲鍟嗙紪鍙?
-TD009 AS 鍗曚綅,
-TD010/(1+TD033) AS 涓嶅惈绋庡崟浠?
-TD011 AS 閲戦,
-TD033 AS 绋庣巼,
-TD035 AS 绋庨,
-TD034 AS 涓嶅惈绋庨噾棰?
-TD007 AS 榛樿浠撳簱鍚嶇О
+AS 确认状态,
+TC004 AS 供应商编号,
+TD009 AS 单位,
+TD010/(1+TD033) AS 不含税单价,
+TD011 AS 金额,
+TD033 AS 税率,
+TD035 AS 税额,
+TD034 AS 不含税金额,
+TD007 AS 默认仓库名称
 FROM 
 	ZJRD..PURTD
 	INNER JOIN ZJRD..PURTC ON TC001 = TD001 AND TC002 = TD002 
@@ -106,48 +106,48 @@ FROM
 		GROUP BY TH011,TH012,TH013
 	) AS QTY ON QTY.QTH011 = TD001 AND QTY.QTH012 = TD002 AND QTY.QTH013 = TD003
 WHERE 1=1
---AND MA002 LIKE '%浼氳豹%'
+--AND MA002 LIKE '%会豪%'
 AND TC014 = 'Y'
 AND TD018 = 'Y'
 AND TD016 = 'N'
 UNION ALL
 SELECT 
 'AHRD' AS COMPANY,
-TC003 AS 瀹℃牳鏃ユ湡,
-TD001 AS 閲囪喘鍗曞埆,
-TD002 AS 閲囪喘鍗曞彿,
-TD003 AS 閲囪喘搴忓彿,
-TC009 AS 璁㈠崟缂栧彿,
-TD012 AS 璁㈠崟棰勮鍒拌揣鏃ユ湡,
-PURTD.UDF05 AS 渚涘簲鍟嗗洖澶嶄氦鏈?
-MA002 AS 渚涘簲鍟嗗悕绉?
-TD004 AS 鐗╂枡缂栧彿,
-TD005 AS 鐗╂枡鍚嶇О,
-TD006 AS 瑙勬牸鍨嬪彿,
-TD008 AS 閲囪喘鏁伴噺,
-TD010 AS 鍚◣鍗曚环,
-ISNULL(QTY.QTH007,0) AS 閫佽揣鏁伴噺,
-TD008 - ISNULL(QTY.QTH007,0) AS 鍙埗鍗曞墿浣欐暟閲?
-ISNULL(QTH015, 0) AS 鍚堟牸鍏ュ簱鏁伴噺,
-TD014 AS 澶囨敞,
+TC003 AS 审核日期,
+TD001 AS 采购单别,
+TD002 AS 采购单号,
+TD003 AS 采购序号,
+TC009 AS 订单编号,
+TD012 AS 订单预计到货日期,
+PURTD.UDF05 AS 供应商回复交期,
+MA002 AS 供应商名称,
+TD004 AS 物料编号,
+TD005 AS 物料名称,
+TD006 AS 规格型号,
+TD008 AS 采购数量,
+TD010 AS 含税单价,
+ISNULL(QTY.QTH007,0) AS 送货数量,
+TD008 - ISNULL(QTY.QTH007,0) AS 可制单剩余数量,
+ISNULL(QTH015, 0) AS 合格入库数量,
+TD014 AS 备注,
 CASE TD016
 	WHEN 'N'
-	THEN '鏈粨鏉?
+	THEN '未结束'
 	WHEN 'Y'
-	THEN '鑷姩缁撴潫'
+	THEN '自动结束'
 	WHEN 'y'
-	THEN '鎸囧畾缁撴潫'
+	THEN '指定结束'
 	ELSE TD016
 END
-AS 纭鐘舵€?
-TC004 AS 渚涘簲鍟嗙紪鍙?
-TD009 AS 鍗曚綅,
-TD010/(1+TD033) AS 涓嶅惈绋庡崟浠?
-TD011 AS 閲戦,
-TD033 AS 绋庣巼,
-TD035 AS 绋庨,
-TD034 AS 涓嶅惈绋庨噾棰?
-TD007 AS 榛樿浠撳簱鍚嶇О
+AS 确认状态,
+TC004 AS 供应商编号,
+TD009 AS 单位,
+TD010/(1+TD033) AS 不含税单价,
+TD011 AS 金额,
+TD033 AS 税率,
+TD035 AS 税额,
+TD034 AS 不含税金额,
+TD007 AS 默认仓库名称
 FROM 
 	AHRD..PURTD
 	INNER JOIN AHRD..PURTC ON TC001 = TD001 AND TC002 = TD002 
@@ -158,7 +158,7 @@ FROM
 		GROUP BY TH011,TH012,TH013
 	) AS QTY ON QTY.QTH011 = TD001 AND QTY.QTH012 = TD002 AND QTY.QTH013 = TD003
 WHERE 1=1
---AND MA002 LIKE '%浼氳豹%'
+--AND MA002 LIKE '%会豪%'
 AND TC014 = 'Y'
 AND TD018 = 'Y'
 AND TD016 = 'N'
@@ -169,63 +169,63 @@ ORDER BY TC003,TD002,TD001
 
 --SELECT 
 --'SDRD' AS COMPANY,
---TA001 AS 璇疯喘鍗曞埆,
---TA002 AS 璇疯喘鍗曞彿,
---TB003 AS 璇疯喘搴忓彿,
---TC009 AS 璁㈠崟缂栧彿,
---TD012 AS 璁㈠崟棰勮鍒拌揣鏃ユ湡,
---PURTD.UDF05 AS 渚涘簲鍟嗗洖澶嶄氦鏈?
---MA002 AS 渚涘簲鍟嗗悕绉?
---TB004 AS 鐗╂枡缂栧彿,
---TB005 AS 鐗╂枡鍚嶇О,
---TB006 AS 瑙勬牸鍨嬪彿,
---TD008 AS 閲囪喘鏁伴噺,
---TD010 AS 鍚◣鍗曚环,
---QTY.QTH007 AS 閫佽揣鏁伴噺,
---TD008 - QTY.QTH007 AS 鍙埗鍗曞墿浣欐暟閲?
---QTH015 AS 鍚堟牸鍏ュ簱鏁伴噺,
---'鍚敤' AS 鏄庣粏鐘舵€?
---TA006 AS 澶囨敞,
+--TA001 AS 请购单别,
+--TA002 AS 请购单号,
+--TB003 AS 请购序号,
+--TC009 AS 订单编号,
+--TD012 AS 订单预计到货日期,
+--PURTD.UDF05 AS 供应商回复交期,
+--MA002 AS 供应商名称,
+--TB004 AS 物料编号,
+--TB005 AS 物料名称,
+--TB006 AS 规格型号,
+--TD008 AS 采购数量,
+--TD010 AS 含税单价,
+--QTY.QTH007 AS 送货数量,
+--TD008 - QTY.QTH007 AS 可制单剩余数量,
+--QTH015 AS 合格入库数量,
+--'启用' AS 明细状态,
+--TA006 AS 备注,
 --CASE TB039
 --	WHEN 'N'
---	THEN '鏈粨鏉?
+--	THEN '未结束'
 --	WHEN 'Y'
---	THEN '鑷姩缁撴潫'
+--	THEN '自动结束'
 --	WHEN 'y'
---	THEN '鎸囧畾缁撴潫'
+--	THEN '指定结束'
 --	ELSE TB039
 --END
---AS 纭鐘舵€?
---TC004 AS 渚涘簲鍟嗙紪鍙?
---TD009 AS 鍗曚綅,
---TD010/(1+TD033) AS 涓嶅惈绋庡崟浠?
---TD011 AS 閲戦,
---TC018 AS 绋庡埆缂栧彿,
---'搴旂◣鍐呭惈' AS 绋庡埆鍚嶇О,
---TD033 AS 绋庣巼,
---TD035 AS 绋庨,
---TD034 AS 涓嶅惈绋庨噾棰?
---'' AS 鏀舵枡缁勫埆鍚嶇О,
---TD007 AS 榛樿浠撳簱鍚嶇О,
-----TG003 AS 瀹為檯鍒拌揣鏃ユ湡,
-----TG016 AS 浠ｇ鏂欐爣蹇?
---'' AS 纭鏃堕棿,
---'' AS 纭浜哄悕绉?
---'' AS 閲囪喘鍛樼‘璁?
---'' AS 纭鏍囧織,
---'' AS 绋庣,
---'' AS 閫佽揣鏂瑰紡,
---'' AS 閲囪喘鍥炲鏃堕棿,
+--AS 确认状态,
+--TC004 AS 供应商编号,
+--TD009 AS 单位,
+--TD010/(1+TD033) AS 不含税单价,
+--TD011 AS 金额,
+--TC018 AS 税别编号,
+--'应税内含' AS 税别名称,
+--TD033 AS 税率,
+--TD035 AS 税额,
+--TD034 AS 不含税金额,
+--'' AS 收料组别名称,
+--TD007 AS 默认仓库名称,
+----TG003 AS 实际到货日期,
+----TG016 AS 代管料标志,
+--'' AS 确认时间,
+--'' AS 确认人名称,
+--'' AS 采购员确认,
+--'' AS 确认标志,
+--'' AS 税种,
+--'' AS 送货方式,
+--'' AS 采购回复时间,
 
---TA003 AS 瀹℃牳鏃ユ湡,
---CMSMV.MV002 AS 鍒跺崟浜哄悕绉?
-----TH030 AS 瀹屾垚鏍囪瘑,
---'' AS 鏄惁鐣欒█,
---'' AS [闀匡紙鎷肩増锛塢,
---'' AS [瀹斤紙鎷肩増锛塢,
---'' AS 鎷肩増,
---'' AS 骞虫柟鏁?
---'' AS 鏉挎潗鏉愯川
+--TA003 AS 审核日期,
+--CMSMV.MV002 AS 制单人名称,
+----TH030 AS 完成标识,
+--'' AS 是否留言,
+--'' AS [长（拼版）],
+--'' AS [宽（拼版）],
+--'' AS 拼版,
+--'' AS 平方数,
+--'' AS 板材材质
 --FROM 
 --	PURTA
 --	INNER JOIN PURTB ON TB001 = TA001 AND TB002 = TA002
@@ -239,21 +239,21 @@ ORDER BY TC003,TD002,TD001
 --		GROUP BY TH011,TH012,TH013
 --	) AS QTY ON QTY.QTH011 = TD001 AND QTY.QTH012 = TD002 AND QTY.QTH013 = TD003
 --	--INNER JOIN LSSJ..ITEMTMP ON ITEMNO = PURTB.TB004
---WHERE MA002 LIKE '%浼氳豹%'
+--WHERE MA002 LIKE '%会豪%'
 --AND TD016 = 'N'
 ----WHERE
 ----TH030 <> 'Y'
 ----AND TG014 BETWEEN '20251001' AND '20251031'
 --ORDER BY TA001,TA002,TB003
-----SELECT TH001 AS 杩涜揣鍗曞埆,
-----TH002 AS 杩涜揣鍗曞彿,
-----TH003 AS 杩涜揣搴忓彿,
-----TH004 AS 鍝佸彿,
-----TH005 鍝佸悕,
-----TH006 瑙勬牸,
-----TH007 杩涜揣鏁伴噺,
-----TH015 AS 楠屾敹鏁伴噺,
-----TH017 AS 楠岄€€鏁伴噺,
+----SELECT TH001 AS 进货单别,
+----TH002 AS 进货单号,
+----TH003 AS 进货序号,
+----TH004 AS 品号,
+----TH005 品名,
+----TH006 规格,
+----TH007 进货数量,
+----TH015 AS 验收数量,
+----TH017 AS 验退数量,
 ----TD001,
 ----TD002,
 ----TD003

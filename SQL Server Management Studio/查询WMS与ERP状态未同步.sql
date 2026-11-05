@@ -2,7 +2,7 @@ SELECT
     ''''+TC007+''',',
     COUNT(*) AS Cnt
 FROM MOCTC
-WHERE LEFT(TC007,1) = 'W'
+--WHERE LEFT(TC007,1) = 'W'
 GROUP BY
     TC007
 HAVING COUNT(*) > 1

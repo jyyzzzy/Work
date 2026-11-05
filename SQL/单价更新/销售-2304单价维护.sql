@@ -17,8 +17,8 @@ SELECT
 				ON MB001 = TH004
 	WHERE
 		TH001 = '2304'
-		AND TG003 >= '20260601'
-		AND TG003 <= '20260631'
+		AND TG003 >= '20261001'
+		AND TG003 <= '20261031'
 		AND TH012 <> MB070
 		AND LEFT(MB001, 1) <> '1'
 /**************************第一步：修改交易明细表单价***************************/
@@ -26,7 +26,7 @@ SELECT
 --FROM SDRD..COPTH INNER JOIN SDRD..COPTG ON TG001 = TH001 AND TG002 = TH002 
 --INNER JOIN SDRD..INVLA ON LA006 = TH001 AND LA007 = TH002 AND LA008 = TH003
 --INNER JOIN SDRD..INVMB ON MB001 = TH004
---WHERE TH001 = '2304' AND TG003 >= '20260601' AND TG003 <= '20170829' AND TH012 <> MB070 and left(MB001,1)<>'1'
+--WHERE TH001 = '2304' AND TG003 >= '20261001' AND TG003 <= '20170829' AND TH012 <> MB070 and left(MB001,1)<>'1'
 
 -- 初始化临时表
 --delete FROM LSSJ..zjdj
@@ -45,12 +45,12 @@ SELECT
 
 
 --select MB070,*from SDRD..INVMB where MB001='313001601300'
-/***************************查询日期202606、单别2304的单据单价与报价不匹配项********************************/
+/***************************查询日期202610、单别2304的单据单价与报价不匹配项********************************/
 SELECT
-	TH004,
-	TH008,
-	TH012,
-	MB070,
+	TH004,--品号
+	TH008,--数量
+	TH012,--销货单价
+	MB070,--售价定价六
 	TH013,
 	TH008 * MB070,
 	TH035,
@@ -72,8 +72,8 @@ SELECT
 	WHERE
 		( TG004 = '10900003' OR TG004 = '11400010' OR TG004 = '10500011' OR TG004 = '19000001')
 		AND ( TH001 LIKE '23%4' OR TH001 LIKE '23%6' )
-		AND TG003 >= '20260601'
-		AND TG003 <= '20260631'
+		AND TG003 >= '20261001'
+		AND TG003 <= '20261031'
 		AND TH012 <> MB070
 		AND LEFT(MB001, 1) <> '1'
 
@@ -93,7 +93,7 @@ SET
 				ON MB001 = ph AND CAST(dj AS NUMERIC(18, 6)) <> CAST(MB070 AS NUMERIC(18, 6))
 /**不匹配数据处理**/
 
-/**************************第二步：修改日期202606的2304单据单价***************************/
+/**************************第二步：修改日期202610的2304单据单价***************************/
 -- 根据品号基本信息档，更新客户为浙江瑞德与安徽瑞德的与品号售价不匹配的销货单身
 UPDATE SDRD..COPTH
 SET
@@ -112,8 +112,8 @@ SET
 	WHERE
 		( TG004 = '10900003' OR TG004 = '11400010'  OR TG004 = '10500011' OR TG004 = '19000001')
 		AND ( TH001 LIKE '23%4' OR TH001 LIKE '23%6' )
-		AND TG003 >= '20260601'
-		--AND TG003 <= '20260631'
+		AND TG003 >= '20261001'
+		--AND TG003 <= '20261031'
 		AND TH012 <> MB070
 		AND LEFT(MB001, 1) <> '1'
 
@@ -125,7 +125,7 @@ SET
 --TH037=CAST(TH008*TH012/1.13 AS NUMERIC(15,6)),TH038=TH008*TH012-CAST(TH008*TH012/1.13 AS NUMERIC(15,6))
 --FROM AHRD..COPTH INNER JOIN AHRD..COPTG ON TG001 = TH001 AND TG002 = TH002 
 --INNER JOIN AHRD..INVMB ON MB001 = TH004
---WHERE    TG003 >= '20260601' AND TG003 <= '20260631'   --and left(MB001,1)<>'1'
+--WHERE    TG003 >= '20261001' AND TG003 <= '20261031'   --and left(MB001,1)<>'1'
 
 
 /*******************修改2304单头金额汇总************************/
@@ -180,14 +180,14 @@ SET
 --FROM COPTH INNER JOIN COPTG ON TG001 = TH001 AND TG002 = TH002 
 --INNER JOIN INVLA ON LA006 = TH001 AND LA007 = TH002 AND LA008 = TH003
 --INNER JOIN INVMB ON MB001 = TH004
---WHERE TG003 >= '20260601' AND TG003 <= '20260631' AND LA012<>CAST(TH012/1.13 AS NUMERIC(15,6))
+--WHERE TG003 >= '20261001' AND TG003 <= '20261031' AND LA012<>CAST(TH012/1.13 AS NUMERIC(15,6))
 
 
 --select LA012=CAST(TH012/1.13 AS NUMERIC(15,6)),LA013=CAST(LA011*TH012/1.13 AS NUMERIC(15,2)),LA017=CAST(LA011*TH012/1.13 AS NUMERIC(15,2))
 --FROM SDRD..COPTH INNER JOIN SDRD..COPTG ON TG001 = TH001 AND TG002 = TH002 
 --INNER JOIN SDRD..INVLA ON LA006 = TH001 AND LA007 = TH002 AND LA008 = TH003
 --INNER JOIN SDRD..INVMB ON MB001 = TH004
---WHERE TH001 = '2304' AND TG003 >= '20260601' AND TG003 <= '20260631' AND LA012<>CAST(TH012/1.13 AS NUMERIC(15,6))
+--WHERE TH001 = '2304' AND TG003 >= '20261001' AND TG003 <= '20261031' AND LA012<>CAST(TH012/1.13 AS NUMERIC(15,6))
 
 
 --初始化临时表
@@ -196,68 +196,68 @@ SET
 --SELECT *FROM   LSSJ..zjcgrk WHERE cgdh  IS NOT NULL
 
 
-/**************************修改销货单据单价***************************/
---根据临时表更新销货单身
-UPDATE COPTH
-SET
-	TH012=dj,
-	TH013=TH008 * dj,
-	TH035=CAST(TH008 * dj / 1.13 AS NUMERIC(15, 6)),
-	TH036=TH008 * dj - CAST(TH008 * dj / 1.13 AS NUMERIC(15, 6)),
-	TH037=CAST(TH008 * dj / 1.13 AS NUMERIC(15, 6)),
-	TH038=TH008 * dj - CAST(TH008 * dj / 1.13 AS NUMERIC(15, 6))
+--/**************************修改销货单据单价***************************/
+----根据临时表更新销货单身
+--UPDATE COPTH
+--SET
+--	TH012=dj,
+--	TH013=TH008 * dj,
+--	TH035=CAST(TH008 * dj / 1.13 AS NUMERIC(15, 6)),
+--	TH036=TH008 * dj - CAST(TH008 * dj / 1.13 AS NUMERIC(15, 6)),
+--	TH037=CAST(TH008 * dj / 1.13 AS NUMERIC(15, 6)),
+--	TH038=TH008 * dj - CAST(TH008 * dj / 1.13 AS NUMERIC(15, 6))
 
---select* 
-	FROM
-		COPTH
-			INNER JOIN COPTG
-				ON TG001 = TH001 AND TG002 = TH002
-			INNER JOIN LSSJ..zjcgrk
-				ON TH001 + '-' + TH002 + '-' + TH003 = cgdh
-	WHERE
-		TG003 >= '20260601'
-		AND TG003 <= '20260631'
--- AND TH012 <> dj  AND  (TH001 like '23%4' or TH001 like '23%6')
+----select* 
+--	FROM
+--		COPTH
+--			INNER JOIN COPTG
+--				ON TG001 = TH001 AND TG002 = TH002
+--			INNER JOIN LSSJ..zjcgrk
+--				ON TH001 + '-' + TH002 + '-' + TH003 = cgdh
+--	WHERE
+--		TG003 >= '20261001'
+--		AND TG003 <= '20261031'
+---- AND TH012 <> dj  AND  (TH001 like '23%4' or TH001 like '23%6')
 
 
-/*******************修改2304单头金额汇总************************/
---跟据销货单身更新销货单头
-UPDATE COPTG
-SET
-	TG013 = JE1,
-	TG025 = JE2,
-	TG045 = JE3,
-	TG046 = JE4
-	FROM
-		COPTG
-			INNER JOIN (
-						   SELECT
-							   TG001,
-							   TG002,
-							   TG013,
-							   SUM(TH035) AS JE1,
-							   TG025,
-							   SUM(TH036) AS JE2,
-							   TG045,
-							   SUM(TH037) AS JE3,
-							   TG046,
-							   SUM(TH038) AS JE4
-							   FROM
-								   COPTG
-									   INNER JOIN COPTH
-										   ON TG001 = TH001 AND TG002 = TH002
-							   GROUP BY
-								   TG001,
-								   TG002,
-								   TG013,
-								   TG025,
-								   TG036,
-								   TG045,
-								   TG046
-							   HAVING
-								   TG013 <> SUM(TH035)
-								   OR TG025 <> SUM(TH036)
-								   OR TG045 <> SUM(TH037)
-								   OR TG046 <> SUM(TH038)
-					   ) AS ZJXH
-				ON COPTG.TG001 = ZJXH.TG001 AND COPTG.TG002 = ZJXH.TG002
+--/*******************修改2304单头金额汇总************************/
+----跟据销货单身更新销货单头
+--UPDATE COPTG
+--SET
+--	TG013 = JE1,
+--	TG025 = JE2,
+--	TG045 = JE3,
+--	TG046 = JE4
+--	FROM
+--		COPTG
+--			INNER JOIN (
+--						   SELECT
+--							   TG001,
+--							   TG002,
+--							   TG013,
+--							   SUM(TH035) AS JE1,
+--							   TG025,
+--							   SUM(TH036) AS JE2,
+--							   TG045,
+--							   SUM(TH037) AS JE3,
+--							   TG046,
+--							   SUM(TH038) AS JE4
+--							   FROM
+--								   COPTG
+--									   INNER JOIN COPTH
+--										   ON TG001 = TH001 AND TG002 = TH002
+--							   GROUP BY
+--								   TG001,
+--								   TG002,
+--								   TG013,
+--								   TG025,
+--								   TG036,
+--								   TG045,
+--								   TG046
+--							   HAVING
+--								   TG013 <> SUM(TH035)
+--								   OR TG025 <> SUM(TH036)
+--								   OR TG045 <> SUM(TH037)
+--								   OR TG046 <> SUM(TH038)
+--					   ) AS ZJXH
+--				ON COPTG.TG001 = ZJXH.TG001 AND COPTG.TG002 = ZJXH.TG002

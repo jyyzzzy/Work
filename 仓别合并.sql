@@ -1,0 +1,234 @@
+--仓别合并受影响单据
+
+--------非库存交易单据------
+SELECT * 
+--UPDATE INVMB SET MB017 = '001'
+FROM INVMB --品号信息
+WHERE MB017 IN ('052','101','301')--主要仓库
+
+SELECT * 
+--UPDATE COPTD SET TD007 = '001'
+FROM COPTD--订单
+WHERE TD007 IN ('052','101','301')
+AND TD016 = 'N'--未交材料订单
+--AND TD021 = 'Y'--已审核
+
+SELECT MOCTB.*
+--UPDATE MOCTB SET TB009 = '001'
+FROM MOCTB--工单单身
+INNER JOIN MOCTA ON TA001 = TB001 AND TA002 = TB002
+WHERE 
+(
+	TB009 IN  ('052','101','301')
+)
+AND TA011 IN ('1','2','3')
+--AND TA013 = 'Y'
+AND TB005 <= TB004
+--AND TB005<=IIF(TA015 <> 0 ,TB004*TA017/TA015,0)
+
+SELECT * 
+--UPDATE PURTB SET TB008 = '001'
+FROM PURTB --请购单
+WHERE TB008 IN ('052','101','301')
+AND TB039 = 'N'--结束码
+--AND TB025 = 'Y'--已审核
+
+SELECT PURTB.* 
+--UPDATE PURTR SET TR014 = '001'
+FROM PURTR--请购子单身
+INNER JOIN PURTB ON TB001 = TR001 AND TB002 = TR002 AND TB003 = TR003 AND TB039 = 'N'
+WHERE TR014 IN ('052','101','301') 
+--AND NOT EXISTS(
+--	SELECT 1 FROM PURTD WHERE TD026 = TR001 AND TD027 = TR002 AND TD028 = TR003
+--)
+
+SELECT * 
+--UPDATE PURTD SET TD007 = '001'
+FROM PURTD--采购单身
+WHERE TD007 IN ('052','101','301')
+AND TD016 = 'N'--结束码
+--AND TD018 = 'Y'--已审核
+---------------------------------------------
+
+
+-----库存交易单据----
+
+SELECT * 
+--UPDATE COPTH SET TH007 = '001'
+FROM COPTH--销货
+WHERE TH007 IN ('052','101','301')
+AND TH020 = 'N'
+
+SELECT * 
+--UPDATE COPTJ SET TJ013 = '001'
+FROM COPTJ--销退
+WHERE TJ013 IN ('052','101','301')
+AND TJ021 = 'N'--未审核
+
+SELECT * 
+--UPDATE INVTB SET TB012 = '001'
+FROM INVTB--库存交易单
+WHERE 
+(
+	TB012 IN  ('052','101','301')
+	--OR TB013 IN ('052','101','301')
+) AND LEFT(TB001,2) <> '12'
+AND TB018 = 'N'
+--AND ISNULL(TB013 , '') <> ''
+
+SELECT * 
+--UPDATE MOCTE SET TE008 = '001'
+FROM MOCTE --领料单
+WHERE TE008 IN ('052','101','301')
+AND TE019 = 'N'
+
+SELECT * 
+--UPDATE PURTH SET TH009 = '001'
+FROM PURTH --采购进货
+WHERE TH009 IN ('052','101','301')
+AND TH030 = 'N'
+
+SELECT * 
+--UPDATE PURTJ SET TJ011 = '001'
+FROM PURTJ --采购退货
+WHERE TJ011 IN ('052','101','301')
+AND TJ020 = 'N'
+
+
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+-- 最多等锁 10 秒，避免无限卡住
+SET LOCK_TIMEOUT 10000;
+
+BEGIN TRY
+
+	BEGIN TRAN;
+
+	------------------------------------------------------------
+	-- 1. 先一次性锁定所有涉及的表
+	-- TABLOCKX = 表级排他锁
+	-- HOLDLOCK = 锁保持到事务结束
+	------------------------------------------------------------
+
+	SELECT TOP (1) 1 FROM INVMB  WITH (TABLOCKX, HOLDLOCK);
+	SELECT TOP (1) 1 FROM COPTD  WITH (TABLOCKX, HOLDLOCK);
+	SELECT TOP (1) 1 FROM MOCTA  WITH (TABLOCKX, HOLDLOCK);
+	SELECT TOP (1) 1 FROM MOCTB  WITH (TABLOCKX, HOLDLOCK);
+	SELECT TOP (1) 1 FROM PURTB  WITH (TABLOCKX, HOLDLOCK);
+	SELECT TOP (1) 1 FROM PURTR  WITH (TABLOCKX, HOLDLOCK);
+	SELECT TOP (1) 1 FROM PURTD  WITH (TABLOCKX, HOLDLOCK);
+
+	SELECT TOP (1) 1 FROM COPTH  WITH (TABLOCKX, HOLDLOCK);
+	SELECT TOP (1) 1 FROM COPTJ  WITH (TABLOCKX, HOLDLOCK);
+	SELECT TOP (1) 1 FROM INVTB  WITH (TABLOCKX, HOLDLOCK);
+	SELECT TOP (1) 1 FROM MOCTE  WITH (TABLOCKX, HOLDLOCK);
+	SELECT TOP (1) 1 FROM PURTH  WITH (TABLOCKX, HOLDLOCK);
+	SELECT TOP (1) 1 FROM PURTJ  WITH (TABLOCKX, HOLDLOCK);
+
+
+	------------------------------------------------------------
+	-- 2. 非库存交易单据
+	------------------------------------------------------------
+
+	UPDATE INVMB
+	SET MB017 = '001'
+	WHERE MB017 IN ('052','101','301');
+
+
+	UPDATE COPTD
+	SET TD007 = '001'
+	WHERE TD007 IN ('052','101','301')
+	  AND TD016 = 'N';
+
+
+	UPDATE TB
+	SET TB009 = '001'
+	FROM MOCTB TB
+	INNER JOIN MOCTA TA
+		ON TA.TA001 = TB.TB001
+	   AND TA.TA002 = TB.TB002
+	WHERE TB.TB009 IN ('052','101','301')
+	  AND TA.TA011 IN ('1','2','3')
+	  AND TB.TB005 <= TB.TB004;
+
+
+	UPDATE PURTB
+	SET TB008 = '001'
+	WHERE TB008 IN ('052','101','301')
+	  AND TB039 = 'N';
+
+
+	UPDATE TR
+	SET TR014 = '001'
+	FROM PURTR TR
+	INNER JOIN PURTB TB
+		ON TB.TB001 = TR.TR001
+	   AND TB.TB002 = TR.TR002
+	   AND TB.TB003 = TR.TR003
+	   AND TB.TB039 = 'N'
+	WHERE TR.TR014 IN ('052','101','301');
+
+
+	UPDATE PURTD
+	SET TD007 = '001'
+	WHERE TD007 IN ('052','101','301')
+	  AND TD016 = 'N';
+
+
+	------------------------------------------------------------
+	-- 3. 库存交易单据
+	------------------------------------------------------------
+
+	UPDATE COPTH
+	SET TH007 = '001'
+	WHERE TH007 IN ('052','101','301')
+	  AND TH020 = 'N';
+
+
+	UPDATE COPTJ
+	SET TJ013 = '001'
+	WHERE TJ013 IN ('052','101','301')
+	  AND TJ021 = 'N';
+
+
+	UPDATE INVTB
+	SET TB012 = '001'
+	WHERE TB012 IN ('052','101','301')
+	  AND LEFT(TB001,2) <> '12'
+	  AND TB018 = 'N';
+
+
+	UPDATE MOCTE
+	SET TE008 = '001'
+	WHERE TE008 IN ('052','101','301')
+	  AND TE019 = 'N';
+
+
+	UPDATE PURTH
+	SET TH009 = '001'
+	WHERE TH009 IN ('052','101','301')
+	  AND TH030 = 'N';
+
+
+	UPDATE PURTJ
+	SET TJ011 = '001'
+	WHERE TJ011 IN ('052','101','301')
+	  AND TJ020 = 'N';
+
+
+	------------------------------------------------------------
+	-- 4. 全部成功才提交
+	------------------------------------------------------------
+	COMMIT TRAN;
+
+END TRY
+BEGIN CATCH
+
+	IF @@TRANCOUNT > 0
+		ROLLBACK TRAN;
+
+	THROW;
+
+END CATCH;

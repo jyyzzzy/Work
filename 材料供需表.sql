@@ -1,0 +1,297 @@
+USE SDRD;
+SET NOCOUNT ON;
+
+;WITH ITEM AS
+(
+    SELECT
+        N'顺德基地' AS 所属基地,
+        LTRIM(RTRIM(MB001)) COLLATE DATABASE_DEFAULT AS 材料品号,
+        MAX(LTRIM(RTRIM(MB002))) COLLATE DATABASE_DEFAULT AS 品名,
+        MAX(LTRIM(RTRIM(MB003))) COLLATE DATABASE_DEFAULT AS 规格,
+        MAX(LTRIM(RTRIM(MB004))) COLLATE DATABASE_DEFAULT AS 单位
+    FROM SDRD..INVMB WITH(NOLOCK)
+    GROUP BY LTRIM(RTRIM(MB001)) COLLATE DATABASE_DEFAULT
+
+    UNION ALL
+
+    SELECT
+        N'浙江基地',
+        LTRIM(RTRIM(MB001)) COLLATE DATABASE_DEFAULT,
+        MAX(LTRIM(RTRIM(MB002))) COLLATE DATABASE_DEFAULT,
+        MAX(LTRIM(RTRIM(MB003))) COLLATE DATABASE_DEFAULT,
+        MAX(LTRIM(RTRIM(MB004))) COLLATE DATABASE_DEFAULT
+    FROM ZJRD..INVMB WITH(NOLOCK)
+    GROUP BY LTRIM(RTRIM(MB001)) COLLATE DATABASE_DEFAULT
+
+    UNION ALL
+
+    SELECT
+        N'安徽基地',
+        LTRIM(RTRIM(MB001)) COLLATE DATABASE_DEFAULT,
+        MAX(LTRIM(RTRIM(MB002))) COLLATE DATABASE_DEFAULT,
+        MAX(LTRIM(RTRIM(MB003))) COLLATE DATABASE_DEFAULT,
+        MAX(LTRIM(RTRIM(MB004))) COLLATE DATABASE_DEFAULT
+    FROM AHRD..INVMB WITH(NOLOCK)
+    GROUP BY LTRIM(RTRIM(MB001)) COLLATE DATABASE_DEFAULT
+
+    UNION ALL
+
+    SELECT
+        N'越南基地',
+        LTRIM(RTRIM(MB001)) COLLATE DATABASE_DEFAULT,
+        MAX(LTRIM(RTRIM(MB002))) COLLATE DATABASE_DEFAULT,
+        MAX(LTRIM(RTRIM(MB003))) COLLATE DATABASE_DEFAULT,
+        MAX(LTRIM(RTRIM(MB004))) COLLATE DATABASE_DEFAULT
+    FROM YNRD..INVMB WITH(NOLOCK)
+    GROUP BY LTRIM(RTRIM(MB001)) COLLATE DATABASE_DEFAULT
+),
+QTY AS
+(
+    ------------------------------------------------------------
+    -- 库存：纳入库存仓 CMSMC.MC005 = 'Y'
+    ------------------------------------------------------------
+    SELECT
+        N'顺德基地' AS 所属基地,
+        LTRIM(RTRIM(MC.MC001)) COLLATE DATABASE_DEFAULT AS 材料品号,
+        SUM(CAST(ISNULL(MC.MC007, 0) AS DECIMAL(38,6))) AS 库存,
+        CAST(0 AS DECIMAL(38,6)) AS 在途,
+        CAST(0 AS DECIMAL(38,6)) AS 分配
+    FROM SDRD..INVMC MC WITH(NOLOCK)
+    INNER JOIN SDRD..CMSMC WH WITH(NOLOCK)
+        ON MC.MC002 = WH.MC001
+    WHERE WH.MC005 = 'Y'
+    GROUP BY LTRIM(RTRIM(MC.MC001)) COLLATE DATABASE_DEFAULT
+
+    UNION ALL
+
+    SELECT
+        N'浙江基地',
+        LTRIM(RTRIM(MC.MC001)) COLLATE DATABASE_DEFAULT,
+        SUM(CAST(ISNULL(MC.MC007, 0) AS DECIMAL(38,6))),
+        0,
+        0
+    FROM ZJRD..INVMC MC WITH(NOLOCK)
+    INNER JOIN ZJRD..CMSMC WH WITH(NOLOCK)
+        ON MC.MC002 = WH.MC001
+    WHERE WH.MC005 = 'Y'
+    GROUP BY LTRIM(RTRIM(MC.MC001)) COLLATE DATABASE_DEFAULT
+
+    UNION ALL
+
+    SELECT
+        N'安徽基地',
+        LTRIM(RTRIM(MC.MC001)) COLLATE DATABASE_DEFAULT,
+        SUM(CAST(ISNULL(MC.MC007, 0) AS DECIMAL(38,6))),
+        0,
+        0
+    FROM AHRD..INVMC MC WITH(NOLOCK)
+    INNER JOIN AHRD..CMSMC WH WITH(NOLOCK)
+        ON MC.MC002 = WH.MC001
+    WHERE WH.MC005 = 'Y'
+    GROUP BY LTRIM(RTRIM(MC.MC001)) COLLATE DATABASE_DEFAULT
+
+    UNION ALL
+
+    SELECT
+        N'越南基地',
+        LTRIM(RTRIM(MC.MC001)) COLLATE DATABASE_DEFAULT,
+        SUM(CAST(ISNULL(MC.MC007, 0) AS DECIMAL(38,6))),
+        0,
+        0
+    FROM YNRD..INVMC MC WITH(NOLOCK)
+    INNER JOIN YNRD..CMSMC WH WITH(NOLOCK)
+        ON MC.MC002 = WH.MC001
+    WHERE WH.MC005 = 'Y'
+    GROUP BY LTRIM(RTRIM(MC.MC001)) COLLATE DATABASE_DEFAULT
+
+    UNION ALL
+
+    ------------------------------------------------------------
+    -- 在途：PURTD，未结束 TD016 = 'N'，已审核/确认 TD018 = 'Y'
+    ------------------------------------------------------------
+    SELECT
+        N'顺德基地',
+        LTRIM(RTRIM(TD.TD004)) COLLATE DATABASE_DEFAULT,
+        0,
+        SUM(CAST(ISNULL(TD.TD008, 0) - ISNULL(TD.TD015, 0) AS DECIMAL(38,6))),
+        0
+    FROM SDRD..PURTD TD WITH(NOLOCK)
+    WHERE TD.TD016 = 'N'
+      AND TD.TD018 = 'Y'
+    GROUP BY LTRIM(RTRIM(TD.TD004)) COLLATE DATABASE_DEFAULT
+
+    UNION ALL
+
+    SELECT
+        N'浙江基地',
+        LTRIM(RTRIM(TD.TD004)) COLLATE DATABASE_DEFAULT,
+        0,
+        SUM(CAST(ISNULL(TD.TD008, 0) - ISNULL(TD.TD015, 0) AS DECIMAL(38,6))),
+        0
+    FROM ZJRD..PURTD TD WITH(NOLOCK)
+    WHERE TD.TD016 = 'N'
+      AND TD.TD018 = 'Y'
+    GROUP BY LTRIM(RTRIM(TD.TD004)) COLLATE DATABASE_DEFAULT
+
+    UNION ALL
+
+    SELECT
+        N'安徽基地',
+        LTRIM(RTRIM(TD.TD004)) COLLATE DATABASE_DEFAULT,
+        0,
+        SUM(CAST(ISNULL(TD.TD008, 0) - ISNULL(TD.TD015, 0) AS DECIMAL(38,6))),
+        0
+    FROM AHRD..PURTD TD WITH(NOLOCK)
+    WHERE TD.TD016 = 'N'
+      AND TD.TD018 = 'Y'
+    GROUP BY LTRIM(RTRIM(TD.TD004)) COLLATE DATABASE_DEFAULT
+
+    UNION ALL
+
+    SELECT
+        N'越南基地',
+        LTRIM(RTRIM(TD.TD004)) COLLATE DATABASE_DEFAULT,
+        0,
+        SUM(CAST(ISNULL(TD.TD008, 0) - ISNULL(TD.TD015, 0) AS DECIMAL(38,6))),
+        0
+    FROM YNRD..PURTD TD WITH(NOLOCK)
+    WHERE TD.TD016 = 'N'
+      AND TD.TD018 = 'Y'
+    GROUP BY LTRIM(RTRIM(TD.TD004)) COLLATE DATABASE_DEFAULT
+
+    UNION ALL
+
+    ------------------------------------------------------------
+    -- 分配：已审核工单，状态 1/2/3
+    ------------------------------------------------------------
+    SELECT
+        N'顺德基地',
+        LTRIM(RTRIM(TB.TB003)) COLLATE DATABASE_DEFAULT,
+        0,
+        0,
+        SUM(
+            CAST(
+                CASE
+                    WHEN ISNULL(TB.TB004, 0) - ISNULL(TB.TB005, 0) <= 0 THEN 0
+                    ELSE ISNULL(TB.TB004, 0) - ISNULL(TB.TB005, 0)
+                END AS DECIMAL(38,6)
+            )
+        )
+    FROM SDRD..MOCTB TB WITH(NOLOCK)
+    INNER JOIN SDRD..MOCTA TA WITH(NOLOCK)
+        ON TA.TA001 = TB.TB001
+       AND TA.TA002 = TB.TB002
+    WHERE TA.TA013 = 'Y'
+      AND TA.TA011 IN ('1', '2', '3')
+    GROUP BY LTRIM(RTRIM(TB.TB003)) COLLATE DATABASE_DEFAULT
+
+    UNION ALL
+
+    SELECT
+        N'浙江基地',
+        LTRIM(RTRIM(TB.TB003)) COLLATE DATABASE_DEFAULT,
+        0,
+        0,
+        SUM(
+            CAST(
+                CASE
+                    WHEN ISNULL(TB.TB004, 0) - ISNULL(TB.TB005, 0) <= 0 THEN 0
+                    ELSE ISNULL(TB.TB004, 0) - ISNULL(TB.TB005, 0)
+                END AS DECIMAL(38,6)
+            )
+        )
+    FROM ZJRD..MOCTB TB WITH(NOLOCK)
+    INNER JOIN ZJRD..MOCTA TA WITH(NOLOCK)
+        ON TA.TA001 = TB.TB001
+       AND TA.TA002 = TB.TB002
+    WHERE TA.TA013 = 'Y'
+      AND TA.TA011 IN ('1', '2', '3')
+    GROUP BY LTRIM(RTRIM(TB.TB003)) COLLATE DATABASE_DEFAULT
+
+    UNION ALL
+
+    SELECT
+        N'安徽基地',
+        LTRIM(RTRIM(TB.TB003)) COLLATE DATABASE_DEFAULT,
+        0,
+        0,
+        SUM(
+            CAST(
+                CASE
+                    WHEN ISNULL(TB.TB004, 0) - ISNULL(TB.TB005, 0) <= 0 THEN 0
+                    ELSE ISNULL(TB.TB004, 0) - ISNULL(TB.TB005, 0)
+                END AS DECIMAL(38,6)
+            )
+        )
+    FROM AHRD..MOCTB TB WITH(NOLOCK)
+    INNER JOIN AHRD..MOCTA TA WITH(NOLOCK)
+        ON TA.TA001 = TB.TB001
+       AND TA.TA002 = TB.TB002
+    WHERE TA.TA013 = 'Y'
+      AND TA.TA011 IN ('1', '2', '3')
+    GROUP BY LTRIM(RTRIM(TB.TB003)) COLLATE DATABASE_DEFAULT
+
+    UNION ALL
+
+    SELECT
+        N'越南基地',
+        LTRIM(RTRIM(TB.TB003)) COLLATE DATABASE_DEFAULT,
+        0,
+        0,
+        SUM(
+            CAST(
+                CASE
+                    WHEN ISNULL(TB.TB004, 0) - ISNULL(TB.TB005, 0) <= 0 THEN 0
+                    ELSE ISNULL(TB.TB004, 0) - ISNULL(TB.TB005, 0)
+                END AS DECIMAL(38,6)
+            )
+        )
+    FROM YNRD..MOCTB TB WITH(NOLOCK)
+    INNER JOIN YNRD..MOCTA TA WITH(NOLOCK)
+        ON TA.TA001 = TB.TB001
+       AND TA.TA002 = TB.TB002
+    WHERE TA.TA013 = 'Y'
+      AND TA.TA011 IN ('1', '2', '3')
+    GROUP BY LTRIM(RTRIM(TB.TB003)) COLLATE DATABASE_DEFAULT
+),
+AGG AS
+(
+    SELECT
+        所属基地,
+        材料品号,
+        SUM(库存) AS 库存,
+        SUM(在途) AS 在途,
+        SUM(分配) AS 分配
+    FROM QTY
+    GROUP BY
+        所属基地,
+        材料品号
+)
+SELECT
+    A.所属基地,
+    A.材料品号,
+    I.品名,
+    I.规格,
+    I.单位,
+    A.库存,
+    A.在途,
+    A.分配
+FROM AGG A
+LEFT JOIN ITEM I
+    ON I.所属基地 = A.所属基地
+   AND I.材料品号 = A.材料品号
+WHERE (
+        ISNULL(A.库存, 0) <> 0
+     OR ISNULL(A.在途, 0) <> 0
+     OR ISNULL(A.分配, 0) <> 0
+)
+AND LEFT(A.材料品号, 1) IN ('3', '5', '6', '7')
+ORDER BY
+    CASE A.所属基地
+        WHEN N'顺德基地' THEN 1
+        WHEN N'浙江基地' THEN 2
+        WHEN N'安徽基地' THEN 3
+        WHEN N'越南基地' THEN 4
+        ELSE 9
+    END,
+    A.材料品号;

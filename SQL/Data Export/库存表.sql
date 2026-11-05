@@ -7,7 +7,7 @@ USE AHRD
 
 
 declare @month2 varchar(8)
-set @month2='20250731'
+set @month2='20261031'
 
 DECLARE @month VARCHAR(6)
 SET @month=LEFT(CONVERT(VARCHAR ,DATEADD(MONTH,-3 ,@month2),112),6)
@@ -160,7 +160,7 @@ WHERE 工作中心编号 IS NULL
 
 
 	delete from LSSJ..KCSJHS
-	insert into LSSJ..KCSJHS exec SDRD.dbo.[KCSJHS] '20250731','1=1'
+	insert into LSSJ..KCSJHS exec SDRD.dbo.[KCSJHS] '20261019','1=1'
 
 
 	SELECT *FROM   LSSJ..KCSJHS
@@ -180,7 +180,7 @@ SELECT SUM(MC08) FROM #KC WHERE LEFT(MC01,1) IN('5','3','6','7')
 
 select  *  from  LSSJ..KCSJHS
 
-select  *  from  LSSJ..KCSJHS where MB001 
+select  *  from  LSSJ..KCSJHS where LEFT(MB001,1) IN('5','3','6','7') 
 
 select 所属事业部,客户名称 仓库编号,分析原因 仓库名称,sum(库存金额)库存金额  from  LSSJ..KCSJHS where 备注 ='按仓别分' group by 所属事业部,客户名称 ,分析原因  
 union all
@@ -200,7 +200,7 @@ select  '营销中心','000',备注,sum(营销中心金额)库存金额 from  LS
 union ALL
 select  '瑞德物联','000',备注,sum(瑞德物联金额)库存金额 from  LSSJ..KCSJHS where 备注 <>'按仓别分'  group by  备注
 union all
-select  '锂电板块','000',备注,sum(锂电板块金额)库存金额 from  LSSJ..KCSJHS where 备注 <>'按仓别分'  group by  备注
+select  '锂电板块','000',备注,sum(锂电储能金额)库存金额 from  LSSJ..KCSJHS where 备注 <>'按仓别分'  group by  备注
 union all
 select  '安徽瑞德','000',备注,sum(安徽瑞德金额)库存金额 from  LSSJ..KCSJHS where 备注 <>'按仓别分'  group by  备注
 union all

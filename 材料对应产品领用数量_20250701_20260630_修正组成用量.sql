@@ -1,0 +1,542 @@
+﻿SET NOCOUNT ON;
+
+DECLARE @BeginDate CHAR(8) = '20250701';
+DECLARE @EndDate   CHAR(8) = '20260630';
+
+IF OBJECT_ID('tempdb..#ITEM_RAW') IS NOT NULL DROP TABLE #ITEM_RAW;
+IF OBJECT_ID('tempdb..#ITEM') IS NOT NULL DROP TABLE #ITEM;
+IF OBJECT_ID('tempdb..#ISSUE_RAW') IS NOT NULL DROP TABLE #ISSUE_RAW;
+IF OBJECT_ID('tempdb..#ISSUE_NET') IS NOT NULL DROP TABLE #ISSUE_NET;
+IF OBJECT_ID('tempdb..#A') IS NOT NULL DROP TABLE #A;
+IF OBJECT_ID('tempdb..#RESULT') IS NOT NULL DROP TABLE #RESULT;
+IF OBJECT_ID('tempdb..#NEED_BOM') IS NOT NULL DROP TABLE #NEED_BOM;
+IF OBJECT_ID('tempdb..#BOM') IS NOT NULL DROP TABLE #BOM;
+IF OBJECT_ID('tempdb..#NEED_ITEM') IS NOT NULL DROP TABLE #NEED_ITEM;
+IF OBJECT_ID('tempdb..#INVMB') IS NOT NULL DROP TABLE #INVMB;
+
+------------------------------------------------------------
+-- 1. ITEMTMP 原始材料清单
+------------------------------------------------------------
+SELECT DISTINCT
+    LTRIM(RTRIM(ITEMNO)) COLLATE DATABASE_DEFAULT AS 材料品号
+INTO #ITEM_RAW
+FROM LSSJ..ITEMTMP
+WHERE ISNULL(LTRIM(RTRIM(ITEMNO)), '') <> '';
+
+CREATE UNIQUE CLUSTERED INDEX IX_ITEM_RAW_材料品号
+ON #ITEM_RAW(材料品号);
+
+------------------------------------------------------------
+-- 2. 四账套领退料基础数据
+--    时间条件：MOCTC.TC003，范围 20250701 - 20260630
+--    领用数量：54 正数，56 负数
+------------------------------------------------------------
+SELECT
+    X.账套,
+    X.工单单别,
+    X.工单单号,
+    X.材料品号,
+    X.实际领用数量
+INTO #ISSUE_RAW
+FROM
+(
+    SELECT
+        'SDRD' AS 账套,
+        LTRIM(RTRIM(TE.TE011)) COLLATE DATABASE_DEFAULT AS 工单单别,
+        LTRIM(RTRIM(TE.TE012)) COLLATE DATABASE_DEFAULT AS 工单单号,
+        LTRIM(RTRIM(TE.TE004)) COLLATE DATABASE_DEFAULT AS 材料品号,
+        CASE
+            WHEN TC.TC001 LIKE '54%' THEN CAST(ISNULL(TE.TE005, 0) AS DECIMAL(38,8))
+            WHEN TC.TC001 LIKE '56%' THEN CAST(0 - ISNULL(TE.TE005, 0) AS DECIMAL(38,8))
+            ELSE CAST(0 AS DECIMAL(38,8))
+        END AS 实际领用数量
+    FROM SDRD..MOCTC TC WITH(NOLOCK)
+    INNER JOIN SDRD..MOCTE TE WITH(NOLOCK)
+        ON TE.TE001 = TC.TC001
+       AND TE.TE002 = TC.TC002
+    INNER JOIN #ITEM_RAW I
+        ON LTRIM(RTRIM(TE.TE004)) COLLATE DATABASE_DEFAULT = I.材料品号
+    WHERE TC.TC003 >= @BeginDate
+      AND TC.TC003 <= @EndDate
+      AND TE.TE019 = 'Y'
+      AND (TC.TC001 LIKE '54%' OR TC.TC001 LIKE '56%')
+      AND ISNULL(TE.TE005, 0) <> 0
+      AND ISNULL(LTRIM(RTRIM(TE.TE011)), '') <> ''
+      AND ISNULL(LTRIM(RTRIM(TE.TE012)), '') <> ''
+
+    UNION ALL
+
+    SELECT
+        'ZJRD' AS 账套,
+        LTRIM(RTRIM(TE.TE011)) COLLATE DATABASE_DEFAULT AS 工单单别,
+        LTRIM(RTRIM(TE.TE012)) COLLATE DATABASE_DEFAULT AS 工单单号,
+        LTRIM(RTRIM(TE.TE004)) COLLATE DATABASE_DEFAULT AS 材料品号,
+        CASE
+            WHEN TC.TC001 LIKE '54%' THEN CAST(ISNULL(TE.TE005, 0) AS DECIMAL(38,8))
+            WHEN TC.TC001 LIKE '56%' THEN CAST(0 - ISNULL(TE.TE005, 0) AS DECIMAL(38,8))
+            ELSE CAST(0 AS DECIMAL(38,8))
+        END AS 实际领用数量
+    FROM ZJRD..MOCTC TC WITH(NOLOCK)
+    INNER JOIN ZJRD..MOCTE TE WITH(NOLOCK)
+        ON TE.TE001 = TC.TC001
+       AND TE.TE002 = TC.TC002
+    INNER JOIN #ITEM_RAW I
+        ON LTRIM(RTRIM(TE.TE004)) COLLATE DATABASE_DEFAULT = I.材料品号
+    WHERE TC.TC003 >= @BeginDate
+      AND TC.TC003 <= @EndDate
+      AND TE.TE019 = 'Y'
+      AND (TC.TC001 LIKE '54%' OR TC.TC001 LIKE '56%')
+      AND ISNULL(TE.TE005, 0) <> 0
+      AND ISNULL(LTRIM(RTRIM(TE.TE011)), '') <> ''
+      AND ISNULL(LTRIM(RTRIM(TE.TE012)), '') <> ''
+
+    UNION ALL
+
+    SELECT
+        'AHRD' AS 账套,
+        LTRIM(RTRIM(TE.TE011)) COLLATE DATABASE_DEFAULT AS 工单单别,
+        LTRIM(RTRIM(TE.TE012)) COLLATE DATABASE_DEFAULT AS 工单单号,
+        LTRIM(RTRIM(TE.TE004)) COLLATE DATABASE_DEFAULT AS 材料品号,
+        CASE
+            WHEN TC.TC001 LIKE '54%' THEN CAST(ISNULL(TE.TE005, 0) AS DECIMAL(38,8))
+            WHEN TC.TC001 LIKE '56%' THEN CAST(0 - ISNULL(TE.TE005, 0) AS DECIMAL(38,8))
+            ELSE CAST(0 AS DECIMAL(38,8))
+        END AS 实际领用数量
+    FROM AHRD..MOCTC TC WITH(NOLOCK)
+    INNER JOIN AHRD..MOCTE TE WITH(NOLOCK)
+        ON TE.TE001 = TC.TC001
+       AND TE.TE002 = TC.TC002
+    INNER JOIN #ITEM_RAW I
+        ON LTRIM(RTRIM(TE.TE004)) COLLATE DATABASE_DEFAULT = I.材料品号
+    WHERE TC.TC003 >= @BeginDate
+      AND TC.TC003 <= @EndDate
+      AND TE.TE019 = 'Y'
+      AND (TC.TC001 LIKE '54%' OR TC.TC001 LIKE '56%')
+      AND ISNULL(TE.TE005, 0) <> 0
+      AND ISNULL(LTRIM(RTRIM(TE.TE011)), '') <> ''
+      AND ISNULL(LTRIM(RTRIM(TE.TE012)), '') <> ''
+
+    UNION ALL
+
+    SELECT
+        'YNRD' AS 账套,
+        LTRIM(RTRIM(TE.TE011)) COLLATE DATABASE_DEFAULT AS 工单单别,
+        LTRIM(RTRIM(TE.TE012)) COLLATE DATABASE_DEFAULT AS 工单单号,
+        LTRIM(RTRIM(TE.TE004)) COLLATE DATABASE_DEFAULT AS 材料品号,
+        CASE
+            WHEN TC.TC001 LIKE '54%' THEN CAST(ISNULL(TE.TE005, 0) AS DECIMAL(38,8))
+            WHEN TC.TC001 LIKE '56%' THEN CAST(0 - ISNULL(TE.TE005, 0) AS DECIMAL(38,8))
+            ELSE CAST(0 AS DECIMAL(38,8))
+        END AS 实际领用数量
+    FROM YNRD..MOCTC TC WITH(NOLOCK)
+    INNER JOIN YNRD..MOCTE TE WITH(NOLOCK)
+        ON TE.TE001 = TC.TC001
+       AND TE.TE002 = TC.TC002
+    INNER JOIN #ITEM_RAW I
+        ON LTRIM(RTRIM(TE.TE004)) COLLATE DATABASE_DEFAULT = I.材料品号
+    WHERE TC.TC003 >= @BeginDate
+      AND TC.TC003 <= @EndDate
+      AND TE.TE019 = 'Y'
+      AND (TC.TC001 LIKE '54%' OR TC.TC001 LIKE '56%')
+      AND ISNULL(TE.TE005, 0) <> 0
+      AND ISNULL(LTRIM(RTRIM(TE.TE011)), '') <> ''
+      AND ISNULL(LTRIM(RTRIM(TE.TE012)), '') <> ''
+) X;
+
+------------------------------------------------------------
+-- 3. 按工单 + 材料汇总净领用
+------------------------------------------------------------
+SELECT
+    X.账套,
+    X.工单单别,
+    X.工单单号,
+    X.材料品号,
+    SUM(X.实际领用数量) AS 实际领用数量
+INTO #ISSUE_NET
+FROM #ISSUE_RAW X
+GROUP BY
+    X.账套,
+    X.工单单别,
+    X.工单单号,
+    X.材料品号
+HAVING SUM(X.实际领用数量) <> 0;
+
+CREATE INDEX IX_ISSUE_NET_工单
+ON #ISSUE_NET(账套, 工单单别, 工单单号);
+
+CREATE INDEX IX_ISSUE_NET_材料
+ON #ISSUE_NET(账套, 材料品号);
+
+------------------------------------------------------------
+-- 4. 过滤后的材料清单
+------------------------------------------------------------
+SELECT DISTINCT
+    材料品号
+INTO #ITEM
+FROM #ISSUE_NET;
+
+CREATE UNIQUE CLUSTERED INDEX IX_ITEM_材料品号
+ON #ITEM(材料品号);
+
+IF NOT EXISTS (SELECT 1 FROM #ITEM)
+BEGIN
+    SELECT
+        CAST(NULL AS VARCHAR(50))      AS 材料品号,
+        CAST(NULL AS NVARCHAR(255))    AS 材料品名,
+        CAST(NULL AS NVARCHAR(255))    AS 材料规格,
+        CAST(NULL AS VARCHAR(50))      AS 产品品号,
+        CAST(NULL AS NVARCHAR(255))    AS 产品品名,
+        CAST(NULL AS NVARCHAR(255))    AS 产品规格,
+        CAST(NULL AS DECIMAL(38,12))   AS 组成用量,
+        CAST(NULL AS DECIMAL(38,8))    AS 领用数量,
+        CAST(NULL AS NVARCHAR(50))     AS 事业部,
+        CAST(NULL AS VARCHAR(20))      AS 账套,
+        CAST(NULL AS NVARCHAR(255))    AS 客户简称,
+        CAST(NULL AS NVARCHAR(255))    AS 销售部门
+    WHERE 1 = 0;
+
+    RETURN;
+END;
+
+------------------------------------------------------------
+-- 5. 订单 - 工单 - 产品 - 事业部 - 客户 - 销售部门
+--    产品品号改为 MOCTA.TA006（工单生产品号）
+--    原来取 COPTD.TD004（订单品号），会导致 BOMMD.MD001 = 产品品号匹配不到，组成用量全部显示 0
+--    只取已经存在领用的工单，减少订单/工单关联量
+------------------------------------------------------------
+SELECT DISTINCT
+    X.账套,
+    X.订单单别,
+    X.订单单号,
+    X.订单序号,
+    X.工单单别,
+    X.工单单号,
+    X.产品品号,
+    X.事业部,
+    X.客户简称,
+    X.销售部门
+INTO #A
+FROM
+(
+    SELECT
+        'SDRD' AS 账套,
+        LTRIM(RTRIM(TD.TD001)) COLLATE DATABASE_DEFAULT AS 订单单别,
+        LTRIM(RTRIM(TD.TD002)) COLLATE DATABASE_DEFAULT AS 订单单号,
+        LTRIM(RTRIM(TD.TD003)) COLLATE DATABASE_DEFAULT AS 订单序号,
+        LTRIM(RTRIM(TA.TA001)) COLLATE DATABASE_DEFAULT AS 工单单别,
+        LTRIM(RTRIM(TA.TA002)) COLLATE DATABASE_DEFAULT AS 工单单号,
+        LTRIM(RTRIM(TA.TA006)) COLLATE DATABASE_DEFAULT AS 产品品号,
+        ISNULL(NULLIF(LTRIM(RTRIM(SUBSTRING(DIVME.ME002, 1, 4))), ''), '未取到') COLLATE DATABASE_DEFAULT AS 事业部,
+        ISNULL(NULLIF(LTRIM(RTRIM(CMA.MA002)), ''), '未取到') COLLATE DATABASE_DEFAULT AS 客户简称,
+        ISNULL(NULLIF(LTRIM(RTRIM(SALEME.ME002)), ''), '未取到') COLLATE DATABASE_DEFAULT AS 销售部门
+    FROM SDRD..COPTC TC WITH(NOLOCK)
+    INNER JOIN SDRD..COPTD TD WITH(NOLOCK)
+        ON TD.TD001 = TC.TC001
+       AND TD.TD002 = TC.TC002
+    INNER JOIN SDRD..MOCTA TA WITH(NOLOCK)
+        ON TA.TA026 = TD.TD001
+       AND TA.TA027 = TD.TD002
+       AND TA.TA028 = TD.TD003
+    LEFT JOIN SDRD..CMSMD MD WITH(NOLOCK)
+        ON MD.MD001 = TA.TA021
+    LEFT JOIN SDRD..CMSME DIVME WITH(NOLOCK)
+        ON DIVME.ME001 = MD.MD015
+    LEFT JOIN SDRD..COPMA CMA WITH(NOLOCK)
+        ON CMA.MA001 = TC.TC004
+    LEFT JOIN SDRD..CMSME SALEME WITH(NOLOCK)
+        ON SALEME.ME001 = TC.TC005
+    WHERE TD.TD021 = 'Y'
+      AND ISNULL(LTRIM(RTRIM(TA.TA006)), '') <> ''
+      AND ISNULL(LTRIM(RTRIM(TA.TA001)), '') <> ''
+      AND ISNULL(LTRIM(RTRIM(TA.TA002)), '') <> ''
+      AND EXISTS
+      (
+          SELECT 1
+          FROM #ISSUE_NET I
+          WHERE I.账套 = 'SDRD'
+            AND I.工单单别 = LTRIM(RTRIM(TA.TA001)) COLLATE DATABASE_DEFAULT
+            AND I.工单单号 = LTRIM(RTRIM(TA.TA002)) COLLATE DATABASE_DEFAULT
+      )
+
+    UNION ALL
+
+    SELECT
+        'ZJRD' AS 账套,
+        LTRIM(RTRIM(TD.TD001)) COLLATE DATABASE_DEFAULT AS 订单单别,
+        LTRIM(RTRIM(TD.TD002)) COLLATE DATABASE_DEFAULT AS 订单单号,
+        LTRIM(RTRIM(TD.TD003)) COLLATE DATABASE_DEFAULT AS 订单序号,
+        LTRIM(RTRIM(TA.TA001)) COLLATE DATABASE_DEFAULT AS 工单单别,
+        LTRIM(RTRIM(TA.TA002)) COLLATE DATABASE_DEFAULT AS 工单单号,
+        LTRIM(RTRIM(TA.TA006)) COLLATE DATABASE_DEFAULT AS 产品品号,
+        ISNULL(NULLIF(LTRIM(RTRIM(SUBSTRING(DIVME.ME002, 1, 4))), ''), '未取到') COLLATE DATABASE_DEFAULT AS 事业部,
+        ISNULL(NULLIF(LTRIM(RTRIM(CMA.MA002)), ''), '未取到') COLLATE DATABASE_DEFAULT AS 客户简称,
+        ISNULL(NULLIF(LTRIM(RTRIM(SALEME.ME002)), ''), '未取到') COLLATE DATABASE_DEFAULT AS 销售部门
+    FROM ZJRD..COPTC TC WITH(NOLOCK)
+    INNER JOIN ZJRD..COPTD TD WITH(NOLOCK)
+        ON TD.TD001 = TC.TC001
+       AND TD.TD002 = TC.TC002
+    INNER JOIN ZJRD..MOCTA TA WITH(NOLOCK)
+        ON TA.TA026 = TD.TD001
+       AND TA.TA027 = TD.TD002
+       AND TA.TA028 = TD.TD003
+    LEFT JOIN ZJRD..CMSMD MD WITH(NOLOCK)
+        ON MD.MD001 = TA.TA021
+    LEFT JOIN ZJRD..CMSME DIVME WITH(NOLOCK)
+        ON DIVME.ME001 = MD.MD015
+    LEFT JOIN ZJRD..COPMA CMA WITH(NOLOCK)
+        ON CMA.MA001 = TC.TC004
+    LEFT JOIN ZJRD..CMSME SALEME WITH(NOLOCK)
+        ON SALEME.ME001 = TC.TC005
+    WHERE TD.TD021 = 'Y'
+      AND ISNULL(LTRIM(RTRIM(TA.TA006)), '') <> ''
+      AND ISNULL(LTRIM(RTRIM(TA.TA001)), '') <> ''
+      AND ISNULL(LTRIM(RTRIM(TA.TA002)), '') <> ''
+      AND EXISTS
+      (
+          SELECT 1
+          FROM #ISSUE_NET I
+          WHERE I.账套 = 'ZJRD'
+            AND I.工单单别 = LTRIM(RTRIM(TA.TA001)) COLLATE DATABASE_DEFAULT
+            AND I.工单单号 = LTRIM(RTRIM(TA.TA002)) COLLATE DATABASE_DEFAULT
+      )
+
+    UNION ALL
+
+    SELECT
+        'AHRD' AS 账套,
+        LTRIM(RTRIM(TD.TD001)) COLLATE DATABASE_DEFAULT AS 订单单别,
+        LTRIM(RTRIM(TD.TD002)) COLLATE DATABASE_DEFAULT AS 订单单号,
+        LTRIM(RTRIM(TD.TD003)) COLLATE DATABASE_DEFAULT AS 订单序号,
+        LTRIM(RTRIM(TA.TA001)) COLLATE DATABASE_DEFAULT AS 工单单别,
+        LTRIM(RTRIM(TA.TA002)) COLLATE DATABASE_DEFAULT AS 工单单号,
+        LTRIM(RTRIM(TA.TA006)) COLLATE DATABASE_DEFAULT AS 产品品号,
+        ISNULL(NULLIF(LTRIM(RTRIM(SUBSTRING(DIVME.ME002, 1, 4))), ''), '未取到') COLLATE DATABASE_DEFAULT AS 事业部,
+        ISNULL(NULLIF(LTRIM(RTRIM(CMA.MA002)), ''), '未取到') COLLATE DATABASE_DEFAULT AS 客户简称,
+        ISNULL(NULLIF(LTRIM(RTRIM(SALEME.ME002)), ''), '未取到') COLLATE DATABASE_DEFAULT AS 销售部门
+    FROM AHRD..COPTC TC WITH(NOLOCK)
+    INNER JOIN AHRD..COPTD TD WITH(NOLOCK)
+        ON TD.TD001 = TC.TC001
+       AND TD.TD002 = TC.TC002
+    INNER JOIN AHRD..MOCTA TA WITH(NOLOCK)
+        ON TA.TA026 = TD.TD001
+       AND TA.TA027 = TD.TD002
+       AND TA.TA028 = TD.TD003
+    LEFT JOIN AHRD..CMSMD MD WITH(NOLOCK)
+        ON MD.MD001 = TA.TA021
+    LEFT JOIN AHRD..CMSME DIVME WITH(NOLOCK)
+        ON DIVME.ME001 = MD.MD015
+    LEFT JOIN AHRD..COPMA CMA WITH(NOLOCK)
+        ON CMA.MA001 = TC.TC004
+    LEFT JOIN AHRD..CMSME SALEME WITH(NOLOCK)
+        ON SALEME.ME001 = TC.TC005
+    WHERE TD.TD021 = 'Y'
+      AND ISNULL(LTRIM(RTRIM(TA.TA006)), '') <> ''
+      AND ISNULL(LTRIM(RTRIM(TA.TA001)), '') <> ''
+      AND ISNULL(LTRIM(RTRIM(TA.TA002)), '') <> ''
+      AND EXISTS
+      (
+          SELECT 1
+          FROM #ISSUE_NET I
+          WHERE I.账套 = 'AHRD'
+            AND I.工单单别 = LTRIM(RTRIM(TA.TA001)) COLLATE DATABASE_DEFAULT
+            AND I.工单单号 = LTRIM(RTRIM(TA.TA002)) COLLATE DATABASE_DEFAULT
+      )
+
+    UNION ALL
+
+    SELECT
+        'YNRD' AS 账套,
+        LTRIM(RTRIM(TD.TD001)) COLLATE DATABASE_DEFAULT AS 订单单别,
+        LTRIM(RTRIM(TD.TD002)) COLLATE DATABASE_DEFAULT AS 订单单号,
+        LTRIM(RTRIM(TD.TD003)) COLLATE DATABASE_DEFAULT AS 订单序号,
+        LTRIM(RTRIM(TA.TA001)) COLLATE DATABASE_DEFAULT AS 工单单别,
+        LTRIM(RTRIM(TA.TA002)) COLLATE DATABASE_DEFAULT AS 工单单号,
+        LTRIM(RTRIM(TA.TA006)) COLLATE DATABASE_DEFAULT AS 产品品号,
+        ISNULL(NULLIF(LTRIM(RTRIM(SUBSTRING(DIVME.ME002, 1, 4))), ''), '未取到') COLLATE DATABASE_DEFAULT AS 事业部,
+        ISNULL(NULLIF(LTRIM(RTRIM(CMA.MA002)), ''), '未取到') COLLATE DATABASE_DEFAULT AS 客户简称,
+        ISNULL(NULLIF(LTRIM(RTRIM(SALEME.ME002)), ''), '未取到') COLLATE DATABASE_DEFAULT AS 销售部门
+    FROM YNRD..COPTC TC WITH(NOLOCK)
+    INNER JOIN YNRD..COPTD TD WITH(NOLOCK)
+        ON TD.TD001 = TC.TC001
+       AND TD.TD002 = TC.TC002
+    INNER JOIN YNRD..MOCTA TA WITH(NOLOCK)
+        ON TA.TA026 = TD.TD001
+       AND TA.TA027 = TD.TD002
+       AND TA.TA028 = TD.TD003
+    LEFT JOIN YNRD..CMSMD MD WITH(NOLOCK)
+        ON MD.MD001 = TA.TA021
+    LEFT JOIN YNRD..CMSME DIVME WITH(NOLOCK)
+        ON DIVME.ME001 = MD.MD015
+    LEFT JOIN YNRD..COPMA CMA WITH(NOLOCK)
+        ON CMA.MA001 = TC.TC004
+    LEFT JOIN YNRD..CMSME SALEME WITH(NOLOCK)
+        ON SALEME.ME001 = TC.TC005
+    WHERE TD.TD021 = 'Y'
+      AND ISNULL(LTRIM(RTRIM(TA.TA006)), '') <> ''
+      AND ISNULL(LTRIM(RTRIM(TA.TA001)), '') <> ''
+      AND ISNULL(LTRIM(RTRIM(TA.TA002)), '') <> ''
+      AND EXISTS
+      (
+          SELECT 1
+          FROM #ISSUE_NET I
+          WHERE I.账套 = 'YNRD'
+            AND I.工单单别 = LTRIM(RTRIM(TA.TA001)) COLLATE DATABASE_DEFAULT
+            AND I.工单单号 = LTRIM(RTRIM(TA.TA002)) COLLATE DATABASE_DEFAULT
+      )
+) X;
+
+CREATE INDEX IX_A_工单
+ON #A(账套, 工单单别, 工单单号);
+
+CREATE INDEX IX_A_产品
+ON #A(账套, 产品品号);
+
+------------------------------------------------------------
+-- 6. 按材料 + 产品 + 事业部 + 账套 + 客户 + 销售部门 汇总领用数量
+------------------------------------------------------------
+SELECT
+    A.账套,
+    I.材料品号,
+    A.产品品号,
+    A.事业部,
+    A.客户简称,
+    A.销售部门,
+    SUM(I.实际领用数量) AS 领用数量
+INTO #RESULT
+FROM #A A
+INNER JOIN #ISSUE_NET I
+    ON I.账套 = A.账套
+   AND I.工单单别 = A.工单单别
+   AND I.工单单号 = A.工单单号
+GROUP BY
+    A.账套,
+    I.材料品号,
+    A.产品品号,
+    A.事业部,
+    A.客户简称,
+    A.销售部门
+HAVING SUM(I.实际领用数量) <> 0;
+
+CREATE CLUSTERED INDEX IX_RESULT_KEY
+ON #RESULT(材料品号, 产品品号, 事业部, 账套);
+
+CREATE INDEX IX_RESULT_BOM
+ON #RESULT(账套, 产品品号, 材料品号);
+
+------------------------------------------------------------
+-- 7. BOM 组成用量
+--    BOMMD 固定取 SDRD，四地 BOM 一致，不再跨账套 UNION
+--    直接取工单生产品号 -> 材料品号的 BOMMD 单位用量
+--    规则：MD006 / MD007；若主件 4 开头，则 MD013 必须为 Y
+------------------------------------------------------------
+SELECT DISTINCT
+    账套,
+    产品品号,
+    材料品号
+INTO #NEED_BOM
+FROM #RESULT
+WHERE ISNULL(产品品号, '') <> ''
+  AND ISNULL(材料品号, '') <> '';
+
+CREATE UNIQUE CLUSTERED INDEX IX_NEED_BOM_KEY
+ON #NEED_BOM(账套, 产品品号, 材料品号);
+
+SELECT
+    N.账套,
+    N.产品品号,
+    N.材料品号,
+    SUM(
+        CAST(ISNULL(M.MD006, 0) AS DECIMAL(38,12))
+        / CAST(ISNULL(NULLIF(M.MD007, 0), 1) AS DECIMAL(38,12))
+    ) AS 组成用量
+INTO #BOM
+FROM #NEED_BOM N
+INNER JOIN SDRD..BOMMD M WITH(NOLOCK)
+    ON M.MD001 COLLATE DATABASE_DEFAULT = N.产品品号
+   AND M.MD003 COLLATE DATABASE_DEFAULT = N.材料品号
+WHERE ((M.MD001 LIKE '4%' AND M.MD013 = 'Y') OR M.MD001 NOT LIKE '4%')
+GROUP BY
+    N.账套,
+    N.产品品号,
+    N.材料品号;
+
+CREATE UNIQUE CLUSTERED INDEX IX_BOM_KEY
+ON #BOM(账套, 产品品号, 材料品号);
+
+------------------------------------------------------------
+-- 8. 只提取结果需要的物料资料
+------------------------------------------------------------
+SELECT DISTINCT
+    R.账套,
+    R.材料品号 AS ITEMNO
+INTO #NEED_ITEM
+FROM #RESULT R
+WHERE ISNULL(R.材料品号, '') <> ''
+
+UNION
+
+SELECT DISTINCT
+    R.账套,
+    R.产品品号 AS ITEMNO
+FROM #RESULT R
+WHERE ISNULL(R.产品品号, '') <> '';
+
+CREATE UNIQUE CLUSTERED INDEX IX_NEED_ITEM_KEY
+ON #NEED_ITEM(账套, ITEMNO);
+
+------------------------------------------------------------
+-- 9. 物料资料
+--    INVMB 固定取 SDRD，四地品号资料一致，不再跨账套 UNION
+------------------------------------------------------------
+SELECT
+    N.账套,
+    N.ITEMNO,
+    MAX(M.MB002) AS MB002,
+    MAX(M.MB003) AS MB003
+INTO #INVMB
+FROM #NEED_ITEM N
+INNER JOIN SDRD..INVMB M WITH(NOLOCK)
+    ON M.MB001 COLLATE DATABASE_DEFAULT = N.ITEMNO
+GROUP BY
+    N.账套,
+    N.ITEMNO;
+
+CREATE UNIQUE CLUSTERED INDEX IX_INVMB_KEY
+ON #INVMB(账套, ITEMNO);
+
+------------------------------------------------------------
+-- 10. 最终输出
+------------------------------------------------------------
+SELECT
+    R.材料品号,
+    MATL.MB002 AS 材料品名,
+    MATL.MB003 AS 材料规格,
+
+    R.产品品号,
+    PROD.MB002 AS 产品品名,
+    PROD.MB003 AS 产品规格,
+
+    ISNULL(B.组成用量, 0) AS 组成用量,
+    R.领用数量,
+    R.事业部,
+    R.账套,
+    R.客户简称,
+    R.销售部门
+FROM #RESULT R
+LEFT JOIN #INVMB MATL
+    ON MATL.账套 = R.账套
+   AND MATL.ITEMNO = R.材料品号
+LEFT JOIN #INVMB PROD
+    ON PROD.账套 = R.账套
+   AND PROD.ITEMNO = R.产品品号
+LEFT JOIN #BOM B
+    ON B.账套 = R.账套
+   AND B.产品品号 = R.产品品号
+   AND B.材料品号 = R.材料品号
+ORDER BY
+    R.材料品号,
+    R.产品品号,
+    R.事业部,
+    R.账套,
+    R.客户简称,
+    R.销售部门;

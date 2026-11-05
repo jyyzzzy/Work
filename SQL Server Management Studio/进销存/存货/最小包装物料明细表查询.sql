@@ -1,17 +1,17 @@
 SELECT 
-MB001 AS Æ·ºÅ, 
-MB002 AS Æ·Ãû, 
-MB003 AS ¹æ¸ñ, 
-MB004 AS ¿â´æµ¥Î», 
-MB038 AS ÅúÁ¿, 
-MB039 AS ×îµÍ²¹Á¿, 
-MB040 AS ²¹»õ±¶Á¿, 
-MB041 AS ÁìÓÃ±¶Á¿, 
-MB096 AS ¹¤Ê±µ×Êý
+MB001 AS å“å·, 
+MB002 AS å“å, 
+MB003 AS è§„æ ¼, 
+MB004 AS åº“å­˜å•ä½, 
+MB038 AS æ‰¹é‡, 
+MB039 AS æœ€ä½Žè¡¥é‡, 
+MB040 AS è¡¥è´§å€é‡, 
+MB041 AS é¢†ç”¨å€é‡, 
+MB096 AS å·¥æ—¶åº•æ•°
 FROM (
-	--SELECT * FROM SDRD..INVMB WHERE SUBSTRING(MB001,1,1) IN('3','5','6','7') AND MB109 = 'Y'
+	SELECT * FROM SDRD..INVMB WHERE SUBSTRING(MB001,1,1) IN('3','5','6','7') AND MB109 = 'Y'
 	--UNION ALL
-	SELECT * FROM AHRD..INVMB WHERE SUBSTRING(MB001,1,1) IN('3','5','6','7') AND MB109 = 'Y'
+	--SELECT * FROM AHRD..INVMB WHERE SUBSTRING(MB001,1,1) IN('3','5','6','7') AND MB109 = 'Y'
 	--UNION ALL
 	--SELECT * FROM ZJRD..INVMB WHERE SUBSTRING(MB001,1,1) IN('3','5','6','7') AND MB109 = 'Y'
 	--UNION ALL

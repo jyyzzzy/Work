@@ -87,7 +87,7 @@ AND( COPTD.TD011 <> AA.单价 --单价
 OR COPTD.TD012 <> AA.改后金额 --金额
 OR COPTD.TD038 <> AA.改后税前金额 --税前金额
 OR COPTD.TD039 <> AA.改后税额 --税额
-)
+);
 
 
 UPDATE dbo.COPTC 
@@ -112,7 +112,7 @@ AND dbo.COPTC.TC002=TD002
 AND (
 	TC029 <> TD029 OR
 	TC030 <> TD030
-)
+);
 
 
 

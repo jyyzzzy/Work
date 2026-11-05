@@ -1,0 +1,404 @@
+﻿/*
+按材料查询产品、单位用量、最近生产事业部和客户。
+BOMMD、INVMB统一取SDRD；采购进货数量取四地Pur_Sup_Detail。
+4开头替代群组中，MD013='Y'为正式料，其余为替代料。
+*/
+
+USE SDRD;
+SET NOCOUNT ON;
+
+IF OBJECT_ID('tempdb..#ITEM') IS NOT NULL DROP TABLE #ITEM;
+IF OBJECT_ID('tempdb..#ALT') IS NOT NULL DROP TABLE #ALT;
+IF OBJECT_ID('tempdb..#BOM') IS NOT NULL DROP TABLE #BOM;
+IF OBJECT_ID('tempdb..#PRODUCT') IS NOT NULL DROP TABLE #PRODUCT;
+IF OBJECT_ID('tempdb..#PURCHASE') IS NOT NULL DROP TABLE #PURCHASE;
+IF OBJECT_ID('tempdb..#RECEIPT') IS NOT NULL DROP TABLE #RECEIPT;
+IF OBJECT_ID('tempdb..#LATEST') IS NOT NULL DROP TABLE #LATEST;
+
+------------------------------------------------------------
+-- 1. 查询材料
+------------------------------------------------------------
+SELECT DISTINCT
+    LTRIM(RTRIM(ITEMNO)) COLLATE DATABASE_DEFAULT AS 材料品号
+INTO #ITEM
+FROM LSSJ..ITEMTMP
+WHERE ISNULL(LTRIM(RTRIM(ITEMNO)), '') <> '';
+
+------------------------------------------------------------
+-- 2. 正式料对应的替代料
+------------------------------------------------------------
+;WITH ALT_BASE AS
+(
+    SELECT DISTINCT
+        LTRIM(RTRIM(F.MD003)) COLLATE DATABASE_DEFAULT AS 正式材料品号,
+        LTRIM(RTRIM(A.MD003)) COLLATE DATABASE_DEFAULT AS 替代品号
+    FROM SDRD..BOMMD AS F
+    INNER JOIN SDRD..BOMMD AS A
+        ON A.MD001 = F.MD001
+       AND ISNULL(A.MD013, '') <> 'Y'
+    INNER JOIN #ITEM AS T
+        ON T.材料品号 = LTRIM(RTRIM(F.MD003)) COLLATE DATABASE_DEFAULT
+    WHERE F.MD001 LIKE '4%'
+      AND ISNULL(F.MD013, '') = 'Y'
+      AND ISNULL(LTRIM(RTRIM(F.MD003)), '') <> ''
+      AND ISNULL(LTRIM(RTRIM(A.MD003)), '') <> ''
+      AND LTRIM(RTRIM(A.MD003)) <> LTRIM(RTRIM(F.MD003))
+),
+ALT_NO AS
+(
+    SELECT
+        正式材料品号,
+        替代品号,
+        ROW_NUMBER() OVER
+        (
+            PARTITION BY 正式材料品号
+            ORDER BY 替代品号
+        ) AS 替代序号
+    FROM ALT_BASE
+)
+SELECT
+    A.正式材料品号,
+    A.替代序号,
+    A.替代品号,
+    LTRIM(RTRIM(I.MB002)) AS 替代品名,
+    LTRIM(RTRIM(I.MB003)) AS 替代规格
+INTO #ALT
+FROM ALT_NO AS A
+LEFT JOIN SDRD..INVMB AS I
+    ON I.MB001 = A.替代品号;
+
+------------------------------------------------------------
+-- 3. 从材料向上递归BOM
+--    4开头替代群组只按MD013='Y'的正式料展开
+------------------------------------------------------------
+;WITH BOM_TREE AS
+(
+    SELECT
+        T.材料品号,
+        LTRIM(RTRIM(M.MD001)) COLLATE DATABASE_DEFAULT AS 产品品号,
+        CAST(
+            CAST(ISNULL(M.MD006, 0) AS DECIMAL(38,12)) /
+            NULLIF(CAST(ISNULL(M.MD007, 0) AS DECIMAL(38,12)), 0)
+            AS DECIMAL(38,12)
+        ) AS 单位用量,
+        CAST(
+            '|' + T.材料品号 + '|' + LTRIM(RTRIM(M.MD001)) + '|'
+            AS NVARCHAR(MAX)
+        ) AS 品号路径
+    FROM #ITEM AS T
+    INNER JOIN SDRD..BOMMD AS M
+        ON LTRIM(RTRIM(M.MD003)) COLLATE DATABASE_DEFAULT = T.材料品号
+    WHERE ISNULL(M.MD007, 0) <> 0
+      AND (M.MD001 NOT LIKE '4%' OR ISNULL(M.MD013, '') = 'Y')
+
+    UNION ALL
+
+    SELECT
+        B.材料品号,
+        LTRIM(RTRIM(M.MD001)) COLLATE DATABASE_DEFAULT,
+        CAST(
+            B.单位用量 *
+            CAST(ISNULL(M.MD006, 0) AS DECIMAL(38,12)) /
+            NULLIF(CAST(ISNULL(M.MD007, 0) AS DECIMAL(38,12)), 0)
+            AS DECIMAL(38,12)
+        ),
+        CAST(
+            B.品号路径 + LTRIM(RTRIM(M.MD001)) + '|'
+            AS NVARCHAR(MAX)
+        )
+    FROM BOM_TREE AS B
+    INNER JOIN SDRD..BOMMD AS M
+        ON LTRIM(RTRIM(M.MD003)) COLLATE DATABASE_DEFAULT = B.产品品号
+    WHERE ISNULL(M.MD007, 0) <> 0
+      AND (M.MD001 NOT LIKE '4%' OR ISNULL(M.MD013, '') = 'Y')
+      AND CHARINDEX(
+            '|' + LTRIM(RTRIM(M.MD001)) + '|',
+            B.品号路径
+          ) = 0
+)
+SELECT
+    材料品号,
+    产品品号,
+    CAST(SUM(单位用量) AS DECIMAL(38,12)) AS 单位用量
+INTO #BOM
+FROM BOM_TREE
+GROUP BY 材料品号, 产品品号
+OPTION (MAXRECURSION 100);
+
+SELECT DISTINCT 产品品号
+INTO #PRODUCT
+FROM #BOM;
+
+------------------------------------------------------------
+-- 4. 四地采购进货数量
+--    Pur_Sup_Detail中的退货数量为负数，会自动冲减
+------------------------------------------------------------
+SELECT
+    X.帐套,
+    X.材料品号,
+    CAST(SUM(CASE WHEN X.日期 >= '20250101' AND X.日期 < '20260101'
+                  THEN X.数量 ELSE 0 END) AS DECIMAL(38,8)) AS [2025年采购进货总数量],
+    CAST(SUM(CASE WHEN X.日期 >= '20260101' AND X.日期 < '20270101'
+                  THEN X.数量 ELSE 0 END) AS DECIMAL(38,8)) AS [2026年采购进货总数量]
+INTO #PURCHASE
+FROM
+(
+    SELECT 'SDRD' AS 帐套,
+           LTRIM(RTRIM(D.TH004C)) COLLATE DATABASE_DEFAULT AS 材料品号,
+           D.TH014C AS 日期,
+           CAST(ISNULL(D.TH016C, 0) AS DECIMAL(38,8)) AS 数量
+    FROM SDRD..Pur_Sup_Detail AS D
+    INNER JOIN #ITEM AS T
+        ON T.材料品号 = LTRIM(RTRIM(D.TH004C)) COLLATE DATABASE_DEFAULT
+    WHERE D.TH014C >= '20250101' AND D.TH014C < '20270101'
+
+    UNION ALL
+
+    SELECT 'ZJRD', LTRIM(RTRIM(D.TH004C)) COLLATE DATABASE_DEFAULT,
+           D.TH014C, CAST(ISNULL(D.TH016C, 0) AS DECIMAL(38,8))
+    FROM ZJRD..Pur_Sup_Detail AS D
+    INNER JOIN #ITEM AS T
+        ON T.材料品号 = LTRIM(RTRIM(D.TH004C)) COLLATE DATABASE_DEFAULT
+    WHERE D.TH014C >= '20250101' AND D.TH014C < '20270101'
+
+    UNION ALL
+
+    SELECT 'AHRD', LTRIM(RTRIM(D.TH004C)) COLLATE DATABASE_DEFAULT,
+           D.TH014C, CAST(ISNULL(D.TH016C, 0) AS DECIMAL(38,8))
+    FROM AHRD..Pur_Sup_Detail AS D
+    INNER JOIN #ITEM AS T
+        ON T.材料品号 = LTRIM(RTRIM(D.TH004C)) COLLATE DATABASE_DEFAULT
+    WHERE D.TH014C >= '20250101' AND D.TH014C < '20270101'
+
+    UNION ALL
+
+    SELECT 'YNRD', LTRIM(RTRIM(D.TH004C)) COLLATE DATABASE_DEFAULT,
+           D.TH014C, CAST(ISNULL(D.TH016C, 0) AS DECIMAL(38,8))
+    FROM YNRD..Pur_Sup_Detail AS D
+    INNER JOIN #ITEM AS T
+        ON T.材料品号 = LTRIM(RTRIM(D.TH004C)) COLLATE DATABASE_DEFAULT
+    WHERE D.TH014C >= '20250101' AND D.TH014C < '20270101'
+) AS X
+GROUP BY X.帐套, X.材料品号;
+
+------------------------------------------------------------
+-- 5. 四地生产入库单
+------------------------------------------------------------
+SELECT *
+INTO #RECEIPT
+FROM
+(
+    SELECT
+        1 AS 帐套顺序,
+        'SDRD' AS 帐套,
+        LTRIM(RTRIM(G.TG004)) COLLATE DATABASE_DEFAULT AS 产品品号,
+        F.TF003 AS 入库日期,
+        G.TG001 AS 入库单别,
+        G.TG002 AS 入库单号,
+        G.TG003 AS 入库序号,
+        CASE
+            WHEN CHARINDEX('-', ISNULL(MD.MD011, '')) > 0
+                THEN LTRIM(RTRIM(LEFT(MD.MD011, CHARINDEX('-', MD.MD011) - 1)))
+            WHEN ISNULL(LTRIM(RTRIM(MD.MD011)), '') <> ''
+                THEN LTRIM(RTRIM(MD.MD011))
+            ELSE '顺德瑞德'
+        END COLLATE DATABASE_DEFAULT AS 事业部,
+        ISNULL(COALESCE(NULLIF(LTRIM(RTRIM(MA.MA002)), ''),
+                        NULLIF(LTRIM(RTRIM(MA.MA003)), '')), '')
+            COLLATE DATABASE_DEFAULT AS 客户
+    FROM SDRD..MOCTG AS G
+    INNER JOIN SDRD..MOCTF AS F
+        ON F.TF001 = G.TG001 AND F.TF002 = G.TG002
+    INNER JOIN #PRODUCT AS P
+        ON P.产品品号 = LTRIM(RTRIM(G.TG004)) COLLATE DATABASE_DEFAULT
+    LEFT JOIN SDRD..CMSMD AS MD
+        ON MD.MD001 = F.TF011
+    LEFT JOIN SDRD..MOCTA AS TA
+        ON TA.TA001 = G.TG014 AND TA.TA002 = G.TG015
+    LEFT JOIN SDRD..COPTD AS TD
+        ON TD.TD001 = TA.TA026
+       AND TD.TD002 = TA.TA027
+       AND TD.TD003 = ISNULL(NULLIF(LTRIM(RTRIM(TA.TA028)), ''), '0001')
+    LEFT JOIN SDRD..COPTC AS TC
+        ON TC.TC001 = ISNULL(TD.TD001, TA.TA026)
+       AND TC.TC002 = ISNULL(TD.TD002, TA.TA027)
+    LEFT JOIN SDRD..COPMA AS MA
+        ON MA.MA001 = TC.TC004
+
+    UNION ALL
+
+    SELECT
+        2, 'ZJRD',
+        LTRIM(RTRIM(G.TG004)) COLLATE DATABASE_DEFAULT,
+        F.TF003, G.TG001, G.TG002, G.TG003,
+        '浙江瑞德' COLLATE DATABASE_DEFAULT,
+        ISNULL(COALESCE(NULLIF(LTRIM(RTRIM(MA.MA002)), ''),
+                        NULLIF(LTRIM(RTRIM(MA.MA003)), '')), '')
+            COLLATE DATABASE_DEFAULT
+    FROM ZJRD..MOCTG AS G
+    INNER JOIN ZJRD..MOCTF AS F
+        ON F.TF001 = G.TG001 AND F.TF002 = G.TG002
+    INNER JOIN #PRODUCT AS P
+        ON P.产品品号 = LTRIM(RTRIM(G.TG004)) COLLATE DATABASE_DEFAULT
+    LEFT JOIN ZJRD..MOCTA AS TA
+        ON TA.TA001 = G.TG014 AND TA.TA002 = G.TG015
+    LEFT JOIN ZJRD..COPTD AS TD
+        ON TD.TD001 = TA.TA026
+       AND TD.TD002 = TA.TA027
+       AND TD.TD003 = ISNULL(NULLIF(LTRIM(RTRIM(TA.TA028)), ''), '0001')
+    LEFT JOIN ZJRD..COPTC AS TC
+        ON TC.TC001 = ISNULL(TD.TD001, TA.TA026)
+       AND TC.TC002 = ISNULL(TD.TD002, TA.TA027)
+    LEFT JOIN ZJRD..COPMA AS MA
+        ON MA.MA001 = TC.TC004
+
+    UNION ALL
+
+    SELECT
+        3, 'AHRD',
+        LTRIM(RTRIM(G.TG004)) COLLATE DATABASE_DEFAULT,
+        F.TF003, G.TG001, G.TG002, G.TG003,
+        CASE
+            WHEN CHARINDEX('-', ISNULL(MD.MD011, '')) > 0
+                THEN LTRIM(RTRIM(LEFT(MD.MD011, CHARINDEX('-', MD.MD011) - 1)))
+            WHEN ISNULL(LTRIM(RTRIM(MD.MD011)), '') <> ''
+                THEN LTRIM(RTRIM(MD.MD011))
+            ELSE '安徽瑞德'
+        END COLLATE DATABASE_DEFAULT,
+        ISNULL(COALESCE(NULLIF(LTRIM(RTRIM(MA.MA002)), ''),
+                        NULLIF(LTRIM(RTRIM(MA.MA003)), '')), '')
+            COLLATE DATABASE_DEFAULT
+    FROM AHRD..MOCTG AS G
+    INNER JOIN AHRD..MOCTF AS F
+        ON F.TF001 = G.TG001 AND F.TF002 = G.TG002
+    INNER JOIN #PRODUCT AS P
+        ON P.产品品号 = LTRIM(RTRIM(G.TG004)) COLLATE DATABASE_DEFAULT
+    LEFT JOIN AHRD..CMSMD AS MD
+        ON MD.MD001 = F.TF011
+    LEFT JOIN AHRD..MOCTA AS TA
+        ON TA.TA001 = G.TG014 AND TA.TA002 = G.TG015
+    LEFT JOIN AHRD..COPTD AS TD
+        ON TD.TD001 = TA.TA026
+       AND TD.TD002 = TA.TA027
+       AND TD.TD003 = ISNULL(NULLIF(LTRIM(RTRIM(TA.TA028)), ''), '0001')
+    LEFT JOIN AHRD..COPTC AS TC
+        ON TC.TC001 = ISNULL(TD.TD001, TA.TA026)
+       AND TC.TC002 = ISNULL(TD.TD002, TA.TA027)
+    LEFT JOIN AHRD..COPMA AS MA
+        ON MA.MA001 = TC.TC004
+
+    UNION ALL
+
+    SELECT
+        4, 'YNRD',
+        LTRIM(RTRIM(G.TG004)) COLLATE DATABASE_DEFAULT,
+        F.TF003, G.TG001, G.TG002, G.TG003,
+        '越南瑞德' COLLATE DATABASE_DEFAULT,
+        ISNULL(COALESCE(NULLIF(LTRIM(RTRIM(MA.MA002)), ''),
+                        NULLIF(LTRIM(RTRIM(MA.MA003)), '')), '')
+            COLLATE DATABASE_DEFAULT
+    FROM YNRD..MOCTG AS G
+    INNER JOIN YNRD..MOCTF AS F
+        ON F.TF001 = G.TG001 AND F.TF002 = G.TG002
+    INNER JOIN #PRODUCT AS P
+        ON P.产品品号 = LTRIM(RTRIM(G.TG004)) COLLATE DATABASE_DEFAULT
+    LEFT JOIN YNRD..MOCTA AS TA
+        ON TA.TA001 = G.TG014 AND TA.TA002 = G.TG015
+    LEFT JOIN YNRD..COPTD AS TD
+        ON TD.TD001 = TA.TA026
+       AND TD.TD002 = TA.TA027
+       AND TD.TD003 = ISNULL(NULLIF(LTRIM(RTRIM(TA.TA028)), ''), '0001')
+    LEFT JOIN YNRD..COPTC AS TC
+        ON TC.TC001 = ISNULL(TD.TD001, TA.TA026)
+       AND TC.TC002 = ISNULL(TD.TD002, TA.TA027)
+    LEFT JOIN YNRD..COPMA AS MA
+        ON MA.MA001 = TC.TC004
+) AS R;
+
+SELECT *
+INTO #LATEST
+FROM
+(
+    SELECT
+        R.*,
+        ROW_NUMBER() OVER
+        (
+            PARTITION BY R.产品品号
+            ORDER BY R.入库日期 DESC,
+                     R.入库单别 DESC,
+                     R.入库单号 DESC,
+                     R.入库序号 DESC,
+                     R.帐套顺序
+        ) AS RN
+    FROM #RECEIPT AS R
+) AS X
+WHERE X.RN = 1;
+
+------------------------------------------------------------
+-- 6. 替代料动态横向展开
+------------------------------------------------------------
+DECLARE @ALT_COLUMNS NVARCHAR(MAX) = '';
+DECLARE @SQL NVARCHAR(MAX);
+
+SELECT @ALT_COLUMNS =
+(
+    SELECT
+        ', MAX(CASE WHEN A.替代序号 = ' + CONVERT(VARCHAR(10), N.替代序号) +
+        ' THEN A.替代品号 END) AS ' + QUOTENAME('替代品号' + CONVERT(VARCHAR(10), N.替代序号)) +
+        ', MAX(CASE WHEN A.替代序号 = ' + CONVERT(VARCHAR(10), N.替代序号) +
+        ' THEN A.替代品名 END) AS ' + QUOTENAME('替代品名' + CONVERT(VARCHAR(10), N.替代序号)) +
+        ', MAX(CASE WHEN A.替代序号 = ' + CONVERT(VARCHAR(10), N.替代序号) +
+        ' THEN A.替代规格 END) AS ' + QUOTENAME('替代规格' + CONVERT(VARCHAR(10), N.替代序号))
+    FROM (SELECT DISTINCT 替代序号 FROM #ALT) AS N
+    ORDER BY N.替代序号
+    FOR XML PATH(''), TYPE
+).value('.', 'NVARCHAR(MAX)');
+
+SET @ALT_COLUMNS = ISNULL(@ALT_COLUMNS, '');
+
+SET @SQL = N'
+SELECT
+    B.材料品号,
+    MI.MB002 AS 材料品名,
+    MI.MB003 AS 材料规格,
+    MI.MB004 AS 材料单位' + @ALT_COLUMNS + N',
+    B.产品品号,
+    PI.MB002 AS 产品品名,
+    PI.MB003 AS 产品规格,
+    PI.MB004 AS 产品单位,
+    B.单位用量,
+    ISNULL(P.[2025年采购进货总数量], 0) AS [2025年采购进货总数量],
+    ISNULL(P.[2026年采购进货总数量], 0) AS [2026年采购进货总数量],
+    L.事业部,
+    L.客户,
+    L.帐套
+FROM #BOM AS B
+INNER JOIN #LATEST AS L
+    ON L.产品品号 = B.产品品号
+LEFT JOIN #PURCHASE AS P
+    ON P.帐套 = L.帐套
+   AND P.材料品号 = B.材料品号
+LEFT JOIN SDRD..INVMB AS MI
+    ON MI.MB001 = B.材料品号
+LEFT JOIN SDRD..INVMB AS PI
+    ON PI.MB001 = B.产品品号
+LEFT JOIN #ALT AS A
+    ON A.正式材料品号 = B.材料品号
+GROUP BY
+    B.材料品号,
+    MI.MB002,
+    MI.MB003,
+    MI.MB004,
+    B.产品品号,
+    PI.MB002,
+    PI.MB003,
+    PI.MB004,
+    B.单位用量,
+    P.[2025年采购进货总数量],
+    P.[2026年采购进货总数量],
+    L.事业部,
+    L.客户,
+    L.帐套
+ORDER BY B.材料品号, B.产品品号;';
+
+EXEC sys.sp_executesql @SQL;

@@ -91,7 +91,7 @@ FROM
     LEFT JOIN SDRD..COPMA MA
         ON MA.MA001 = TC.TC004
     WHERE LEFT(E.TE001, 2) IN ('54', '56')
-      AND C.TC003 >= '20250101'
+      AND C.TC003 >= '20260101'
       AND C.TC003 <  '20270101'
       AND ISNULL(LTRIM(RTRIM(TA.TA006)), '') <> ''
 
@@ -152,7 +152,7 @@ FROM
     LEFT JOIN ZJRD..COPMA MA
         ON MA.MA001 = TC.TC004
     WHERE LEFT(E.TE001, 2) IN ('54', '56')
-      AND C.TC003 >= '20250101'
+      AND C.TC003 >= '20260101'
       AND C.TC003 <  '20270101'
       AND ISNULL(LTRIM(RTRIM(TA.TA006)), '') <> ''
 
@@ -213,7 +213,7 @@ FROM
     LEFT JOIN AHRD..COPMA MA
         ON MA.MA001 = TC.TC004
     WHERE LEFT(E.TE001, 2) IN ('54', '56')
-      AND C.TC003 >= '20250101'
+      AND C.TC003 >= '20260101'
       AND C.TC003 <  '20270101'
       AND ISNULL(LTRIM(RTRIM(TA.TA006)), '') <> ''
 
@@ -274,7 +274,7 @@ FROM
     LEFT JOIN YNRD..COPMA MA
         ON MA.MA001 = TC.TC004
     WHERE LEFT(E.TE001, 2) IN ('54', '56')
-      AND C.TC003 >= '20250101'
+      AND C.TC003 >= '20260101'
       AND C.TC003 <  '20270101'
       AND ISNULL(LTRIM(RTRIM(TA.TA006)), '') <> ''
 ) X;
@@ -283,7 +283,7 @@ CREATE INDEX IX_ISSUE_BASE_1
 ON #ISSUE_BASE(MATL, PROD, 事业部, 客户编号, 领退料日期);
 
 ------------------------------------------------------------
--- 3. 按 材料 + 产品 + 事业部 + 客户 汇总 2025 / 2026 领用量
+-- 3. 按 材料 + 产品 + 事业部 + 客户 汇总 2026 / 2027 领用量
 ------------------------------------------------------------
 SELECT
     MATL,
@@ -293,16 +293,16 @@ SELECT
     MAX(ISNULL(客户名称, '')) AS 客户名称,
 
     SUM(CASE
-            WHEN 领退料日期 >= '20250101' AND 领退料日期 < '20260101'
-            THEN ISNULL(领用量, 0)
-            ELSE 0
-        END) AS [2025年领用量],
-
-    SUM(CASE
             WHEN 领退料日期 >= '20260101' AND 领退料日期 < '20270101'
             THEN ISNULL(领用量, 0)
             ELSE 0
-        END) AS [2026年领用量]
+        END) AS [2026年领用量],
+
+    SUM(CASE
+            WHEN 领退料日期 >= '20270101' AND 领退料日期 < '20270101'
+            THEN ISNULL(领用量, 0)
+            ELSE 0
+        END) AS [2027年领用量]
 INTO #ISSUE_AGG
 FROM #ISSUE_BASE
 GROUP BY
@@ -312,12 +312,12 @@ GROUP BY
     ISNULL(客户编号, '')
 HAVING
     SUM(CASE
-            WHEN 领退料日期 >= '20250101' AND 领退料日期 < '20260101'
+            WHEN 领退料日期 >= '20260101' AND 领退料日期 < '20270101'
             THEN ISNULL(领用量, 0)
             ELSE 0
         END)
   + SUM(CASE
-            WHEN 领退料日期 >= '20260101' AND 领退料日期 < '20270101'
+            WHEN 领退料日期 >= '20270101' AND 领退料日期 < '20270101'
             THEN ISNULL(领用量, 0)
             ELSE 0
         END) <> 0;
@@ -360,8 +360,8 @@ SELECT
     IA.客户编号,
     IA.客户名称,
 
-    IA.[2025年领用量],
-    IA.[2026年领用量]
+    IA.[2026年领用量],
+    IA.[2027年领用量]
 FROM #ISSUE_AGG IA
 LEFT JOIN #INVMB MATL
     ON MATL.ITEMNO = IA.MATL

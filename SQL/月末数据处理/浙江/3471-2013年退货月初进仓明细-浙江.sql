@@ -3,15 +3,27 @@ SELECT * FROM LSSJ..LSCGTH ORDER BY 单号,序号
 --delete FROM LSSJ..LSCGTH WHERE ISNULL(单号,'')=''
 
 
-select MAX(TG002) FROM ZJRD..PURTG  where TG001='3471' and left(TG003,6)='202607'
+select MAX(TG002) FROM ZJRD..PURTG  where TG001='3471' and left(TG003,6)='202610'
 
 --UPDATE LSSJ..LSCGTH SET 序号 = RIGHT(序号,4)
-UPDATE LSSJ..LSCGTH SET 单号 = replace(单号,'202606','202607')
+UPDATE LSSJ..LSCGTH SET 单号 = replace(单号,'202609','202610')
 SELECT 供应商,MA002 from LSSJ..LSCGTH INNER JOIN ZJRD..PURMA ON 供应商=MA001
 
 SELECT * FROM LSSJ..LSCGTH order by 单号,序号
 	
- 
+ declare @No int--单号编号
+declare @FormNo varchar(11)--单号前缀
+
+set @FormNo='202610'--次月月份
+select @No=right(rtrim(isnull(MAX(TG002),'00000')),5) FROM AHRD..PURTG  where TG001='3471' and left(TG002,6)=@FormNo
+select @No
+ update B set 单号=xindan ,序号=xinxu
+ -- select xindan ,xinxu 
+ from (SELECT 单号 dan,序号 xu,@FormNo + right(cast((100000+@No+DENSE_RANK() OVER(ORDER BY 供应商 asc,币种,汇率 )) as varchar(6)),5) xindan,10000+ROW_NUMBER() over(partition by  供应商,币种,汇率  order by 品号) xinxu,品号 ph,供应商 gys,币种 bz,汇率 hl,数量 sl,单价 dj
+from  LSSJ..LSCGTH) AS A join LSSJ..LSCGTH B on A.dan=B.单号  and 品号= ph and 供应商= gys and 币种= bz and 汇率 =hl and 数量=sl AND 单价=dj--AND ISNULL(A.xu,'')=ISNULL(B.序号,'')
+
+
+
 
 
 
@@ -56,8 +68,8 @@ TG054 , TG056 , TG057 , TG058 , UDF01 , UDF02 , UDF03 , UDF04 , UDF05 , UDF06 , 
 SELECT
 '0001','10105978','90001',FORMAT(GETDATE(), 'yyyyMMddHHmmssfff')
 ,'','',1,
-'3471',单号,'20260701','000201',供应商,'','RMB',1,'S','1',
-'',0,'N','20260701','N','采购月末退货月初进仓',SUM(单价*数量),0,SUM(单价*数量)-SUM(单价*数量)/1.13,0,
+'3471',单号,'20261001','000201',供应商,'','RMB',1,'S','1',
+'',0,'N','20261001','N','采购月末退货月初进仓',SUM(单价*数量),0,SUM(单价*数量)-SUM(单价*数量)/1.13,0,
 PURMA.MA003,'','1','N',0,SUM(数量),'',SUM(单价*数量)/1.13,'',0.13,
 SUM(单价*数量)/1.13,SUM(单价*数量)-SUM(单价*数量)/1.13,PURMA.MA055,'','','','',0,0,0,
 0,'N','','',0,'','','','N',SUM(数量),
@@ -82,7 +94,7 @@ SELECT
 '0001','10105978','90001',FORMAT(GETDATE(), 'yyyyMMddHHmmssfff')
 ,'','',1,
 '3471',单号,序号,品号,INVMB.MB002,INVMB.MB003,数量,INVMB.MB004,仓库,'********************',
-'','','','20260701',数量,数量,0,单价,单价*数量,0,
+'','','','20261001',数量,数量,0,单价,单价*数量,0,
 '','','',0,'','N','N','2','N','N',
 'N','N','',数量,'','','','','','',
 '','','N','N',单价*数量/1.13,单价*数量-单价*数量/1.13,单价*数量/1.13,单价*数量-单价*数量/1.13,0,0,
@@ -93,13 +105,13 @@ FROM LSSJ..LSCGTH INNER JOIN ZJRD..PURMA ON 供应商 = PURMA.MA001
 INNER JOIN ZJRD..INVMB ON 品号 = INVMB.MB001 where 单价 is not null--where 单号>='20121200021'
 
 
-SELECT * FROM   ZJRD..PURTG WITH(NOLOCK)WHERE TG001='3471' AND TG002 LIKE '202407%' and CREATE_DATE='20260701113934473'
+SELECT * FROM   ZJRD..PURTG WITH(NOLOCK)WHERE TG001='3471' AND TG002 LIKE '202407%' and CREATE_DATE='20261001113934473'
 
 
---DELETE FROM ZJRD..PURTH WHERE  TH001='3471' AND  CREATE_DATE='20260701113934473'
---DELETE  FROM ZJRD..PURTG WHERE  TG001='3471' AND  CREATE_DATE='20260701113934473'
+--DELETE FROM ZJRD..PURTH WHERE  TH001='3471' AND  CREATE_DATE='20261001113934473'
+--DELETE  FROM ZJRD..PURTG WHERE  TG001='3471' AND  CREATE_DATE='20261001113934473'
 
-SELECT * FROM   ZJRD..PURTH WITH(NOLOCK)WHERE TH001='3471' AND TH002 LIKE '202407%' and CREATE_DATE='20260701113934473'
+SELECT * FROM   ZJRD..PURTH WITH(NOLOCK)WHERE TH001='3471' AND TH002 LIKE '202407%' and CREATE_DATE='20261001113934473'
 AND TH030 <> 'Y'
 
 select * from LSSJ..LSCGTH where 单号='20250200013'
@@ -109,7 +121,7 @@ SELECT * FROM   ZJRD..PURTG WHERE TG002='20250200013'
 declare @No int--单号编号
 declare @FormNo varchar(11)--单号前缀
 
-set @FormNo='202607'--次月月份
+set @FormNo='202610'--次月月份
 select @No=right(rtrim(isnull(MAX(TG002),'00000')),5) FROM ZJRD..PURTG  where TG001='3471' and left(TG002,6)=@FormNo
 
 

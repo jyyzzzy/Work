@@ -4,7 +4,7 @@ SELECT * FROM LSSJ..TmpItemTransfer
 DELETE FROM LSSJ..TmpItemTransfer
 
 INSERT INTO LSSJ..TmpItemTransfer(ItemCode,FromWarehouse,ToWarehouse,TransferQty) VALUES('315009527400','052','R',6000);
---="INSERT INTO LSSJ..TmpItemTransfer(ItemCode,FromWarehouse,ToWarehouse,TransferQty) VALUES('"&&"','"&&"','"&&"',"&&");"
+--="INSERT INTO LSSJ..TmpItemTransfer(ItemCode,FromWarehouse,ToWarehouse,TransferQty,Remark) VALUES('"&&"','"&&"','"&&"',"&&",'"&&"');"
 INSERT INTO [dbo].[INVTB]
            ([COMPANY]
            ,[CREATOR]
@@ -63,15 +63,15 @@ INSERT INTO [dbo].[INVTB]
            ,[UDF55]
            ,[UDF56])
 SELECT
-      '0001' AS [COMPANY]                 -- char(10)
-    , '10105978' AS [CREATOR]             -- char(10)
-    , '90001' AS [USR_GROUP]             -- char(10)
+      '0011' AS [COMPANY]                 -- char(10)
+    , '50068033' AS [CREATOR]             -- char(10)
+    , '06001' AS [USR_GROUP]             -- char(10)
     , FORMAT(GETDATE(), 'yyyyMMddHHmmssfff') AS [CREATE_DATE]  -- char(17)
     , '' AS [MODIFIER]                    -- char(10)
     , '' AS [MODI_DATE]                   -- char(17)
     , 1  AS [FLAG]                        -- numeric(3,0)
-    , '1201' AS [TB001]                   -- char(4)
-    , '20260701001' AS [TB002]            -- char(11)
+    , '1271' AS [TB001]                   -- char(4)
+    , '20261100003' AS [TB002]            -- char(11)
     , RIGHT('0000' + CAST(
           ROW_NUMBER() OVER (
               ORDER BY IT.ItemCode, IT.FromWarehouse, IT.ToWarehouse
@@ -90,9 +90,9 @@ SELECT
     , '********************' AS [TB014]                       -- char(20)
     , '' AS [TB015]                       -- char(8)
     , '' AS [TB016]                       -- char(8)
-    , '' AS [TB017]                       -- varchar(255)
+    , IT.Remark AS [TB017]                       -- varchar(255)
     , 'N' AS [TB018]                       -- char(1)
-    , '20260701' AS [TB019]                       -- char(8)
+    , '20261107' AS [TB019]                       -- char(8)
     , MB072 AS [TB020]                       -- char(4)
     , '' AS [TB021]                       -- char(20)
     , 0  AS [TB022]                       -- numeric(15,6)
@@ -129,7 +129,7 @@ LEFT OUTER JOIN INVMC ON MC001 = IT.ItemCode AND MC002 = IT.FromWarehouse
 ;
 
 GO
---SELECT * FROM INVTB WHERE TB001 = '1201' AND TB002 = '20260701001'
+--SELECT * FROM INVTB WHERE TB001 = '1271' AND TB002 = '20261100003'
 
 
 
@@ -185,16 +185,16 @@ INSERT INTO [dbo].[INVTA]
            ,[UDF55]
            ,[UDF56])
 SELECT
-      '0001'                       AS [COMPANY]      -- char(10)
-    , '10105978'                       AS [CREATOR]      -- char(10)
-    , '90001'                     AS [USR_GROUP]    -- char(10)
+      '0011'                       AS [COMPANY]      -- char(10)
+    , '50068033'                       AS [CREATOR]      -- char(10)
+    , '06001'                     AS [USR_GROUP]    -- char(10)
     , FORMAT(GETDATE(),'yyyyMMddHHmmssfff') AS [CREATE_DATE]  -- char(17)
     , ''                              AS [MODIFIER]     -- char(10)
     , ''                              AS [MODI_DATE]    -- char(17)
     , 1                               AS [FLAG]         -- numeric(3,0)
     , B.TB001                         AS [TA001]        -- char(4)  调拨单别
     , B.TB002                         AS [TA002]        -- char(11) 调拨单号
-    , '20260701'  AS [TA003]        -- char(8)  单据日期
+    , '20261107'  AS [TA003]        -- char(8)  单据日期
     , '120800'                              AS [TA004]        -- char(6)
     , ''                              AS [TA005]        -- varchar(255)
     , 'N'                              AS [TA006]        -- char(1)
@@ -205,7 +205,7 @@ SELECT
     , B.TB007                               AS [TA011]        -- numeric(15,6)
     , B.TB011                               AS [TA012]        -- numeric(15,2)
     , 'N'                              AS [TA013]        -- char(1)
-    , '20260701'                              AS [TA014]        -- char(8)
+    , '20261107'                              AS [TA014]        -- char(8)
     , ''                              AS [TA015]        -- char(10)
     , TB022                               AS [TA016]        -- numeric(15,6)
     , 'N'                              AS [TA017]        -- char(1)
@@ -239,23 +239,55 @@ FROM (
     -- 一张单据头对应多行明细时，用 DISTINCT/分组保证每个单号只插一条头
     SELECT COMPANY, CREATOR, USR_GROUP, TB001, TB002,SUM(TB007) AS TB007,SUM(TB011) AS TB011,SUM(TB022) AS TB022
     FROM   dbo.INVTB
-    WHERE TB001 = '1201' AND TB002 = '20260701001'
+    WHERE TB001 = '1271' AND TB002 = '20261100003'
     GROUP BY COMPANY, CREATOR, USR_GROUP, TB001, TB002
 ) AS B;
 
+--查询本月空单号
+WITH N AS
+(
+    SELECT CAST(TA002 AS BIGINT) AS 单号
+    FROM INVTA
+    WHERE TA001 = '1271' AND TA002 LIKE '202611%'
+
+    UNION
+
+    SELECT CAST(TB002 AS BIGINT)
+    FROM INVTB
+    WHERE TB001 = '1271' AND TB002 LIKE '202611%'
+)
+SELECT MIN(单号) AS 单号
+FROM
+(
+    SELECT CAST(20261100001 AS BIGINT) AS 单号
+    UNION ALL
+    SELECT 单号 + 1 FROM N
+) A
+WHERE 单号 <= 20261199999
+  AND NOT EXISTS
+  (
+      SELECT 1 FROM N WHERE N.单号 = A.单号
+  );
+
 UPDATE INVTB SET TB017 = '呆滞转安徽暂存'
-WHERE TB001 = '1201' AND TB002 = '20260701001'
+WHERE TB001 = '1271' AND TB002 = '20261100003'
 
 UPDATE INVTB SET TA008 = '000301'
-WHERE TB001 = '1201' AND TB002 = '20260701001'
+WHERE TB001 = '1271' AND TB002 = '20261100003'
 
 
 SELECT TB003,TB004,[TB007],MB064 FROM INVTB 
 INNER JOIN INVMB ON MB001 = INVTB.TB004
-WHERE TB001 = '1201' AND TB002 = '20260701001'
+WHERE TB001 = '1271' AND TB002 = '20261100003'
 AND TB007>MB064
 
-DELETE FROM INVTA
-WHERE TA001 = '1201' AND TA002 = '20260701001'
+UPDATE INVTA SET TA017 = 'N'
+WHERE TA001 = '1201' AND TA002 = '20261100005'
 
-DELETE FROM INVTB WHERE TB001 = '1201' AND TB002 = '20260701001'
+DELETE FROM INVTB 
+WHERE TB001 = '1271'
+AND TB002 = '20261100046' 
+AND (
+    TB012 NOT IN ('001','005','052','101','301','605')
+    OR TB013 NOT IN ('001','005','052','101','301','605')
+)

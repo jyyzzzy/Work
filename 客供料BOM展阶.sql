@@ -85,9 +85,11 @@ FROM
        AND TG002 = TH002
     JOIN SDRD..COPMA
         ON TG004 = MA001
-    WHERE TG003 >= '20250701'
-      AND TG003 <= '20251231'
-      AND LEFT(TH004, 1) IN ('A', '1')
+    WHERE 
+    --TG003 >= '20250701'
+    --  AND TG003 <= '20251231'
+    --  AND 
+      LEFT(TH004, 1) IN ('A', '1')
       AND TG023 = 'Y'
 
     UNION ALL
@@ -107,9 +109,11 @@ FROM
        AND TG002 = TH002
     JOIN AHRD..COPMA
         ON TG004 = MA001
-    WHERE TG003 >= '20250701'
-      AND TG003 <= '20251231'
-      AND LEFT(TH004, 1) IN ('A', '1')
+    WHERE 
+    --TG003 >= '20250701'
+    --  AND TG003 <= '20251231'
+    --  AND 
+      LEFT(TH004, 1) IN ('A', '1')
       AND TG023 = 'Y'
 
     UNION ALL
@@ -129,9 +133,11 @@ FROM
        AND TG002 = TH002
     JOIN ZJRD..COPMA
         ON TG004 = MA001
-    WHERE TG003 >= '20250701'
-      AND TG003 <= '20251231'
-      AND LEFT(TH004, 1) IN ('A', '1')
+    WHERE 
+    --TG003 >= '20250701'
+    --  AND TG003 <= '20251231'
+    --  AND 
+      LEFT(TH004, 1) IN ('A', '1')
       AND TG023 = 'Y'
 ) AS COPINV
 WHERE MA002 LIKE '%纯米%'

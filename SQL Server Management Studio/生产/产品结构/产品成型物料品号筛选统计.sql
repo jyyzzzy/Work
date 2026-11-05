@@ -1,21 +1,21 @@
 SELECT  
-    --TA.TA001 AS ¹¤µ¥µ¥±ð,
-    --TA.TA002 AS ¹¤µ¥µ¥ºÅ,
-    CME.ME002 AS ²¿ÃÅÃû³Æ,
-    TA.TA006 AS ²úÆ·Æ·ºÅ,
-    MBA.MB002 AS ²úÆ·Æ·Ãû,
-    MBA.MB003 AS ²úÆ·¹æ¸ñ,
-    TB.TB003 AS ²ÄÁÏÆ·ºÅ,
-    BMD.MD009 AS ²ÄÁÏ¹¤ÒÕ,
-    TB.TB012 AS ²ÄÁÏÆ·Ãû,
-    TB.TB013 AS ²ÄÁÏ¹æ¸ñ,
-    SUM(TB.TB005) AS ×ÜÁìÓÃÁ¿,
-    BMD.MD006 AS ×é³ÉÓÃÁ¿
+    --TA.TA001 AS å·¥å•å•åˆ«,
+    --TA.TA002 AS å·¥å•å•å·,
+    CME.ME002 AS éƒ¨é—¨åç§°,
+    TA.TA006 AS äº§å“å“å·,
+    MBA.MB002 AS äº§å“å“å,
+    MBA.MB003 AS äº§å“è§„æ ¼,
+    TB.TB003 AS ææ–™å“å·,
+    BMD.MD009 AS ææ–™å·¥è‰º,
+    TB.TB012 AS ææ–™å“å,
+    TB.TB013 AS ææ–™è§„æ ¼,
+    SUM(TB.TB005) AS æ€»é¢†ç”¨é‡,
+    BMD.MD006 AS ç»„æˆç”¨é‡
 FROM MOCTB AS TB
-INNER JOIN INVMB AS MBB ON TB.TB003 = MBB.MB001 --Æ¥ÅäBOMÆ·ºÅ
-INNER JOIN MOCTA AS TA ON TB.TB001 = TA.TA001 --Æ¥Åä¹¤µ¥
+INNER JOIN INVMB AS MBB ON TB.TB003 = MBB.MB001 --åŒ¹é…BOMå“å·
+INNER JOIN MOCTA AS TA ON TB.TB001 = TA.TA001 --åŒ¹é…å·¥å•
     AND TB.TB002 = TA.TA002 
-    AND TA.TA013 = 'Y' --ÒÑÉóºË
+    AND TA.TA013 = 'Y' --å·²å®¡æ ¸
     AND TA.TA003 BETWEEN '20240901' AND '20250831' --
 INNER JOIN INVMB AS MBA ON MBA.MB001 = TA.TA006
 INNER JOIN BOMMD AS BMD ON BMD.MD001 = TA.TA006 AND BMD.MD003 = TB.TB003
@@ -24,31 +24,31 @@ LEFT JOIN CMSME AS CME ON CME.ME001 = CMD.MD015
 
 WHERE 
     ((
-        CHARINDEX('É¢ÈÈÆ¬', MBB.MB002) > 0
-        OR CHARINDEX('ÕûÁ÷ÇÅ', MBB.MB002) > 0
-        OR CHARINDEX('¿É¿Ø¹è', MBB.MB002) > 0
-        OR CHARINDEX('Èý¼«¹Ü', MBB.MB002) > 0
-        OR CHARINDEX('±£ÏÕË¿', MBB.MB002) > 0
-        OR CHARINDEX('³¡Ð§Ó¦¹Ü', MBB.MB002) > 0
-        OR CHARINDEX('Ð¤ÌØ»ù¶þ¼«¹Ü', MBB.MB002) > 0
-        OR CHARINDEX('·¢¹â¶þ¼«¹Ü', MBB.MB002) > 0
-        OR CHARINDEX('°²¹æµçÈÝ', MBB.MB002) > 0
-        OR CHARINDEX('µç½âµçÈÝ', MBB.MB002) > 0
-        OR CHARINDEX('ÏßÈÆµç×è', MBB.MB002) > 0
-        OR CHARINDEX('½ðÄ¤µç×è', MBB.MB002) > 0
-        OR CHARINDEX('ÈÈÃôµç×è', MBB.MB002) > 0
-        OR CHARINDEX('Ñ¹Ãôµç×è', MBB.MB002) > 0
-        OR CHARINDEX('¹¤×Öµç¸Ð', MBB.MB002) > 0
-        OR CHARINDEX('É«Âëµç¸Ð', MBB.MB002) > 0
-        OR CHARINDEX('ÌøÏß', MBB.MB002) > 0
-        OR CHARINDEX('½ðÊôÄ¤µçÈÝ', MBB.MB002) > 0
+        CHARINDEX('æ•£çƒ­ç‰‡', MBB.MB002) > 0
+        OR CHARINDEX('æ•´æµæ¡¥', MBB.MB002) > 0
+        OR CHARINDEX('å¯æŽ§ç¡…', MBB.MB002) > 0
+        OR CHARINDEX('ä¸‰æžç®¡', MBB.MB002) > 0
+        OR CHARINDEX('ä¿é™©ä¸', MBB.MB002) > 0
+        OR CHARINDEX('åœºæ•ˆåº”ç®¡', MBB.MB002) > 0
+        OR CHARINDEX('è‚–ç‰¹åŸºäºŒæžç®¡', MBB.MB002) > 0
+        OR CHARINDEX('å‘å…‰äºŒæžç®¡', MBB.MB002) > 0
+        OR CHARINDEX('å®‰è§„ç”µå®¹', MBB.MB002) > 0
+        OR CHARINDEX('ç”µè§£ç”µå®¹', MBB.MB002) > 0
+        OR CHARINDEX('çº¿ç»•ç”µé˜»', MBB.MB002) > 0
+        OR CHARINDEX('é‡‘è†œç”µé˜»', MBB.MB002) > 0
+        OR CHARINDEX('çƒ­æ•ç”µé˜»', MBB.MB002) > 0
+        OR CHARINDEX('åŽ‹æ•ç”µé˜»', MBB.MB002) > 0
+        OR CHARINDEX('å·¥å­—ç”µæ„Ÿ', MBB.MB002) > 0
+        OR CHARINDEX('è‰²ç ç”µæ„Ÿ', MBB.MB002) > 0
+        OR CHARINDEX('è·³çº¿', MBB.MB002) > 0
+        OR CHARINDEX('é‡‘å±žè†œç”µå®¹', MBB.MB002) > 0
         OR CHARINDEX('IGBT', MBB.MB002) > 0
-        OR CHARINDEX('½ÓÊÕÍ·', MBB.MB002) > 0
-         OR CHARINDEX('É¢ÈÈÆ÷', MBB.MB002) > 0
+        OR CHARINDEX('æŽ¥æ”¶å¤´', MBB.MB002) > 0
+         OR CHARINDEX('æ•£çƒ­å™¨', MBB.MB002) > 0
     ) OR (
-        CHARINDEX('±à´ø', MBB.MB003) > 0
-        OR CHARINDEX('½Å³¤', MBB.MB003) > 0
-        OR CHARINDEX('ÈÈËõÌ×¹Ü', MBB.MB003) > 0
+        CHARINDEX('ç¼–å¸¦', MBB.MB003) > 0
+        OR CHARINDEX('è„šé•¿', MBB.MB003) > 0
+        OR CHARINDEX('çƒ­ç¼©å¥—ç®¡', MBB.MB003) > 0
     )) AND TB.TB005 > 0
 GROUP BY CME.ME002,TA.TA006,MBA.MB002,MBA.MB003,TB.TB003,TB.TB012,TB.TB013,BMD.MD009,BMD.MD006
 ORDER BY TA.TA006 ASC,TB.TB003 ASC
